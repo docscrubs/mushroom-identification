@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import type { Observation, IdentificationResult } from '@/types';
 import { assembleResult } from '@/engine/result-assembler';
@@ -77,6 +77,8 @@ const CONFIDENCE_COLORS: Record<string, string> = {
 export function IdentifyPage() {
   const [observation, setObservation] = useState<Observation>({});
   const [result, setResult] = useState<IdentificationResult | null>(null);
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   function updateObs(field: keyof Observation, raw: string) {
     setObservation((prev) => {
@@ -102,6 +104,8 @@ export function IdentifyPage() {
   function handleReset() {
     setObservation({});
     setResult(null);
+    setPhotoFile(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
   }
 
   return (
@@ -120,6 +124,26 @@ export function IdentifyPage() {
       {/* Observation form */}
       <div className="rounded-lg bg-white border border-stone-200 p-4 space-y-4">
         <h2 className="font-semibold text-stone-700">Observations</h2>
+
+        <Field label="Photo (optional)">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            capture="environment"
+            className="w-full text-sm text-stone-700 file:mr-3 file:rounded-lg file:border-0 file:bg-green-700 file:px-3 file:py-2 file:text-sm file:text-white"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) {
+                setPhotoFile(file);
+                updateObs('photo_available', 'true');
+              }
+            }}
+          />
+          {photoFile && (
+            <p className="text-xs text-green-700 mt-1">Photo attached: {photoFile.name}</p>
+          )}
+        </Field>
 
         <Field label="What's under the cap?">
           <Select
