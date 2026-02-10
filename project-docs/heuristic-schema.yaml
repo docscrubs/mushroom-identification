@@ -1,0 +1,148 @@
+# Foraging Heuristic Schema
+# Binary or near-binary rules that simplify identification/edibility decisions
+
+heuristic_id: russula_taste_test
+name: Russula Taste Test
+category: edibility_determination
+
+applies_to:
+  genus: Russula
+  confidence_required: high  # Must be confident it's a Russula first
+  
+prerequisites:
+  - "Can reliably identify Russula genus (brittle flesh test)"
+  - "Has NOT confused with Lactarius (no milk exuding)"
+  - "Has NOT confused with Amanita (no volva, no ring)"
+
+procedure: |
+  1. Break off a small piece of the cap flesh (NOT the gills)
+  2. Touch it briefly to your tongue, or chew a tiny piece
+  3. Spit it out immediately
+  4. Wait 30 seconds and note the sensation
+
+outcomes:
+  - condition: "Mild, nutty, pleasant, or no strong taste"
+    conclusion: EDIBLE
+    confidence: high
+    action: "Safe to eat. Quality varies by species - some are choice, some are bland."
+    
+  - condition: "Peppery, hot, burning, or acrid"
+    conclusion: REJECT
+    confidence: high
+    action: "Do not eat. Will cause gastric upset. Discard or leave."
+    
+  - condition: "Uncertain - slight tingle but not definitely peppery"
+    conclusion: CAUTION
+    confidence: medium
+    action: "Treat as peppery and reject. Re-test with fresh specimen if available."
+
+safety_notes:
+  - "This test ONLY works for confirmed Russula specimens"
+  - "Do not swallow the test piece"
+  - "The peppery sensation may take 10-30 seconds to develop fully"
+  - "Fresh specimens give clearer results than old/waterlogged ones"
+
+exceptions:
+  - species: olivacea
+    note: "Can taste mild but causes GI upset in some people - avoid"
+  - species: cyanoxantha
+    note: "Flexible gills (unusual) - still use taste test as confirmation"
+
+source: "Traditional foraging knowledge, documented in Phillips, Wright, Buczacki"
+reliability: proven
+
+---
+heuristic_id: bolete_blue_staining_caution
+name: Bolete Blue Staining Check
+category: safety_screening
+
+applies_to:
+  family: Boletaceae
+  confidence_required: medium
+
+procedure: |
+  1. Cut the mushroom in half vertically
+  2. Watch the cut flesh for 30 seconds
+  3. Note any color change
+
+outcomes:
+  - condition: "No color change, or slight browning"
+    conclusion: PROCEED_WITH_CAUTION
+    action: "Continue to species identification"
+    
+  - condition: "Rapid blue staining"
+    conclusion: INVESTIGATE_FURTHER
+    action: "Check for red pores. If red pores AND blue staining, likely toxic Rubroboletus."
+    
+  - condition: "Blue staining AND red pores"
+    conclusion: REJECT
+    confidence: high
+    action: "Likely Satan's Bolete or similar. Do not eat."
+
+safety_notes:
+  - "Many excellent edibles stain blue (Bay Bolete, various Leccinum)"
+  - "Blue staining alone is NOT a reason to reject"
+  - "Blue staining PLUS red pores is the danger combination"
+
+---
+heuristic_id: lactarius_milk_color
+name: Lactarius Milk Color Test
+category: edibility_determination
+
+applies_to:
+  genus: Lactarius
+  confidence_required: high
+
+procedure: |
+  1. Break or cut the gills
+  2. Observe the color of the milk that exudes
+  3. Wait 5 minutes and observe any color change in the milk
+
+outcomes:
+  - condition: "Orange or carrot-colored milk, no color change"
+    conclusion: EDIBLE
+    confidence: high
+    action: "Likely Saffron Milkcap (L. deliciosus) or similar. Choice edible."
+    
+  - condition: "White milk, stays white"
+    conclusion: CAUTION
+    confidence: medium
+    action: "Species-dependent. Many are peppery/inedible. Avoid unless specifically identified."
+    
+  - condition: "White milk that turns yellow"
+    conclusion: LIKELY_TOXIC
+    confidence: high
+    action: "Avoid. Several toxic species show this reaction."
+
+---
+heuristic_id: avoid_lbms
+name: Avoid Little Brown Mushrooms (LBMs)
+category: safety_rule
+
+applies_to:
+  morphology:
+    cap_color: brown
+    cap_size: small (under 5cm)
+    gill_type: present
+    
+procedure: |
+  If you find a small brown gilled mushroom and you're not an expert:
+  Leave it alone.
+
+outcomes:
+  - condition: "Any small brown gilled mushroom"
+    conclusion: AVOID
+    confidence: high
+    action: "Do not attempt identification unless expert level. Contains many deadly lookalikes."
+
+rationale: |
+  The "LBM" group contains hundreds of species including:
+  - Deadly Galerina (Galerina marginata) - contains same toxins as Death Cap
+  - Deadly Conocybe species
+  - Various Inocybe (many toxic)
+  
+  Even experts struggle to distinguish these without microscopy.
+  The risk/reward ratio is terrible - no LBMs are choice edibles.
+
+source: "Universal foraging wisdom"
+reliability: proven

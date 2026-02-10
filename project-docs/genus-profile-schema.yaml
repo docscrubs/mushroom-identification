@@ -1,0 +1,81 @@
+# Genus Profile Schema
+# Use this template to build out the mycological knowledge base
+
+genus: Russula
+common_names: 
+  - Brittlegills
+
+confidence_markers:
+  high:
+    - Brittle flesh that snaps cleanly (like chalk)
+    - No ring or volva
+    - Attached gills, often brittle
+    - Cap often brightly colored (red, green, yellow, purple, white)
+  moderate:
+    - White to cream spore print (most species)
+    - Mycorrhizal with trees
+  
+ecological_context:
+  habitat: 
+    - woodland
+    - forest edges
+    - parkland with trees
+  substrate: soil near trees (never on wood)
+  associations: 
+    - oak
+    - birch
+    - beech
+    - pine
+    - spruce
+  season:
+    UK: 
+      - July
+      - August
+      - September
+      - October
+      - November
+
+uk_occurrence: very common
+
+lookalike_genera:
+  - genus: Lactarius
+    distinction: "Lactarius exudes milk when flesh is cut or gills damaged; Russula does not"
+    danger_level: low
+  - genus: Amanita
+    distinction: "Amanita has volva at base, often has ring, flesh is NOT brittle but fibrous"
+    danger_level: critical
+
+key_species_uk:
+  edible:
+    - species: cyanoxantha
+      common_name: Charcoal Burner
+      notes: "One of the best - mild taste, flexible gills (unusual for Russula)"
+    - species: virescens
+      common_name: Greencracked Brittlegill
+      notes: "Choice edible, distinctive cracked cap surface"
+    - species: vesca
+      common_name: Bare-toothed Brittlegill
+      notes: "Good edible, gills don't reach cap edge"
+  
+  toxic_or_inedible:
+    - species: emetica
+      common_name: The Sickener
+      notes: "Bright red cap, pure white gills, very peppery - causes vomiting"
+    - species: foetens
+      common_name: Stinking Brittlegill
+      notes: "Smells of bitter almonds/marzipan, acrid taste"
+
+foraging_heuristics:
+  - heuristic_id: russula_taste_test
+    description: "The taste test for Russula edibility"
+    
+notes: |
+  Russula is an excellent genus for beginners because:
+  1. Easy to recognize at genus level (brittle flesh test)
+  2. No deadly toxic species in UK
+  3. Simple taste test separates edible from inedible
+  4. Very common - lots of practice opportunities
+  
+  Progression: Learn genus recognition → Master taste test → 
+  Learn choice species (cyanoxantha, virescens) → 
+  Learn to distinguish from Lactarius

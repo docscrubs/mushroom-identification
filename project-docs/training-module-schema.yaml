@@ -1,0 +1,241 @@
+# Training Module Schema
+# Structure for progressive learning content
+
+training_module:
+  id: agaricus_amanita_discrimination
+  name: "Distinguishing Field Mushrooms from Death Caps"
+  category: critical_safety
+  
+  description: |
+    The most important safety discrimination for anyone wanting to forage
+    white field mushrooms (Agaricus species). Death Cap and Destroying Angel
+    have killed more people than any other mushrooms in Europe.
+  
+  prerequisites:
+    - basic_mushroom_anatomy
+    - understands_volva_concept
+    
+  learning_objectives:
+    - Reliably identify presence/absence of volva
+    - Distinguish Agaricus gill color progression from Amanita
+    - Know the smell differences (anise vs. none/unpleasant)
+    - Understand why this matters (toxicity level)
+    - Correctly reject any ambiguous white gilled mushroom
+    
+  estimated_time: "30-45 minutes theory, multiple field sessions"
+  
+  content:
+    - type: explanation
+      id: why_this_matters
+      content: |
+        The Death Cap (Amanita phalloides) and Destroying Angel (Amanita virosa)
+        are responsible for more than 90% of mushroom fatalities worldwide.
+        
+        They're particularly dangerous because:
+        - They look superficially like edible Agaricus (field mushrooms)
+        - They taste pleasant - no warning bitter/peppery taste
+        - Symptoms are delayed 6-12 hours, after toxins have been absorbed
+        - By the time you feel ill, liver damage has begun
+        - There is no antidote - survival depends on aggressive medical intervention
+        
+        The good news: With proper training, they're easy to distinguish.
+        
+    - type: visual_comparison
+      id: base_comparison
+      images: 
+        - path: images/agaricus_base_clean.jpg
+          label: "Agaricus campestris base - clean, no volva"
+        - path: images/amanita_base_volva.jpg
+          label: "Amanita phalloides base - volva visible"
+      key_points:
+        - "Amanita emerges from an egg-like universal veil"
+        - "The volva remains as a cup or bag at the base"
+        - "Agaricus has NO volva - base is clean or slightly bulbous"
+        - "ALWAYS dig up the base to check - volva can be buried"
+        
+    - type: visual_comparison
+      id: gill_comparison
+      images:
+        - path: images/agaricus_gills_pink.jpg
+          label: "Agaricus - pink gills (young)"
+        - path: images/agaricus_gills_brown.jpg
+          label: "Agaricus - chocolate brown gills (mature)"
+        - path: images/amanita_gills_white.jpg
+          label: "Amanita - pure white gills (always)"
+      key_points:
+        - "Agaricus gills start pink, mature to chocolate brown"
+        - "Amanita gills stay pure white throughout development"
+        - "White gills on a white mushroom = extreme caution"
+        
+    - type: explanation
+      id: smell_differences
+      content: |
+        Smell is a useful secondary check:
+        
+        **Agaricus** - Often has a pleasant anise (aniseed) smell, 
+        especially A. arvensis (Horse Mushroom). Some smell more "mushroomy."
+        
+        **Amanita phalloides** - Faint, slightly sweet honey smell when young.
+        Older specimens may smell unpleasant/sickly.
+        
+        **Amanita virosa** - Often described as smelling of radishes.
+        
+        Note: Smell is SECONDARY. Never rely on smell alone.
+        
+    - type: interactive_quiz
+      id: quiz_visual
+      format: image_comparison
+      questions:
+        - image: quiz/specimen_a.jpg
+          question: "Does this specimen show a volva?"
+          correct_answer: "Yes"
+          explanation: "The cup-like structure at the base is a volva."
+        - image: quiz/specimen_b.jpg
+          question: "What color are these gills?"
+          correct_answer: "Pink"
+          explanation: "Pink gills indicate a young Agaricus - but still check the base!"
+          
+    - type: decision_tree
+      id: white_mushroom_protocol
+      content: |
+        FOUND A WHITE GILLED MUSHROOM?
+        
+        1. STOP. Do not assume it's a field mushroom.
+        
+        2. DIG UP THE BASE CAREFULLY
+           → Volva present (cup/bag at base)? → DO NOT EAT. Possible Amanita.
+           → Base clean, no volva? → Continue to step 3.
+           
+        3. CHECK GILL COLOR
+           → Pure white gills? → DO NOT EAT without expert confirmation.
+           → Pink or brown gills? → Continue to step 4.
+           
+        4. CHECK LOCATION
+           → Under/near trees? → Higher Amanita risk. Extra caution.
+           → Open grassland, no trees nearby? → Lower risk, continue.
+           
+        5. SMELL TEST
+           → Pleasant anise smell? → Supports Agaricus.
+           → No smell or slightly unpleasant? → Caution.
+           
+        6. STILL UNCERTAIN?
+           → Leave it. There will be other mushrooms.
+        
+    - type: field_exercise
+      id: field_practice
+      instruction: |
+        Over your next 3-5 foraging sessions:
+        
+        1. Find ANY white-gilled mushroom (don't need to eat it)
+        2. Practice the full protocol:
+           - Dig up base, photograph it
+           - Check gills, photograph them
+           - Note location (near trees? grassland?)
+           - Note smell
+        3. Report back with your observations
+        
+        We'll review your findings together. This builds real-world
+        pattern recognition that no amount of reading can replace.
+        
+        DO NOT eat any of these practice specimens until we've
+        confirmed your discrimination is solid.
+
+  assessment:
+    required_for_completion:
+      - quiz_visual: score >= 80%
+      - field_exercise: completed with review
+      
+    required_for_unlock:
+      - type: field_demonstration
+        description: "Correctly identify presence/absence of volva on 3 specimens"
+      - type: correct_rejection
+        description: "Correctly reject at least 1 Amanita or ambiguous specimen"
+      - type: no_false_positives
+        description: "Zero instances of misidentifying Amanita as safe"
+        
+    unlocks:
+      - white_mushroom_foraging
+      - agaricus_species_discrimination
+
+---
+# Module Template for New Content
+
+module_template:
+  id: "unique_id_lowercase_underscores"
+  name: "Human Readable Name"
+  category: "safety | genus | species | technique | ecology"
+  
+  description: |
+    Brief description of what this module teaches and why it matters.
+  
+  prerequisites:
+    - list
+    - of
+    - required_modules
+    
+  learning_objectives:
+    - List of specific skills user will demonstrate
+    - Should be observable/testable
+    
+  estimated_time: "X minutes/hours"
+  
+  content:
+    - type: explanation | visual_comparison | interactive_quiz | decision_tree | field_exercise
+      id: unique_within_module
+      # ... type-specific fields
+      
+  assessment:
+    required_for_completion:
+      - criteria
+    required_for_unlock:
+      - additional criteria for unlocking dependent content
+    unlocks:
+      - list of modules or permissions unlocked
+
+---
+# Spaced Repetition Configuration
+
+spaced_repetition:
+  item: death_cap_recognition
+  priority: critical
+  
+  initial_interval: 3  # days after first learning
+  
+  schedule:
+    - review: 1
+      interval_days: 3
+    - review: 2
+      interval_days: 7
+    - review: 3
+      interval_days: 21
+    - review: 4
+      interval_days: 90
+    - ongoing: season_start
+    
+  review_formats:
+    - type: recall_prompt
+      question: "What are the key features that distinguish Death Cap from field mushrooms?"
+      expected_points:
+        - Volva at base
+        - Pure white gills (vs pink/brown)
+        - Often near trees
+        - No anise smell
+      
+    - type: scenario
+      prompt: |
+        You find a white-capped mushroom under oak with white 
+        gills and a ring. What do you check next, and what are 
+        you looking for?
+      expected_action: "Dig up base to check for volva"
+      
+    - type: image_id
+      images:
+        - show Amanita phalloides
+        - show Agaricus campestris
+      task: "Identify which is which and explain how you know"
+
+  failure_handling:
+    if_failed:
+      - Reset interval to initial
+      - Flag for extra attention
+      - Consider retraining if repeated failures

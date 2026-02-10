@@ -1,0 +1,214 @@
+# User Competency Model Schema
+# Tracks what a user has demonstrated they can do, not what they claim
+
+user_id: example_user_001
+created: 2025-01-15
+last_active: 2025-10-15
+region: UK_South
+
+# Competencies are unlocked by demonstration, not assertion
+competencies:
+  genus_recognition:
+    Russula:
+      status: confident  # learning | aware | confident | expert
+      first_exposure: 2025-07-20
+      evidence:
+        - date: 2025-09-12
+          type: correct_identification
+          notes: "Correctly identified brittlegill texture, applied taste test"
+        - date: 2025-09-18
+          type: correct_identification
+          notes: "Identified R. cyanoxantha by flexible gills"
+        - date: 2025-09-20
+          type: correct_rejection
+          notes: "Correctly rejected Lactarius based on milk test"
+      gaps: []
+      unlocks:
+        - russula_species_discrimination
+        - skip_brittlegill_explanation
+        
+    Boletus:
+      status: learning
+      first_exposure: 2025-08-05
+      evidence:
+        - date: 2025-09-14
+          type: assisted_identification
+          notes: "Needed prompting on blue staining check"
+      gaps:
+        - "Hasn't encountered Rubroboletus group"
+        - "Hasn't practiced reticulation assessment"
+        - "Hasn't seen red-pored species"
+        
+    Amanita:
+      status: aware_not_confident
+      first_exposure: 2025-09-10
+      evidence:
+        - date: 2025-09-10
+          type: training_completed
+          topic: "Amanita danger briefing"
+      gaps:
+        - "Hasn't demonstrated volva identification in field"
+      notes: "Knows to be cautious, hasn't demonstrated discrimination"
+      
+    Agaricus:
+      status: not_started
+      prerequisite_for: 
+        - white_mushroom_foraging
+
+  safety_discriminations:
+    agaricus_vs_amanita:
+      status: not_demonstrated
+      required_for: "Foraging white field mushrooms"
+      training_available: true
+      priority: critical
+      
+    edible_vs_toxic_boletes:
+      status: partial
+      evidence:
+        - "Knows to check for blue staining"
+        - "Knows red pores are danger sign"
+      gaps:
+        - "Hasn't seen red-pored species in person"
+
+  heuristics_mastered:
+    - russula_taste_test
+    - bolete_blue_staining_caution
+    
+  heuristics_introduced_not_mastered:
+    - lactarius_milk_color_test
+    
+  heuristics_not_yet_introduced:
+    - agaricus_anise_smell
+    - puffball_interior_check
+
+# Tracks overconfidence or underconfidence
+calibration:
+  false_positives: 0     # Said confident but was wrong
+  false_negatives: 2     # Was unsure but could have been confident
+  appropriate_uncertainty: 5  # Correctly expressed doubt
+  overconfidence_incidents: 0
+  notes: "Tends toward caution - good for safety, can encourage more confidence on well-known genera"
+
+# What they've actually encountered
+experience_log:
+  total_sessions: 12
+  genera_encountered: 
+    - Russula
+    - Boletus
+    - Lactarius
+    - Agaricus
+    - Coprinus
+    - Amanita  # training only, not field
+  seasons_active: 
+    - Summer_2025
+    - Autumn_2025
+  habitats:
+    - deciduous_woodland
+    - grassland
+  regions:
+    - Hampshire
+    - Surrey
+
+# Training progress
+training:
+  completed_modules:
+    - basic_mushroom_anatomy
+    - russula_introduction
+    - amanita_danger_briefing
+  in_progress:
+    - boletus_family
+  available_unlocked:
+    - russula_species_level
+    - lactarius_introduction
+  locked:
+    - agaricus_field_id  # requires agaricus_vs_amanita discrimination
+
+# Spaced repetition schedule
+review_schedule:
+  due:
+    - item: death_cap_recognition
+      due_date: 2025-10-20
+      priority: critical
+  upcoming:
+    - item: russula_taste_test_review
+      due_date: 2025-11-01
+
+---
+# Competency State Definitions
+
+status_definitions:
+  not_started:
+    description: "User has not been introduced to this topic"
+    permissions: []
+    
+  aware:
+    description: "User knows this exists and basic danger level"
+    permissions:
+      - "Can be reminded of basic facts"
+    
+  aware_not_confident:
+    description: "User has been trained but hasn't demonstrated in practice"
+    permissions:
+      - "Full guidance still required"
+      - "Suitable for training exercises"
+    
+  learning:
+    description: "User is actively building competency with evidence"
+    permissions:
+      - "Can skip basic introductions"
+      - "Receives targeted guidance on gaps"
+    
+  confident:
+    description: "User has demonstrated reliable competency"
+    permissions:
+      - "Skip explanations of basics"
+      - "Unlock dependent competencies"
+      - "Receive condensed guidance"
+    criteria:
+      correct_identifications: ">= 3"
+      correct_rejections: ">= 1"
+      false_positives: 0
+      timespan_days: ">= 30"
+    
+  expert:
+    description: "User demonstrates teaching-level competency"
+    permissions:
+      - "All confident permissions"
+      - "Can contribute to knowledge base"
+      - "Receives minimal guidance"
+    criteria:
+      correct_identifications: ">= 10"
+      seasons_active: ">= 2"
+      has_taught_others: true
+
+---
+# Upgrade/Downgrade Rules
+
+competency_rules:
+  upgrade:
+    - from: learning
+      to: confident
+      requires:
+        correct_identifications: 3
+        correct_rejections: 1
+        false_positives: 0
+        timespan_days: 30
+        
+    - from: confident
+      to: expert
+      requires:
+        correct_identifications: 10
+        seasons_active: 2
+        no_safety_incidents: true
+        
+  downgrade:
+    - trigger: false_positive_on_safety_discrimination
+      action: "Demote related competency to learning, require retraining"
+      
+    - trigger: no_activity_days > 180
+      action: "Demote species-level competencies to needs_refresh"
+      
+  refresh:
+    - trigger: season_start
+      action: "Prompt review of critical safety discriminations"
+      priority: critical
