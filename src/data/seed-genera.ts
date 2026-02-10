@@ -10,6 +10,7 @@ export const seedGenera: GenusProfile[] = [
   {
     genus: 'Amanita',
     common_names: ['Amanita', 'Death Cap family'],
+    reference_image: '/images/mushrooms/amanita_phalloides.jpg',
     confidence_markers: {
       high: [
         'Volva (cup/bag) at the base of the stem',
@@ -43,13 +44,13 @@ export const seedGenera: GenusProfile[] = [
     ],
     key_species_uk: {
       edible: [
-        { species: 'rubescens', common_name: 'The Blusher', notes: 'Edible when cooked, flesh turns pink when damaged. NOT for beginners.' },
+        { species: 'rubescens', common_name: 'The Blusher', notes: 'Edible when cooked, flesh turns pink when damaged. NOT for beginners.', image_url: '/images/mushrooms/amanita_rubescens.jpg' },
       ],
       toxic_or_inedible: [
-        { species: 'phalloides', common_name: 'Death Cap', notes: 'LETHALLY TOXIC. Greenish-yellow cap, white gills, prominent volva. Responsible for most mushroom deaths worldwide.' },
-        { species: 'virosa', common_name: 'Destroying Angel', notes: 'LETHALLY TOXIC. Pure white throughout, prominent volva and ring.' },
-        { species: 'pantherina', common_name: 'Panther Cap', notes: 'Seriously toxic. Brown cap with pure white veil patches.' },
-        { species: 'muscaria', common_name: 'Fly Agaric', notes: 'Toxic. The iconic red cap with white spots.' },
+        { species: 'phalloides', common_name: 'Death Cap', notes: 'LETHALLY TOXIC. Greenish-yellow cap, white gills, prominent volva. Responsible for most mushroom deaths worldwide.', image_url: '/images/mushrooms/amanita_phalloides.jpg' },
+        { species: 'virosa', common_name: 'Destroying Angel', notes: 'LETHALLY TOXIC. Pure white throughout, prominent volva and ring.', image_url: '/images/mushrooms/amanita_virosa.jpg' },
+        { species: 'pantherina', common_name: 'Panther Cap', notes: 'Seriously toxic. Brown cap with pure white veil patches.', image_url: '/images/mushrooms/amanita_pantherina.jpg' },
+        { species: 'muscaria', common_name: 'Fly Agaric', notes: 'Toxic. The iconic red cap with white spots.', image_url: '/images/mushrooms/amanita_muscaria.jpg' },
       ],
     },
     foraging_heuristics: [
@@ -61,6 +62,7 @@ export const seedGenera: GenusProfile[] = [
   {
     genus: 'Agaricus',
     common_names: ['Field Mushroom family', 'Mushrooms'],
+    reference_image: '/images/mushrooms/agaricus_campestris.jpg',
     confidence_markers: {
       high: [
         'Ring on the stem',
@@ -89,11 +91,11 @@ export const seedGenera: GenusProfile[] = [
     ],
     key_species_uk: {
       edible: [
-        { species: 'campestris', common_name: 'Field Mushroom', notes: 'The classic wild mushroom. Pink gills when young, brown when mature.' },
-        { species: 'arvensis', common_name: 'Horse Mushroom', notes: 'Large, smells of anise, yellows slightly when bruised.' },
+        { species: 'campestris', common_name: 'Field Mushroom', notes: 'The classic wild mushroom. Pink gills when young, brown when mature.', image_url: '/images/mushrooms/agaricus_campestris.jpg' },
+        { species: 'arvensis', common_name: 'Horse Mushroom', notes: 'Large, smells of anise, yellows slightly when bruised.', image_url: '/images/mushrooms/agaricus_arvensis.jpg' },
       ],
       toxic_or_inedible: [
-        { species: 'xanthodermus', common_name: 'Yellow-staining Mushroom', notes: 'Causes GI upset. Stains bright chrome yellow at base of stem. Smells of ink/phenol.' },
+        { species: 'xanthodermus', common_name: 'Yellow-staining Mushroom', notes: 'Causes GI upset. Stains bright chrome yellow at base of stem. Smells of ink/phenol.', image_url: '/images/mushrooms/agaricus_xanthodermus.jpg' },
       ],
     },
     foraging_heuristics: [
@@ -107,6 +109,7 @@ export const seedGenera: GenusProfile[] = [
   {
     genus: 'Russula',
     common_names: ['Brittlegills'],
+    reference_image: '/images/mushrooms/russula_cyanoxantha.jpg',
     confidence_markers: {
       high: [
         'Brittle flesh that snaps cleanly (like chalk)',
@@ -140,13 +143,13 @@ export const seedGenera: GenusProfile[] = [
     ],
     key_species_uk: {
       edible: [
-        { species: 'cyanoxantha', common_name: 'Charcoal Burner', notes: 'One of the best - mild taste, flexible gills (unusual for Russula)' },
-        { species: 'virescens', common_name: 'Greencracked Brittlegill', notes: 'Choice edible, distinctive cracked cap surface' },
-        { species: 'vesca', common_name: 'Bare-toothed Brittlegill', notes: "Good edible, gills don't reach cap edge" },
+        { species: 'cyanoxantha', common_name: 'Charcoal Burner', notes: 'One of the best - mild taste, flexible gills (unusual for Russula)', image_url: '/images/mushrooms/russula_cyanoxantha.jpg' },
+        { species: 'virescens', common_name: 'Greencracked Brittlegill', notes: 'Choice edible, distinctive cracked cap surface', image_url: '/images/mushrooms/russula_virescens.jpg' },
+        { species: 'vesca', common_name: 'Bare-toothed Brittlegill', notes: "Good edible, gills don't reach cap edge", image_url: '/images/mushrooms/russula_vesca.jpg' },
       ],
       toxic_or_inedible: [
-        { species: 'emetica', common_name: 'The Sickener', notes: 'Bright red cap, pure white gills, very peppery - causes vomiting' },
-        { species: 'foetens', common_name: 'Stinking Brittlegill', notes: 'Smells of bitter almonds/marzipan, acrid taste' },
+        { species: 'emetica', common_name: 'The Sickener', notes: 'Bright red cap, pure white gills, very peppery - causes vomiting', image_url: '/images/mushrooms/russula_emetica.jpg' },
+        { species: 'foetens', common_name: 'Stinking Brittlegill', notes: 'Smells of bitter almonds/marzipan, acrid taste', image_url: '/images/mushrooms/russula_foetens.jpg' },
       ],
     },
     foraging_heuristics: [
@@ -157,6 +160,7 @@ export const seedGenera: GenusProfile[] = [
   {
     genus: 'Boletus',
     common_names: ['Boletes', 'Penny Bun family'],
+    reference_image: '/images/mushrooms/boletus_edulis.jpg',
     confidence_markers: {
       high: [
         'Sponge-like pore surface under cap (not gills)',
@@ -184,11 +188,11 @@ export const seedGenera: GenusProfile[] = [
     ],
     key_species_uk: {
       edible: [
-        { species: 'edulis', common_name: 'Penny Bun / Cep / Porcini', notes: 'The king of edible mushrooms. White reticulated stem, firm white flesh.' },
+        { species: 'edulis', common_name: 'Penny Bun / Cep / Porcini', notes: 'The king of edible mushrooms. White reticulated stem, firm white flesh.', image_url: '/images/mushrooms/boletus_edulis.jpg' },
       ],
       toxic_or_inedible: [
-        { species: 'satanas', common_name: "Satan's Bolete", notes: 'Toxic. Red pores, red stem base, pale cap. Rare in UK.' },
-        { species: 'luridiformis', common_name: 'Scarletina Bolete', notes: 'Edible when cooked but blues dramatically when cut. Confusing for beginners.' },
+        { species: 'satanas', common_name: "Satan's Bolete", notes: 'Toxic. Red pores, red stem base, pale cap. Rare in UK.', image_url: '/images/mushrooms/boletus_satanas.jpg' },
+        { species: 'luridiformis', common_name: 'Scarletina Bolete', notes: 'Edible when cooked but blues dramatically when cut. Confusing for beginners.', image_url: '/images/mushrooms/boletus_luridiformis.jpg' },
       ],
     },
     foraging_heuristics: [
@@ -200,6 +204,7 @@ export const seedGenera: GenusProfile[] = [
   {
     genus: 'Cantharellus',
     common_names: ['Chanterelle'],
+    reference_image: '/images/mushrooms/cantharellus_cibarius.jpg',
     confidence_markers: {
       high: [
         'Forked ridges (false gills), not true blade-like gills',
@@ -228,7 +233,7 @@ export const seedGenera: GenusProfile[] = [
     ],
     key_species_uk: {
       edible: [
-        { species: 'cibarius', common_name: 'Chanterelle', notes: 'Choice edible. Egg-yellow, apricot smell, forked ridges.' },
+        { species: 'cibarius', common_name: 'Chanterelle', notes: 'Choice edible. Egg-yellow, apricot smell, forked ridges.', image_url: '/images/mushrooms/cantharellus_cibarius.jpg' },
       ],
       toxic_or_inedible: [],
     },
@@ -240,6 +245,7 @@ export const seedGenera: GenusProfile[] = [
   {
     genus: 'Lactarius',
     common_names: ['Milkcaps'],
+    reference_image: '/images/mushrooms/lactarius_deliciosus.jpg',
     confidence_markers: {
       high: [
         'Exudes milk (latex) when flesh is cut or gills damaged',
@@ -267,10 +273,10 @@ export const seedGenera: GenusProfile[] = [
     ],
     key_species_uk: {
       edible: [
-        { species: 'deliciosus', common_name: 'Saffron Milkcap', notes: 'Choice edible. Orange milk that turns green. Under pines.' },
+        { species: 'deliciosus', common_name: 'Saffron Milkcap', notes: 'Choice edible. Orange milk that turns green. Under pines.', image_url: '/images/mushrooms/lactarius_deliciosus.jpg' },
       ],
       toxic_or_inedible: [
-        { species: 'torminosus', common_name: 'Woolly Milkcap', notes: 'Causes GI upset raw. Pink, very woolly cap margin, white milk.' },
+        { species: 'torminosus', common_name: 'Woolly Milkcap', notes: 'Causes GI upset raw. Pink, very woolly cap margin, white milk.', image_url: '/images/mushrooms/lactarius_torminosus.jpg' },
       ],
     },
     foraging_heuristics: [
@@ -281,6 +287,7 @@ export const seedGenera: GenusProfile[] = [
   {
     genus: 'Pleurotus',
     common_names: ['Oyster Mushrooms'],
+    reference_image: '/images/mushrooms/pleurotus_ostreatus.jpg',
     confidence_markers: {
       high: [
         'Growing on wood (dead or living trees)',
@@ -309,7 +316,7 @@ export const seedGenera: GenusProfile[] = [
     ],
     key_species_uk: {
       edible: [
-        { species: 'ostreatus', common_name: 'Oyster Mushroom', notes: 'Good edible. Grey to blue-grey cap, white gills, on wood.' },
+        { species: 'ostreatus', common_name: 'Oyster Mushroom', notes: 'Good edible. Grey to blue-grey cap, white gills, on wood.', image_url: '/images/mushrooms/pleurotus_ostreatus.jpg' },
       ],
       toxic_or_inedible: [],
     },
@@ -321,6 +328,7 @@ export const seedGenera: GenusProfile[] = [
   {
     genus: 'Macrolepiota',
     common_names: ['Parasol Mushroom'],
+    reference_image: '/images/mushrooms/macrolepiota_procera.jpg',
     confidence_markers: {
       high: [
         'Very large cap (15-30cm when mature)',
@@ -354,7 +362,7 @@ export const seedGenera: GenusProfile[] = [
     ],
     key_species_uk: {
       edible: [
-        { species: 'procera', common_name: 'Parasol Mushroom', notes: 'Choice edible. Very large, snakeskin stem, movable ring.' },
+        { species: 'procera', common_name: 'Parasol Mushroom', notes: 'Choice edible. Very large, snakeskin stem, movable ring.', image_url: '/images/mushrooms/macrolepiota_procera.jpg' },
       ],
       toxic_or_inedible: [],
     },
@@ -367,6 +375,7 @@ export const seedGenera: GenusProfile[] = [
   {
     genus: 'Coprinopsis',
     common_names: ['Ink Caps'],
+    reference_image: '/images/mushrooms/coprinopsis_comatus.jpg',
     confidence_markers: {
       high: [
         'Gills that deliquesce (dissolve into inky black liquid)',
@@ -388,10 +397,10 @@ export const seedGenera: GenusProfile[] = [
     lookalike_genera: [],
     key_species_uk: {
       edible: [
-        { species: 'comatus', common_name: 'Shaggy Ink Cap', notes: 'Good edible when young (before ink starts). Shaggy white cap. Note: this is Coprinus comatus, now in a separate genus.' },
+        { species: 'comatus', common_name: 'Shaggy Ink Cap', notes: 'Good edible when young (before ink starts). Shaggy white cap. Note: this is Coprinus comatus, now in a separate genus.', image_url: '/images/mushrooms/coprinopsis_comatus.jpg' },
       ],
       toxic_or_inedible: [
-        { species: 'atramentaria', common_name: 'Common Ink Cap', notes: 'TOXIC WITH ALCOHOL. Contains coprine. Avoid alcohol for 3 days before and after consumption.' },
+        { species: 'atramentaria', common_name: 'Common Ink Cap', notes: 'TOXIC WITH ALCOHOL. Contains coprine. Avoid alcohol for 3 days before and after consumption.', image_url: '/images/mushrooms/coprinopsis_atramentaria.jpg' },
       ],
     },
     foraging_heuristics: [
@@ -403,6 +412,7 @@ export const seedGenera: GenusProfile[] = [
   {
     genus: 'Hydnum',
     common_names: ['Hedgehog Fungus'],
+    reference_image: '/images/mushrooms/hydnum_repandum.jpg',
     confidence_markers: {
       high: [
         'Teeth/spines hanging down under the cap (not gills or pores)',
@@ -424,7 +434,7 @@ export const seedGenera: GenusProfile[] = [
     lookalike_genera: [],
     key_species_uk: {
       edible: [
-        { species: 'repandum', common_name: 'Hedgehog Fungus', notes: 'Choice edible. Very safe - the teeth are virtually unique among UK mushrooms.' },
+        { species: 'repandum', common_name: 'Hedgehog Fungus', notes: 'Choice edible. Very safe - the teeth are virtually unique among UK mushrooms.', image_url: '/images/mushrooms/hydnum_repandum.jpg' },
       ],
       toxic_or_inedible: [],
     },
@@ -438,6 +448,7 @@ export const seedGenera: GenusProfile[] = [
   {
     genus: 'Laetiporus',
     common_names: ['Chicken of the Woods'],
+    reference_image: '/images/mushrooms/laetiporus_sulphureus.jpg',
     confidence_markers: {
       high: [
         'Large bracket fungus growing on living/dead trees',
@@ -460,7 +471,7 @@ export const seedGenera: GenusProfile[] = [
     lookalike_genera: [],
     key_species_uk: {
       edible: [
-        { species: 'sulphureus', common_name: 'Chicken of the Woods', notes: 'Good edible when young (soft). Avoid specimens on yew (may absorb toxins).' },
+        { species: 'sulphureus', common_name: 'Chicken of the Woods', notes: 'Good edible when young (soft). Avoid specimens on yew (may absorb toxins).', image_url: '/images/mushrooms/laetiporus_sulphureus.jpg' },
       ],
       toxic_or_inedible: [],
     },
@@ -472,6 +483,7 @@ export const seedGenera: GenusProfile[] = [
   {
     genus: 'Fistulina',
     common_names: ['Beefsteak Fungus'],
+    reference_image: '/images/mushrooms/fistulina_hepatica.jpg',
     confidence_markers: {
       high: [
         'Tongue-shaped bracket on oak or sweet chestnut',
@@ -494,7 +506,7 @@ export const seedGenera: GenusProfile[] = [
     lookalike_genera: [],
     key_species_uk: {
       edible: [
-        { species: 'hepatica', common_name: 'Beefsteak Fungus', notes: 'Edible. Best sliced thin as it can be sour/acidic. Looks remarkably like raw meat.' },
+        { species: 'hepatica', common_name: 'Beefsteak Fungus', notes: 'Edible. Best sliced thin as it can be sour/acidic. Looks remarkably like raw meat.', image_url: '/images/mushrooms/fistulina_hepatica.jpg' },
       ],
       toxic_or_inedible: [],
     },
@@ -506,6 +518,7 @@ export const seedGenera: GenusProfile[] = [
   {
     genus: 'Marasmius',
     common_names: ['Fairy Ring Champignon'],
+    reference_image: '/images/mushrooms/marasmius_oreades.jpg',
     confidence_markers: {
       high: [
         'Small, tough/wiry mushroom that revives when wet',
@@ -534,7 +547,7 @@ export const seedGenera: GenusProfile[] = [
     ],
     key_species_uk: {
       edible: [
-        { species: 'oreades', common_name: 'Fairy Ring Champignon', notes: 'Good edible. Dries well. Growing in rings in lawns is very characteristic.' },
+        { species: 'oreades', common_name: 'Fairy Ring Champignon', notes: 'Good edible. Dries well. Growing in rings in lawns is very characteristic.', image_url: '/images/mushrooms/marasmius_oreades.jpg' },
       ],
       toxic_or_inedible: [],
     },
@@ -546,6 +559,7 @@ export const seedGenera: GenusProfile[] = [
   {
     genus: 'Craterellus',
     common_names: ['Horn of Plenty', 'Black Trumpet'],
+    reference_image: '/images/mushrooms/craterellus_cornucopioides.jpg',
     confidence_markers: {
       high: [
         'Trumpet/funnel shape, hollow down to base',
@@ -567,7 +581,7 @@ export const seedGenera: GenusProfile[] = [
     lookalike_genera: [],
     key_species_uk: {
       edible: [
-        { species: 'cornucopioides', common_name: 'Horn of Plenty', notes: 'Choice edible. Dries beautifully. Hard to spot due to dark colour among leaf litter.' },
+        { species: 'cornucopioides', common_name: 'Horn of Plenty', notes: 'Choice edible. Dries beautifully. Hard to spot due to dark colour among leaf litter.', image_url: '/images/mushrooms/craterellus_cornucopioides.jpg' },
       ],
       toxic_or_inedible: [],
     },
@@ -580,6 +594,7 @@ export const seedGenera: GenusProfile[] = [
   {
     genus: 'Sparassis',
     common_names: ['Cauliflower Fungus'],
+    reference_image: '/images/mushrooms/sparassis_crispa.jpg',
     confidence_markers: {
       high: [
         'Large cauliflower/brain-like mass of lobed, wavy fronds',
@@ -602,7 +617,7 @@ export const seedGenera: GenusProfile[] = [
     lookalike_genera: [],
     key_species_uk: {
       edible: [
-        { species: 'crispa', common_name: 'Cauliflower Fungus', notes: 'Good edible. Unmistakable shape. Needs thorough washing as debris collects in the folds.' },
+        { species: 'crispa', common_name: 'Cauliflower Fungus', notes: 'Good edible. Unmistakable shape. Needs thorough washing as debris collects in the folds.', image_url: '/images/mushrooms/sparassis_crispa.jpg' },
       ],
       toxic_or_inedible: [],
     },
@@ -614,6 +629,7 @@ export const seedGenera: GenusProfile[] = [
   {
     genus: 'Calvatia',
     common_names: ['Giant Puffball', 'Puffballs'],
+    reference_image: '/images/mushrooms/calvatia_gigantea.jpg',
     confidence_markers: {
       high: [
         'Large round/ball-shaped fruitbody',
@@ -642,7 +658,7 @@ export const seedGenera: GenusProfile[] = [
     ],
     key_species_uk: {
       edible: [
-        { species: 'gigantea', common_name: 'Giant Puffball', notes: 'Edible when young (pure white inside). Slice in half to verify no internal gill/cap structure — rules out Amanita egg.' },
+        { species: 'gigantea', common_name: 'Giant Puffball', notes: 'Edible when young (pure white inside). Slice in half to verify no internal gill/cap structure — rules out Amanita egg.', image_url: '/images/mushrooms/calvatia_gigantea.jpg' },
       ],
       toxic_or_inedible: [],
     },
@@ -656,6 +672,7 @@ export const seedGenera: GenusProfile[] = [
   {
     genus: 'Leccinum',
     common_names: ['Rough-stemmed Boletes'],
+    reference_image: '/images/mushrooms/leccinum_scabrum.jpg',
     confidence_markers: {
       high: [
         'Sponge-like pore surface (bolete)',
@@ -683,8 +700,8 @@ export const seedGenera: GenusProfile[] = [
     ],
     key_species_uk: {
       edible: [
-        { species: 'scabrum', common_name: 'Brown Birch Bolete', notes: 'Good edible. Grey-brown cap, always under birch. Flesh soft and watery.' },
-        { species: 'versipelle', common_name: 'Orange Birch Bolete', notes: 'Good edible. Orange cap, under birch. Flesh turns dark when cooked.' },
+        { species: 'scabrum', common_name: 'Brown Birch Bolete', notes: 'Good edible. Grey-brown cap, always under birch. Flesh soft and watery.', image_url: '/images/mushrooms/leccinum_scabrum.jpg' },
+        { species: 'versipelle', common_name: 'Orange Birch Bolete', notes: 'Good edible. Orange cap, under birch. Flesh turns dark when cooked.', image_url: '/images/mushrooms/leccinum_versipelle.jpg' },
       ],
       toxic_or_inedible: [],
     },
@@ -698,6 +715,7 @@ export const seedGenera: GenusProfile[] = [
   {
     genus: 'Armillaria',
     common_names: ['Honey Fungus'],
+    reference_image: '/images/mushrooms/armillaria_mellea.jpg',
     confidence_markers: {
       high: [
         'Growing in large clusters at base of trees or on stumps',
@@ -726,7 +744,7 @@ export const seedGenera: GenusProfile[] = [
     ],
     key_species_uk: {
       edible: [
-        { species: 'mellea', common_name: 'Honey Fungus', notes: 'Edible when thoroughly cooked. Must not be eaten raw. Can cause GI upset in some people.' },
+        { species: 'mellea', common_name: 'Honey Fungus', notes: 'Edible when thoroughly cooked. Must not be eaten raw. Can cause GI upset in some people.', image_url: '/images/mushrooms/armillaria_mellea.jpg' },
       ],
       toxic_or_inedible: [],
     },
@@ -739,6 +757,7 @@ export const seedGenera: GenusProfile[] = [
   {
     genus: 'Clitocybe',
     common_names: ['Funnels'],
+    reference_image: '/images/mushrooms/clitocybe_rivulosa.jpg',
     confidence_markers: {
       high: [
         'Funnel-shaped or depressed cap',
@@ -773,8 +792,8 @@ export const seedGenera: GenusProfile[] = [
     key_species_uk: {
       edible: [],
       toxic_or_inedible: [
-        { species: 'rivulosa', common_name: "Fool's Funnel", notes: 'DEADLY. Contains high levels of muscarine. Small, white, grows in rings on lawns.' },
-        { species: 'dealbata', common_name: 'Ivory Funnel', notes: 'DEADLY. Similar to C. rivulosa. Small, white, in grassland.' },
+        { species: 'rivulosa', common_name: "Fool's Funnel", notes: 'DEADLY. Contains high levels of muscarine. Small, white, grows in rings on lawns.', image_url: '/images/mushrooms/clitocybe_rivulosa.jpg' },
+        { species: 'dealbata', common_name: 'Ivory Funnel', notes: 'DEADLY. Similar to C. rivulosa. Small, white, in grassland.', image_url: '/images/mushrooms/clitocybe_dealbata.jpg' },
       ],
     },
     foraging_heuristics: [
@@ -785,6 +804,7 @@ export const seedGenera: GenusProfile[] = [
   {
     genus: 'Lepista',
     common_names: ['Blewits'],
+    reference_image: '/images/mushrooms/lepista_nuda.jpg',
     confidence_markers: {
       high: [
         'Distinctive lilac/violet colour on stem and/or gills',
@@ -818,8 +838,8 @@ export const seedGenera: GenusProfile[] = [
     ],
     key_species_uk: {
       edible: [
-        { species: 'nuda', common_name: 'Wood Blewit', notes: 'Good edible when cooked. Distinctive all-over lilac when fresh. Must be cooked thoroughly.' },
-        { species: 'saeva', common_name: 'Field Blewit', notes: 'Good edible. Lilac stem but buff/tan cap. In grassland. Late season.' },
+        { species: 'nuda', common_name: 'Wood Blewit', notes: 'Good edible when cooked. Distinctive all-over lilac when fresh. Must be cooked thoroughly.', image_url: '/images/mushrooms/lepista_nuda.jpg' },
+        { species: 'saeva', common_name: 'Field Blewit', notes: 'Good edible. Lilac stem but buff/tan cap. In grassland. Late season.', image_url: '/images/mushrooms/lepista_saeva.jpg' },
       ],
       toxic_or_inedible: [],
     },

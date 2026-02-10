@@ -133,6 +133,31 @@ describe('Seed Genera', () => {
     });
   });
 
+  describe('Reference images', () => {
+    it('every genus has a reference_image', () => {
+      for (const g of seedGenera) {
+        expect(g.reference_image, `${g.genus} missing reference_image`).toBeTruthy();
+      }
+    });
+
+    it('every species entry has an image_url', () => {
+      for (const g of seedGenera) {
+        for (const s of [...g.key_species_uk.edible, ...g.key_species_uk.toxic_or_inedible]) {
+          expect(s.image_url, `${g.genus} ${s.species} missing image_url`).toBeTruthy();
+        }
+      }
+    });
+
+    it('image paths follow /images/mushrooms/ convention', () => {
+      for (const g of seedGenera) {
+        expect(g.reference_image).toMatch(/^\/images\/mushrooms\//);
+        for (const s of [...g.key_species_uk.edible, ...g.key_species_uk.toxic_or_inedible]) {
+          expect(s.image_url).toMatch(/^\/images\/mushrooms\//);
+        }
+      }
+    });
+  });
+
   describe('Toxic species coverage', () => {
     it('Amanita lists Death Cap and Destroying Angel', () => {
       const amanita = seedGenera.find((g) => g.genus === 'Amanita');

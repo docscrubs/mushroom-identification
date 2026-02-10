@@ -16,7 +16,7 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'prompt',
-      includeAssets: ['favicon.svg', 'icons/*.png'],
+      includeAssets: ['favicon.svg', 'icons/*.png', 'images/mushrooms/*.jpg'],
       manifest: {
         name: 'Mushroom ID - UK Foraging Guide',
         short_name: 'MushroomID',
@@ -31,7 +31,7 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,json}'],
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,json,jpg}'],
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/api\.anthropic\.com\/.*/i,

@@ -31,11 +31,13 @@ export interface SpeciesEntry {
   species: string;
   common_name: string;
   notes: string;
+  image_url?: string;
 }
 
 export interface GenusProfile {
   genus: string;
   common_names: string[];
+  reference_image?: string;
   confidence_markers: ConfidenceMarkers;
   ecological_context: EcologicalContext;
   uk_occurrence: UKOccurrence;
