@@ -5,6 +5,7 @@ import { assembleResult } from '@/engine/result-assembler';
 import { featureRules } from '@/engine/feature-rules';
 import { ALL_GENERA } from '@/engine/genera';
 import { getGenusEdibility } from '@/engine/edibility';
+import { generateOfflineExplanation } from '@/engine/explanation-templates';
 
 type SelectOption = { value: string; label: string };
 
@@ -294,12 +295,13 @@ export function IdentifyPage() {
       </div>
 
       {/* Results */}
-      {result && <ResultView result={result} />}
+      {result && <ResultView result={result} observation={observation} />}
     </div>
   );
 }
 
-function ResultView({ result }: { result: IdentificationResult }) {
+function ResultView({ result, observation }: { result: IdentificationResult; observation: Observation }) {
+  const explanation = generateOfflineExplanation(result, observation);
   const activeCandidates = result.candidates.filter(
     (c) => !c.contradicting_evidence.some((e) => e.tier === 'exclusionary') && c.score > 0,
   );
@@ -312,6 +314,12 @@ function ResultView({ result }: { result: IdentificationResult }) {
 
   return (
     <div className="space-y-4">
+      {/* Explanation summary */}
+      <div className="rounded-lg bg-green-50 border border-green-200 p-4">
+        <p className="text-sm font-medium text-green-900">{explanation.summary}</p>
+        <p className="text-sm text-green-800 mt-2">{explanation.identification}</p>
+      </div>
+
       {/* Safety warnings */}
       {result.safety.warnings.length > 0 && (
         <div className="rounded-lg bg-red-50 border border-red-300 p-4 space-y-2">
