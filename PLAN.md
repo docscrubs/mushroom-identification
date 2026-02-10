@@ -1104,11 +1104,11 @@ NETWORK ONLY:
 
 **Goal**: Comprehensive UK foraging knowledge base.
 
-- [ ] Create genus profiles for top 20 UK foraging genera
-- [ ] Create safety rules for all UK deadly/seriously toxic species
-- [ ] Create discrimination heuristics for critical lookalike pairs
-- [ ] Create edibility determination heuristics for each beginner-friendly genus
-- [ ] Create ecological context rules (season, habitat, regional data)
+- [x] Create genus profiles for top 20 UK foraging genera
+- [x] Create safety rules for all UK deadly/seriously toxic species
+- [x] Create discrimination heuristics for critical lookalike pairs
+- [x] Create edibility determination heuristics for each beginner-friendly genus
+- [x] Create ecological context rules (season, habitat, regional data)
 - [ ] Expert review of all safety-critical content
 - [ ] Add reference images (sourced or photographed)
 
