@@ -33,6 +33,7 @@ export type {
   RuleActivation,
   RuleRelevance,
   DisambiguationQuestion,
+  AmbiguityFlag,
 } from './identification';
 export type {
   UserModel,

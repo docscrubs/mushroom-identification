@@ -84,12 +84,22 @@ export interface SuggestedAction {
   safety_relevant: boolean;
 }
 
+/** Ambiguity that warrants a follow-up question */
+export interface AmbiguityFlag {
+  id: string;
+  fields: Array<string>;
+  question: string;
+  explanation: string;
+  relevant_genera: string[];
+}
+
 export interface IdentificationResult {
   candidates: Candidate[];
   reasoning_chain: string[];
   safety: SafetyAssessment;
   edibility?: EdibilityInfo;
   suggested_actions: SuggestedAction[];
+  ambiguities: AmbiguityFlag[];
 }
 
 /** Rule activation state during identification */

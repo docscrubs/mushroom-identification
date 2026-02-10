@@ -14,6 +14,7 @@ import { scoreAllCandidates, scoreToConfidence, type CandidateScore } from './sc
 import { selectQuestions } from './disambiguation';
 import { summarizeObservation, summarizeAllObservations } from './evidence-summary';
 import { inferFeatures } from './feature-inference';
+import { detectAmbiguities } from './ambiguity-detection';
 
 /** Genera known to contain deadly or seriously toxic species */
 const DANGEROUS_GENERA: Record<string, { toxicity: string; message: string }> = {
@@ -131,12 +132,19 @@ export function assembleResult(
   const questions = selectQuestions(scored, enrichedObs, rules);
   const actions = buildSuggestedActions(scored, questions);
 
+  // Step 7: Detect ambiguities
+  const activeCandidateGenera = scored
+    .filter((s) => !s.eliminated && s.score > 0)
+    .map((s) => s.genus);
+  const ambiguities = detectAmbiguities(enrichedObs, activeCandidateGenera);
+
   return {
     candidates,
     reasoning_chain: reasoning,
     safety,
     edibility,
     suggested_actions: actions,
+    ambiguities,
   };
 }
 

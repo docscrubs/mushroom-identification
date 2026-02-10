@@ -444,6 +444,19 @@ function ResultView({ result }: { result: IdentificationResult }) {
         </div>
       )}
 
+      {/* Ambiguities — follow-up questions */}
+      {result.ambiguities.length > 0 && (
+        <div className="rounded-lg bg-violet-50 border border-violet-200 p-4 space-y-3">
+          <h3 className="font-semibold text-violet-800">Clarifications Needed</h3>
+          {result.ambiguities.map((a) => (
+            <div key={a.id} className="text-sm space-y-1">
+              <p className="font-medium text-violet-700">{a.question}</p>
+              <p className="text-xs text-violet-600">{a.explanation}</p>
+            </div>
+          ))}
+        </div>
+      )}
+
       {/* Suggested next steps */}
       {result.suggested_actions.length > 0 && (
         <div className="rounded-lg bg-blue-50 border blue-200 p-4 space-y-2">
