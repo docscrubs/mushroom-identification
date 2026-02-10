@@ -52,7 +52,10 @@ export const seedGenera: GenusProfile[] = [
         { species: 'muscaria', common_name: 'Fly Agaric', notes: 'Toxic. The iconic red cap with white spots.' },
       ],
     },
-    foraging_heuristics: [],
+    foraging_heuristics: [
+      { heuristic_id: 'amanita_recognition_warning', description: 'Recognising Amanita features: volva, ring, white gills' },
+      { heuristic_id: 'death_cap_habitat_alert', description: 'Death Cap habitat and ecological context' },
+    ],
     notes: 'Amanita is the most dangerous genus in the UK. Beginners must learn to recognise the volva and ring combination. NEVER eat any Amanita unless you are absolutely certain of the species.',
   },
   {
@@ -93,7 +96,10 @@ export const seedGenera: GenusProfile[] = [
         { species: 'xanthodermus', common_name: 'Yellow-staining Mushroom', notes: 'Causes GI upset. Stains bright chrome yellow at base of stem. Smells of ink/phenol.' },
       ],
     },
-    foraging_heuristics: [],
+    foraging_heuristics: [
+      { heuristic_id: 'agaricus_vs_amanita_discrimination', description: 'Critical discrimination between Agaricus and Amanita' },
+      { heuristic_id: 'agaricus_yellow_stain_test', description: 'Test for Yellow-staining Mushroom (A. xanthodermus)' },
+    ],
     notes: 'Agaricus is the genus of the common shop mushroom. Critical to distinguish from Amanita. Always check: no volva, gills never pure white, dark spore print.',
   },
 
@@ -187,6 +193,7 @@ export const seedGenera: GenusProfile[] = [
     },
     foraging_heuristics: [
       { heuristic_id: 'bolete_blue_staining_caution', description: 'Caution with blue-staining boletes' },
+      { heuristic_id: 'bolete_red_pore_test', description: 'Red pore danger test for boletes' },
     ],
     notes: 'Boletes are generally beginner-friendly because of the distinctive pore surface. Very few are seriously toxic. The main rule: avoid any bolete with red pores.',
   },
@@ -225,7 +232,9 @@ export const seedGenera: GenusProfile[] = [
       ],
       toxic_or_inedible: [],
     },
-    foraging_heuristics: [],
+    foraging_heuristics: [
+      { heuristic_id: 'chanterelle_vs_false_chanterelle', description: 'Distinguish true Chanterelle from False Chanterelle' },
+    ],
     notes: 'Chanterelle is a choice edible with few dangerous lookalikes. Key identification: forked ridges (not true gills), apricot smell, egg-yellow colour.',
   },
   {
@@ -304,7 +313,9 @@ export const seedGenera: GenusProfile[] = [
       ],
       toxic_or_inedible: [],
     },
-    foraging_heuristics: [],
+    foraging_heuristics: [
+      { heuristic_id: 'grassland_vs_woodland_context', description: 'Habitat context for identification' },
+    ],
     notes: 'Oyster mushrooms are beginner-friendly: distinctive growth on wood in shelf-like clusters, very few dangerous lookalikes.',
   },
   {
@@ -347,7 +358,10 @@ export const seedGenera: GenusProfile[] = [
       ],
       toxic_or_inedible: [],
     },
-    foraging_heuristics: [],
+    foraging_heuristics: [
+      { heuristic_id: 'macrolepiota_vs_lepiota_vs_amanita', description: 'Parasol vs small Lepiota vs Amanita discrimination' },
+      { heuristic_id: 'avoid_small_lepiota', description: 'Avoid all small (<10cm) lepiota-like mushrooms' },
+    ],
     notes: 'Parasol is a choice edible but CRITICAL to distinguish from deadly small Lepiota species and Amanita. Only pick large specimens (>10cm cap) with confirmed snakeskin stem and NO volva.',
   },
   {
@@ -380,7 +394,10 @@ export const seedGenera: GenusProfile[] = [
         { species: 'atramentaria', common_name: 'Common Ink Cap', notes: 'TOXIC WITH ALCOHOL. Contains coprine. Avoid alcohol for 3 days before and after consumption.' },
       ],
     },
-    foraging_heuristics: [],
+    foraging_heuristics: [
+      { heuristic_id: 'coprinopsis_alcohol_warning', description: 'Ink cap + alcohol interaction warning' },
+      { heuristic_id: 'coprinopsis_freshness_check', description: 'Freshness check for edible ink caps' },
+    ],
     notes: 'Ink caps are distinctive due to deliquescence. Critical safety warning: Common Ink Cap causes severe illness with alcohol. Shaggy Ink Cap is technically safe but must be eaten very fresh.',
   },
   {
@@ -411,7 +428,9 @@ export const seedGenera: GenusProfile[] = [
       ],
       toxic_or_inedible: [],
     },
-    foraging_heuristics: [],
+    foraging_heuristics: [
+      { heuristic_id: 'mycorrhizal_tree_association', description: 'Tree association guide for mycorrhizal species' },
+    ],
     notes: 'Hydnum is one of the safest genera for beginners: the teeth under the cap are unique and have no dangerous lookalikes in the UK.',
   },
 
@@ -445,7 +464,9 @@ export const seedGenera: GenusProfile[] = [
       ],
       toxic_or_inedible: [],
     },
-    foraging_heuristics: [],
+    foraging_heuristics: [
+      { heuristic_id: 'laetiporus_host_tree_check', description: 'Host tree safety check (avoid yew/eucalyptus)' },
+    ],
     notes: 'Distinctive and popular edible. Avoid specimens growing on yew or eucalyptus. Only eat when young and soft. Can cause GI upset in some individuals — try a small amount first.',
   },
   {
@@ -477,7 +498,9 @@ export const seedGenera: GenusProfile[] = [
       ],
       toxic_or_inedible: [],
     },
-    foraging_heuristics: [],
+    foraging_heuristics: [
+      { heuristic_id: 'mycorrhizal_tree_association', description: 'Found specifically on oak and sweet chestnut' },
+    ],
     notes: 'Beefsteak fungus is unmistakable: it looks like a tongue of raw beef growing from a tree. Safe, no dangerous lookalikes.',
   },
   {
@@ -515,7 +538,9 @@ export const seedGenera: GenusProfile[] = [
       ],
       toxic_or_inedible: [],
     },
-    foraging_heuristics: [],
+    foraging_heuristics: [
+      { heuristic_id: 'marasmius_vs_clitocybe_rivulosa', description: 'Critical discrimination: Fairy Ring Champignon vs Fool\'s Funnel' },
+    ],
     notes: 'Fairy ring champignon is a good edible but CRITICAL lookalike hazard: Clitocybe rivulosa (deadly) also grows in rings on lawns. Must confirm tough stem and free gills.',
   },
   {
@@ -546,7 +571,10 @@ export const seedGenera: GenusProfile[] = [
       ],
       toxic_or_inedible: [],
     },
-    foraging_heuristics: [],
+    foraging_heuristics: [
+      { heuristic_id: 'mycorrhizal_tree_association', description: 'Found among beech and oak leaf litter' },
+      { heuristic_id: 'uk_seasonal_fruiting_guide', description: 'Peak season September-December' },
+    ],
     notes: 'Horn of Plenty is a choice edible with no dangerous lookalikes. The dark colour and smooth fertile surface are distinctive. Often hard to spot in leaf litter.',
   },
   {
@@ -578,7 +606,9 @@ export const seedGenera: GenusProfile[] = [
       ],
       toxic_or_inedible: [],
     },
-    foraging_heuristics: [],
+    foraging_heuristics: [
+      { heuristic_id: 'mycorrhizal_tree_association', description: 'Found at base of conifer trunks (pine, spruce)' },
+    ],
     notes: 'Cauliflower fungus is unmistakable — no other UK fungus looks like a pale cauliflower growing at the base of a tree. Very safe for beginners.',
   },
   {
@@ -616,7 +646,11 @@ export const seedGenera: GenusProfile[] = [
       ],
       toxic_or_inedible: [],
     },
-    foraging_heuristics: [],
+    foraging_heuristics: [
+      { heuristic_id: 'puffball_slice_safety_check', description: 'Mandatory slice check to rule out Amanita egg' },
+      { heuristic_id: 'puffball_interior_check', description: 'Interior colour check for edibility' },
+      { heuristic_id: 'puffball_vs_amanita_egg', description: 'Discrimination between puffball and Amanita egg' },
+    ],
     notes: 'Giant puffball is edible when young but CRITICAL safety check: always slice in half. If there is any internal structure (silhouette of a cap or gills), it may be an Amanita egg (deadly).',
   },
   {
@@ -654,7 +688,9 @@ export const seedGenera: GenusProfile[] = [
       ],
       toxic_or_inedible: [],
     },
-    foraging_heuristics: [],
+    foraging_heuristics: [
+      { heuristic_id: 'mycorrhizal_tree_association', description: 'Tree association guide (Leccinum with birch, oak, etc.)' },
+    ],
     notes: 'Leccinum boletes are generally safe edibles. The rough scabers on the stem distinguish them from Boletus. Always cook thoroughly.',
   },
 
@@ -694,7 +730,10 @@ export const seedGenera: GenusProfile[] = [
       ],
       toxic_or_inedible: [],
     },
-    foraging_heuristics: [],
+    foraging_heuristics: [
+      { heuristic_id: 'armillaria_vs_galerina', description: 'Critical discrimination: Honey Fungus vs Funeral Bell (Galerina)' },
+      { heuristic_id: 'galerina_marginata_warning', description: 'Funeral Bell avoidance warning' },
+    ],
     notes: 'Honey fungus is edible but has a DEADLY lookalike in Galerina marginata. Spore print is critical: Armillaria = white, Galerina = rusty brown. Not recommended for beginners.',
   },
   {
@@ -738,7 +777,9 @@ export const seedGenera: GenusProfile[] = [
         { species: 'dealbata', common_name: 'Ivory Funnel', notes: 'DEADLY. Similar to C. rivulosa. Small, white, in grassland.' },
       ],
     },
-    foraging_heuristics: [],
+    foraging_heuristics: [
+      { heuristic_id: 'clitocybe_rivulosa_warning', description: 'Fool\'s Funnel / Ivory Funnel avoidance warning' },
+    ],
     notes: 'Clitocybe is a dangerous genus for beginners. Several species are deadly. NOT recommended for eating unless very experienced. C. rivulosa is one of the UK\'s most dangerous mushrooms.',
   },
   {
@@ -782,7 +823,10 @@ export const seedGenera: GenusProfile[] = [
       ],
       toxic_or_inedible: [],
     },
-    foraging_heuristics: [],
+    foraging_heuristics: [
+      { heuristic_id: 'lepista_vs_cortinarius', description: 'Critical discrimination: Blewit vs Webcap (Cortinarius)' },
+      { heuristic_id: 'cortinarius_avoidance', description: 'Webcap avoidance — deadly kidney toxin' },
+    ],
     notes: 'Blewits are good edibles but require care to distinguish from Cortinarius (some deadly) and Clitocybe. Key: lilac stem, pink spore print, perfumed smell. Must be cooked.',
   },
 ];
