@@ -13,6 +13,7 @@ import { type FeatureRule } from './feature-rules';
 import { scoreAllCandidates, scoreToConfidence, type CandidateScore } from './scorer';
 import { selectQuestions } from './disambiguation';
 import { summarizeObservation, summarizeAllObservations } from './evidence-summary';
+import { inferFeatures } from './feature-inference';
 
 /** Genera known to contain deadly or seriously toxic species */
 const DANGEROUS_GENERA: Record<string, { toxicity: string; message: string }> = {
@@ -107,14 +108,17 @@ export function assembleResult(
   genera: string[],
   rules: FeatureRule[],
 ): IdentificationResult {
+  // Step 0: Infer implicit features from context
+  const { observation: enrichedObs } = inferFeatures(observation);
+
   // Step 1: Score all candidates
-  const scored = scoreAllCandidates(observation, genera, rules);
+  const scored = scoreAllCandidates(enrichedObs, genera, rules);
 
   // Step 2: Build candidates list
-  const candidates = scored.map((s) => toCandidateResult(s, observation));
+  const candidates = scored.map((s) => toCandidateResult(s, enrichedObs));
 
   // Step 3: Build reasoning chain
-  const reasoning = buildReasoningChain(observation, scored);
+  const reasoning = buildReasoningChain(enrichedObs, scored);
 
   // Step 4: Safety assessment
   const safety = buildSafetyAssessment(scored);
@@ -124,7 +128,7 @@ export function assembleResult(
   const edibility = topCandidate ? buildEdibility(topCandidate) : undefined;
 
   // Step 6: Suggested actions from disambiguation
-  const questions = selectQuestions(scored, observation, rules);
+  const questions = selectQuestions(scored, enrichedObs, rules);
   const actions = buildSuggestedActions(scored, questions);
 
   return {
