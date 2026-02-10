@@ -38,38 +38,53 @@ The critical design principle: **the deterministic rule engine handles ALL safet
 ### Data Flow for an Identification Session
 
 ```
-1. User uploads photo + provides context (location, habitat, season)
+1. User provides whatever they have (photo, description, context -- all optional)
        |
        v
-2. [Feature Extraction] -- structured form or LLM-assisted feature extraction
-   Output: { cap_color, gill_type, stem_features, habitat, substrate, season, ... }
+2. [Feature Ingestion]
+   - Accept all-optional observation fields
+   - Infer implicit features from context (e.g., "park" → not deep woodland)
+   - Flag ambiguities for follow-up ("soil or buried wood?")
+   - Online: LLM can extract features from natural language / photos
+   - Offline: structured form with guided prompts
        |
        v
-3. [Rule Engine: Genus Classification]
-   - Match features against genus profiles
-   - Apply ecological context filters (season, habitat, tree associations)
-   - Produce ranked genus candidates with confidence scores
+3. [Candidate Generation] -- broad and inclusive
+   - Score ALL genera against observed features using weighted evidence model
+   - Definitive features (e.g., brittle gills) establish/eliminate candidates immediately
+   - Strong/moderate/weak features adjust scores (non-additive, diminishing returns)
+   - Any genus not definitively excluded remains a candidate
        |
        v
-4. [Rule Engine: Safety Screening]
-   - Check ALL candidates against safety rules
-   - Flag any dangerous lookalikes
-   - Apply hard safety blocks (e.g., "avoid all LBMs", "white gilled + ring + volva = STOP")
+4. [Safety Annotation] -- attached to candidates, never blocks identification
+   - Look up toxicity and dangerous lookalikes for every candidate
+   - Flag if a dangerous lookalike is plausible given current evidence
+   - Compute whether confidence is sufficient for edibility advice
        |
        v
-5. [Interactive Disambiguation]
-   - Generate targeted questions based on remaining candidates
-   - Guide user through discriminating tests (taste, smell, bruise, spore print)
-   - Each answer narrows candidates further
+5. [Conditional Rule Pruning]
+   - Activate heuristic sets relevant to top candidates
+   - Deactivate irrelevant rules (Russula confirmed → Bolete rules off)
        |
        v
-6. [Result Assembly]
-   - Rule engine produces: { candidate, confidence, safety_level, reasoning_chain }
-   - If online: LLM generates natural language explanation from structured result
+6. [Interactive Disambiguation] -- all questions skippable
+   - Select questions by information gain from active rules only
+   - Prioritise: safety-relevant > high-gain > easy-to-answer
+   - "Not sure / Can't tell" is always valid -- reduces confidence, never halts
+   - Each answer updates candidate scores and may activate/deactivate rules
+   - Loop until confidence is sufficient or no high-value questions remain
+       |
+       v
+7. [Result Assembly]
+   - IDENTIFICATION: candidates with confidence levels and full reasoning chain
+   - SAFETY: warnings + lookalikes (always present, never gates identification)
+   - EDIBILITY: advice gated by confidence ("I'd need X to advise on eating this")
+   - NEXT STEPS: what to check to increase confidence
+   - If online: LLM generates natural language explanation grounded in above
    - If offline: templated explanation from rule data
        |
        v
-7. [Competency Assessment]
+8. [Competency Assessment]
    - Track what the user demonstrated in this session
    - Update competency model
    - Schedule spaced repetition reviews if applicable
@@ -338,33 +353,268 @@ user_editable:
   allow_regional_override: true # User can add regional notes
 ```
 
-### 3.5 How the Rule Engine Executes Heuristics
+### 3.5 Handling Incomplete and Ambiguous Information
 
-The rule engine processes heuristics in priority order:
+Users in the field often can't answer every question. They may not know tree species, may be unsure whether something is growing on soil or buried wood, or simply can't tell gill attachment type without a hand lens. The system must treat partial information as normal, not exceptional.
+
+#### Design Principles
+
+1. **Every observation field is optional.** The system works with whatever the user provides. More information = higher confidence, but absent information never blocks identification.
+2. **"I don't know" is always a valid answer.** Every question in the disambiguation flow has an explicit "Not sure / Can't tell" option. This is not a failure -- it simply means that feature doesn't contribute to narrowing candidates.
+3. **Ambiguity is flagged, not assumed.** If the user says "growing in grass", the system should surface the ambiguity: "Is it growing directly from the soil, or could there be buried wood underneath?" -- but accept "not sure" and adjust confidence accordingly.
+4. **Infer where possible.** "Found in a park under oak trees" implies: soil substrate, mycorrhizal possibility, not deep woodland. The system should extract these implicit signals.
+5. **Confidence reflects information density.** A specimen with 3 observed features will have lower confidence than one with 10 features, even if both point to the same species. The system communicates this: "Based on what you've told me, this is likely X, but checking [feature Y] would significantly increase confidence."
+
+#### Observation Model
+
+```typescript
+// Every field is optional. null = not observed, not "absent"
+interface Observation {
+  // Morphological features
+  cap_color?: string | null;        // null = user hasn't looked / can't tell
+  cap_size_cm?: number | null;
+  cap_shape?: string | null;
+  cap_texture?: string | null;
+  gill_type?: 'gills' | 'pores' | 'teeth' | 'smooth' | 'ridges' | null;
+  gill_color?: string | null;
+  gill_attachment?: string | null;
+  stem_present?: boolean | null;
+  stem_color?: string | null;
+  ring_present?: boolean | null;
+  volva_present?: boolean | null;
+  spore_print_color?: string | null;
+  flesh_color?: string | null;
+  bruising_color?: string | null;
+  smell?: string | null;
+  taste?: string | null;           // only when safe to taste-test
+
+  // Ecological context
+  habitat?: string | null;          // woodland, grassland, etc.
+  substrate?: string | null;        // soil, wood, dung, etc.
+  substrate_confidence?: 'certain' | 'likely' | 'unsure';
+  nearby_trees?: string[] | null;   // user may not know species
+  tree_confidence?: 'certain' | 'likely' | 'unsure';
+  season_month?: number;            // from device date
+  region?: string | null;           // from device location or manual
+  growth_pattern?: string | null;   // solitary, clustered, ring, etc.
+
+  // Meta
+  photo_available?: boolean;
+  observation_conditions?: string;  // "wet day", "specimen old/damaged", etc.
+}
+```
+
+### 3.6 Confidence Model: Weighted, Non-Additive Evidence
+
+Confidence is **not** a simple sum of matching features. A single highly discriminative feature (brittle gills) can carry more weight than a dozen weak signals (cap color, season, habitat) combined.
+
+#### Evidence Tiers
+
+Each feature observation is classified by its **discriminative power** for a given candidate:
+
+| Tier | Name | Weight Behaviour | Examples |
+|------|------|-----------------|----------|
+| **D** | **Definitive** | Near-certain on its own. Establishes or eliminates a candidate regardless of other evidence. | Brittle snapping flesh → Russula/Lactarius. Pores instead of gills → Bolete family. Milk exuding from gills → Lactarius. |
+| **S** | **Strong** | High weight. A single strong feature significantly shifts confidence. Two strong features together approach definitive. | Volva at base (strong Amanita signal). Free gills + chocolate brown spore print (strong Agaricus signal). |
+| **M** | **Moderate** | Meaningful but not decisive alone. Requires corroboration. | Cap color, habitat type, season, growth pattern. Each adds evidence but none is conclusive. |
+| **W** | **Weak** | Slight signal. Useful for tiebreaking between close candidates, not for establishing identification. | "Looks like what I picked last year." Vague smell descriptions. Size alone. |
+| **N** | **Negative/Exclusionary** | Eliminates candidates. A single exclusionary feature removes a candidate entirely. | No volva → eliminates Amanita (for species with obligate volva). Growing on wood → eliminates all strictly mycorrhizal soil species. |
+
+#### How Evidence Combines
+
+The confidence model is **hierarchical and conditional**, not additive:
 
 ```
-1. SAFETY SCREENING (critical priority)
-   - All binary safety rules fire first
-   - If ANY safety rule triggers REJECT, that overrides everything
-   - Output: { blocked: bool, reason: string, dangerous_lookalike: species? }
+Step 1: DEFINITIVE features fire first
+  - If a definitive feature matches, that candidate is strongly established
+  - If a definitive exclusionary feature matches, that candidate is eliminated
+  - Example: brittle flesh → Russula/Lactarius (others heavily penalised)
 
-2. GENUS CLASSIFICATION (standard priority)
-   - Match morphological features + ecological context against genus profiles
-   - Score each candidate genus by how many confidence_markers match
-   - Output: { candidates: [{ genus, confidence, matching_markers, missing_markers }] }
+Step 2: STRONG features refine within the established group
+  - Milk exuding? → Lactarius, not Russula (definitive within the narrowed set)
+  - No milk? → Russula confirmed
+  - Volva present? → Even if other features suggest Russula, this overrides (exclusionary)
 
-3. DISAMBIGUATION (interactive)
-   - For top candidate genera, identify discriminating questions
-   - Each question is selected to maximally separate remaining candidates
-   - Output: { question: string, expected_outcomes: [{ answer, effect_on_candidates }] }
+Step 3: MODERATE features adjust relative confidence among remaining candidates
+  - Cap color, habitat, season each nudge scores
+  - Multiple moderate features in agreement compound (diminishing returns)
+  - A moderate feature that contradicts a strong one does NOT override it
 
-4. HEURISTIC APPLICATION (once genus is confirmed)
-   - Apply genus-specific heuristics (taste test, milk color, etc.)
-   - Output: { conclusion: string, confidence: string, next_steps: string[] }
+Step 4: WEAK features break ties only
+  - If two candidates are close after strong/moderate evidence, weak features decide
+  - Never enough to establish or eliminate on their own
+```
 
-5. RESULT ASSEMBLY
-   - Combine all rule outputs into a structured identification result
-   - Include the full reasoning chain for transparency
+#### Conditional Rule Activation
+
+Once the candidate space is narrowed, the rule engine **prunes irrelevant rule sets**:
+
+```typescript
+interface RuleActivation {
+  rule_id: string;
+  relevance: 'active' | 'deprioritised' | 'inactive';
+  reason: string;
+}
+
+// Example: brittle gills confirmed → Russula established
+// Result:
+// - Russula heuristics:     ACTIVE (taste test, species discrimination)
+// - Lactarius heuristics:   ACTIVE (still need to confirm no milk)
+// - Amanita heuristics:     DEPRIORITISED (only if volva/ring observed)
+// - Bolete heuristics:      INACTIVE (gills present, not pores)
+// - LBM safety rule:        INACTIVE (size/genus don't match)
+
+function activateRules(candidates: Candidate[]): RuleActivation[] {
+  const activeGenera = candidates
+    .filter(c => c.confidence > THRESHOLD_ACTIVE)
+    .map(c => c.genus);
+  const marginalGenera = candidates
+    .filter(c => c.confidence > THRESHOLD_MARGINAL && c.confidence <= THRESHOLD_ACTIVE)
+    .map(c => c.genus);
+
+  return allRules.map(rule => {
+    if (activeGenera.includes(rule.applies_to.genus)) {
+      return { rule_id: rule.id, relevance: 'active', reason: `${rule.applies_to.genus} is a current candidate` };
+    }
+    if (marginalGenera.includes(rule.applies_to.genus)) {
+      return { rule_id: rule.id, relevance: 'deprioritised', reason: `${rule.applies_to.genus} is marginal` };
+    }
+    return { rule_id: rule.id, relevance: 'inactive', reason: `${rule.applies_to.genus} eliminated` };
+  });
+}
+```
+
+This means: **if we know it's a Russula, we don't waste the user's time with Amanita questions** unless there's a specific reason to doubt the Russula identification (e.g., the user hasn't confirmed brittle flesh and the specimen has a ring).
+
+#### Disambiguation Question Selection
+
+Questions are selected by **information gain** -- which question most efficiently separates remaining candidates:
+
+```typescript
+interface DisambiguationQuestion {
+  question: string;
+  feature_tested: string;
+  information_gain: number;       // how much this separates remaining candidates
+  eliminates_if_yes: string[];    // candidates removed by "yes"
+  eliminates_if_no: string[];     // candidates removed by "no"
+  skippable: boolean;             // true -- user can always say "not sure"
+  skip_cost: number;              // how much confidence we lose by skipping
+  safety_relevant: boolean;       // if true, strongly encourage answering
+}
+```
+
+The system prioritises questions that:
+1. Have the highest information gain (separate the most candidates)
+2. Are easy for the user to answer (observable without tools)
+3. Are safety-relevant (e.g., "is there a volva at the base?" when Amanita is a candidate)
+
+If a question is skipped, the system continues with reduced confidence rather than halting.
+
+#### Confidence Score Semantics
+
+The output confidence is not a percentage but a **named level with clear meaning**:
+
+| Level | Meaning | Typical Evidence | System Behaviour |
+|-------|---------|-----------------|------------------|
+| **Definitive** | Single candidate, confirmed by definitive features + corroborating evidence | Brittle gills + no milk + taste test done | "This is [species]. Here's why." |
+| **High** | Strong candidate, well-supported but one or two confirming features missing | Genus confirmed, species likely but spore print not done | "Very likely [species]. Checking [X] would confirm." |
+| **Moderate** | Leading candidate but alternatives remain plausible | Several moderate features align, no definitive feature observed | "Probably [species], but could be [Y]. Key question: [Z]." |
+| **Low** | Multiple candidates roughly equal, insufficient information | Few features observed, or features match several genera | "Could be [A], [B], or [C]. I'd need to know [features] to narrow it down." |
+| **Insufficient** | Not enough information to meaningfully narrow candidates | Only photo + location, no morphological observations | "I can see it's a gilled mushroom. To identify it I'd need [basic observations]." |
+
+### 3.7 Identification vs. Edibility: Separation of Concerns
+
+The system's primary job is **identification** -- telling the user what they're looking at. Edibility is a property of the identified species, not a gate on the identification process.
+
+#### What This Means in Practice
+
+- **The system never refuses to identify something.** Even Death Cap gets a full identification with reasoning. Blocking identification of dangerous species would be both patronising and counterproductive -- users learn by understanding what's dangerous and why.
+- **Safety warnings are attached to identifications, not used to prevent them.** Instead of "I won't help you with that white mushroom", the system says: "This matches Amanita phalloides (Death Cap). Here's why: [reasoning]. This species is lethally toxic. Do not eat under any circumstances."
+- **Edibility information is layered on top of identification.** First: "What is it?" Then: "Is it safe?" These are separate outputs in the result.
+- **Confidence gates affect edibility guidance, not identification.** If confidence is low, the system still identifies candidates but says: "I'm not confident enough in this identification to give edibility advice. Here's what would help me be more certain."
+
+#### Result Structure
+
+```typescript
+interface IdentificationResult {
+  // IDENTIFICATION (always provided, regardless of safety)
+  candidates: Array<{
+    species: string;
+    genus: string;
+    common_name: string;
+    confidence: ConfidenceLevel;
+    matching_evidence: Evidence[];     // what supports this candidate
+    contradicting_evidence: Evidence[]; // what argues against it
+    missing_evidence: Evidence[];       // what would confirm/deny it
+  }>;
+  reasoning_chain: string[];           // step-by-step logic trail
+
+  // SAFETY ASSESSMENT (attached to identification, never blocks it)
+  safety: {
+    toxicity: ToxicityLevel;           // of the top candidate
+    warnings: SafetyWarning[];         // specific hazards
+    dangerous_lookalikes: Lookalike[]; // what else this could be that's dangerous
+    confidence_sufficient_for_foraging: boolean;
+  };
+
+  // EDIBILITY (only meaningful when confidence is high enough)
+  edibility?: {
+    status: 'edible' | 'edible_with_caution' | 'inedible' | 'toxic' | 'deadly';
+    notes: string;
+    preparation_notes?: string;
+    available: boolean;              // false if confidence too low to advise
+    reason_unavailable?: string;     // "Confidence too low" / "Confirm X first"
+  };
+
+  // NEXT STEPS (always provided)
+  suggested_actions: Array<{
+    action: string;                  // "Check for volva at base"
+    reason: string;                  // "Would distinguish Agaricus from Amanita"
+    priority: 'critical' | 'recommended' | 'optional';
+    safety_relevant: boolean;
+  }>;
+}
+```
+
+### 3.8 How the Rule Engine Executes (Revised Flow)
+
+```
+1. FEATURE INGESTION
+   - Accept whatever the user provides (all fields optional)
+   - Infer implicit features from context (park → not deep woodland)
+   - Flag ambiguities for follow-up ("soil or buried wood?")
+   - Output: Observation with confidence annotations per field
+
+2. CANDIDATE GENERATION (broad, inclusive)
+   - Score ALL genera against observed features using weighted evidence model
+   - Definitive features establish/eliminate candidates immediately
+   - Strong/moderate/weak features adjust scores
+   - Include any genus that isn't definitively excluded
+   - Output: ranked candidate list with per-candidate evidence breakdown
+
+3. SAFETY ANNOTATION (attached, never blocking)
+   - For every candidate, look up toxicity and dangerous lookalikes
+   - If a dangerous lookalike is plausible given current evidence, flag it
+   - Compute: "is confidence high enough to give edibility advice?"
+   - Output: safety metadata attached to each candidate
+
+4. CONDITIONAL RULE PRUNING
+   - Based on top candidates, activate relevant heuristic sets
+   - Deactivate irrelevant rule sets (Russula confirmed → Bolete rules off)
+   - Output: active rule set for disambiguation
+
+5. DISAMBIGUATION (interactive, all questions skippable)
+   - Select questions by information gain from active rules only
+   - Prioritise: safety-relevant questions > high-gain > easy-to-answer
+   - Every question has "Not sure / Can't tell" as a valid answer
+   - Each answer updates candidate scores and may activate/deactivate rules
+   - Loop until: confidence is high, or no high-value questions remain
+
+6. RESULT ASSEMBLY
+   - Identification: top candidates with confidence levels and reasoning
+   - Safety: warnings, lookalikes, confidence-gated edibility advice
+   - Next steps: what the user could check to increase confidence
+   - Learning hooks: what competencies this session could demonstrate
 ```
 
 ### 3.6 Heuristic Effectiveness: How to Maximize with LLM
@@ -679,19 +929,84 @@ class MushroomDB extends Dexie {
 }
 ```
 
-### 7.2 Knowledge Base Loading Strategy
+### 7.2 Storage Persistence & Backup
+
+IndexedDB is browser-local storage. Data survives page refreshes and app restarts, but is vulnerable to the user clearing browser data, storage eviction under pressure, or device loss. Since users build competency evidence and personal annotations over months/years, data loss would be significant.
+
+#### Layer 1: Persistent Storage (always active)
+
+Request persistent storage on first launch so the browser won't evict our data under storage pressure:
+
+```typescript
+async function requestPersistentStorage(): Promise<boolean> {
+  if (navigator.storage?.persist) {
+    const granted = await navigator.storage.persist();
+    // PWAs installed to homescreen almost always get this granted
+    return granted;
+  }
+  return false;
+}
+```
+
+PWAs added to the homescreen on both Android and iOS are almost always granted persistent storage. This protects against automatic eviction but not against the user manually clearing data.
+
+#### Layer 2: Manual Export/Import (Phase 1+)
+
+Give the user full control over their data with JSON export/import via the `dexie-export-import` addon:
+
+```typescript
+import { exportDB, importDB } from 'dexie-export-import';
+
+// Export entire DB to a downloadable JSON blob
+async function backupData(db: MushroomDB): Promise<Blob> {
+  return await exportDB(db, {
+    prettyJson: true,
+    filter: (table) => table !== 'llmCache', // skip cached LLM responses
+  });
+}
+
+// Import from a previously exported file
+async function restoreData(file: File): Promise<void> {
+  await importDB(file, { overwriteValues: true });
+}
+```
+
+UI integration:
+- **Settings > Backup & Restore** with "Export Data" and "Import Data" buttons
+- **Periodic reminder**: After every 10 identification sessions or 30 days (whichever comes first), show a non-intrusive prompt: "Back up your data? You have X sessions and Y notes that aren't backed up."
+- **Last backup timestamp** displayed in settings so the user knows how current their backup is
+- Export includes: user model, competency records, FSRS card states, user contributions, identification session history. Excludes: core KB (ships with app), LLM cache (ephemeral).
+
+This is zero-cost, works offline, gives the user full data ownership, and requires no server infrastructure.
+
+#### Layer 3: Cloud Sync (Phase 6+ / Future)
+
+If the project grows to support multi-device use or community features, evaluate:
+
+- **Dexie Cloud** (first-party sync addon) -- adds multi-device sync, auth, and server-side persistence on top of the same Dexie API. Handles conflict resolution and offline-first sync automatically. Tradeoff: dependency on their hosted service (or self-host).
+- **Custom sync to Supabase/Firebase** -- most flexible but most work. Need conflict resolution, versioning, offline queue.
+- **CRDTs** for conflict-free merge of user contributions across devices.
+
+Cloud sync is only needed for: user model, competency records, FSRS card states, and user contributions. The core knowledge base ships with the app and is version-controlled in git.
+
+#### What Lives Where
+
+| Data | Storage | Backed Up? | Synced (Future)? |
+|------|---------|-----------|-------------------|
+| Core KB (genus profiles, heuristics, safety rules) | Ships as JSON in build -> IndexedDB on first load | No need -- reinstall restores it | No need -- versioned in git |
+| User model & competency records | IndexedDB | Yes (export/import) | Yes |
+| FSRS card states | IndexedDB | Yes (export/import) | Yes |
+| User contributions (notes, overrides, drafts) | IndexedDB | Yes (export/import) | Yes |
+| Identification session history | IndexedDB | Yes (export/import) | Optional |
+| Cached LLM responses | IndexedDB | No (ephemeral) | No |
+| User-uploaded photos | IndexedDB | Optional (large) | No |
+
+### 7.3 Knowledge Base Loading Strategy
 
 1. **Ship core KB with the app** -- The 20 most common UK foraging genera + all safety rules are bundled as JSON files in the build
 2. **Store in IndexedDB on first load** -- Parsed and indexed for efficient lookup
-3. **Periodic updates** -- When online, check for KB updates (new species, corrected rules). Versioned with semver.
-4. **User contributions overlay** -- User edits stored in separate IndexedDB tables, merged at query time
-
-### 7.3 Data Sync (Future)
-
-If user accounts are added:
-- User model and contributions sync to cloud storage
-- KB updates push from server
-- CRDTs for conflict-free merge of user contributions across devices
+3. **Periodic updates** -- When online, check for KB updates (new species, corrected rules). Versioned with semver. Updates are diffed against the installed version to avoid re-downloading unchanged data.
+4. **User contributions overlay** -- User edits stored in separate IndexedDB tables, merged at query time. Core KB and user data are never mixed in the same tables.
 
 ---
 
@@ -750,30 +1065,40 @@ NETWORK ONLY:
 
 **Goal**: Working PWA shell with local knowledge base and basic identification flow.
 
-- [ ] Set up Vite + React + TypeScript project with PWA plugin
-- [ ] Configure Dexie.js IndexedDB schema
-- [ ] Parse existing YAML schemas into TypeScript types
-- [ ] Load core knowledge base (genus profiles, heuristics, safety rules) into IndexedDB
-- [ ] Build basic UI shell: home screen, identification flow, settings
-- [ ] Implement photo capture via native input
-- [ ] Service worker for offline caching
-- [ ] Basic routing (React Router)
+- [x] Set up Vite + React + TypeScript project with PWA plugin
+- [x] Configure Dexie.js IndexedDB schema
+- [x] Request persistent storage on first launch (`navigator.storage.persist()`)
+- [x] Implement data export/import via `dexie-export-import` (Settings > Backup & Restore)
+- [x] Add periodic backup reminder (every 10 sessions or 30 days)
+- [x] Parse existing YAML schemas into TypeScript types
+- [x] Load core knowledge base (genus profiles, heuristics, safety rules) into IndexedDB
+- [x] Build basic UI shell: home screen, identification flow, settings
+- [x] Implement photo capture via native input
+- [x] Service worker for offline caching
+- [x] Basic routing (React Router)
 
-**Deliverable**: Installable PWA that loads and displays knowledge base data.
+**Deliverable**: Installable PWA that loads and displays knowledge base data, with data backup/restore.
 
 ### Phase 2: Rule Engine
 
-**Goal**: Deterministic identification engine that applies heuristics.
+**Goal**: Deterministic identification engine with weighted non-additive confidence model.
 
-- [ ] Build rule engine core: match features against genus profiles
-- [ ] Implement safety screening (critical rules fire first)
-- [ ] Implement genus scoring (confidence markers, ecological context)
-- [ ] Build interactive disambiguation (guided question sequences)
-- [ ] Implement heuristic execution (procedures, outcomes, exceptions)
-- [ ] Build result assembly with reasoning chain
-- [ ] Templated explanations for offline mode
+- [x] Define evidence tier system (Definitive / Strong / Moderate / Weak / Exclusionary)
+- [x] Build observation model with all-optional fields and confidence annotations
+- [x] Build candidate generator: score all genera against observed features using weighted model
+- [x] Implement definitive feature fast-path (brittle gills → Russula/Lactarius immediately)
+- [x] Implement exclusionary logic (single feature eliminates candidate)
+- [x] Implement moderate/weak evidence accumulation with diminishing returns
+- [x] Build conditional rule pruning (narrow active heuristic sets as candidates narrow)
+- [x] Build safety annotation layer (attached to candidates, never blocking identification)
+- [x] Build disambiguation question selector ranked by information gain
+- [x] Ensure every question supports "Not sure / Can't tell" without blocking progress
+- [x] Build result assembly: identification + safety + edibility (gated by confidence) + next steps
+- [x] Implement implicit feature inference from context (park → not deep woodland)
+- [x] Build ambiguity detection and follow-up prompts ("soil or buried wood?")
+- [x] Templated explanations for offline mode
 
-**Deliverable**: Complete offline identification flow using structured form input.
+**Deliverable**: Complete offline identification flow that handles partial information gracefully, uses weighted non-additive confidence, and separates identification from edibility advice.
 
 ### Phase 3: Knowledge Base Population
 
@@ -873,7 +1198,7 @@ NETWORK ONLY:
 
 | Risk | Impact | Mitigation |
 |------|--------|------------|
-| Incorrect identification leads to poisoning | Critical | Rule engine defaults to caution; safety rules cannot be overridden; disclaimers; competency gates |
+| Incorrect identification leads to poisoning | Critical | Rule engine always flags dangerous lookalikes; edibility advice gated by confidence; safety warnings attached to every identification; disclaimers |
 | LLM hallucination about mushroom safety | Critical | LLM never makes safety decisions; all safety logic is deterministic |
 | Knowledge base errors | High | Cross-referencing, expert review, provenance tracking, version control |
 | LLM API costs spiral | Medium | Offline-first design; aggressive caching; model routing; budget caps |
