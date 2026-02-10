@@ -1110,7 +1110,7 @@ NETWORK ONLY:
 - [x] Create edibility determination heuristics for each beginner-friendly genus
 - [x] Create ecological context rules (season, habitat, regional data)
 - [ ] Expert review of all safety-critical content
-- [ ] Add reference images (sourced or photographed)
+- [x] Add reference images (sourced or photographed)
 
 **Priority genera** (roughly by importance to UK foragers):
 1. Amanita (safety critical)
