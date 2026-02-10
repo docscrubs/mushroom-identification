@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 
 const BACKUP_SESSION_THRESHOLD = 10;
+const BACKUP_DAYS_THRESHOLD = 30;
 
 interface AppState {
   isInitialized: boolean;
@@ -8,6 +9,7 @@ interface AppState {
   activeSessionId: string | null;
   lastBackupDate: string | null;
   sessionsSinceBackup: number;
+  backupReminderDismissedAt: string | null;
 
   setInitialized: () => void;
   setOnline: (online: boolean) => void;
@@ -15,6 +17,7 @@ interface AppState {
   endSession: () => void;
   recordBackup: () => void;
   isBackupNeeded: () => boolean;
+  dismissBackupReminder: () => void;
 }
 
 export const useAppStore = create<AppState>()((set, get) => ({
@@ -23,6 +26,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
   activeSessionId: null,
   lastBackupDate: null,
   sessionsSinceBackup: 0,
+  backupReminderDismissedAt: null,
 
   setInitialized: () => set({ isInitialized: true }),
 
@@ -35,6 +39,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
     set((state) => ({
       activeSessionId: null,
       sessionsSinceBackup: state.sessionsSinceBackup + 1,
+      backupReminderDismissedAt: null,
     })),
 
   recordBackup: () =>
@@ -43,5 +48,21 @@ export const useAppStore = create<AppState>()((set, get) => ({
       sessionsSinceBackup: 0,
     }),
 
-  isBackupNeeded: () => get().sessionsSinceBackup >= BACKUP_SESSION_THRESHOLD,
+  isBackupNeeded: () => {
+    const { sessionsSinceBackup, lastBackupDate } = get();
+
+    // Session count threshold
+    if (sessionsSinceBackup >= BACKUP_SESSION_THRESHOLD) return true;
+
+    // 30-day threshold (only if a backup has been made before)
+    if (lastBackupDate) {
+      const daysSinceBackup = (Date.now() - new Date(lastBackupDate).getTime()) / (1000 * 60 * 60 * 24);
+      if (daysSinceBackup >= BACKUP_DAYS_THRESHOLD) return true;
+    }
+
+    return false;
+  },
+
+  dismissBackupReminder: () =>
+    set({ backupReminderDismissedAt: new Date().toISOString() }),
 }));

@@ -111,5 +111,43 @@ describe('AppStore', () => {
       }
       expect(useAppStore.getState().isBackupNeeded()).toBe(false);
     });
+
+    it('reports backup needed when last backup was over 30 days ago', () => {
+      // Record a backup 31 days in the past
+      const thirtyOneDaysAgo = new Date(Date.now() - 31 * 24 * 60 * 60 * 1000).toISOString();
+      useAppStore.setState({ lastBackupDate: thirtyOneDaysAgo, sessionsSinceBackup: 0 });
+      expect(useAppStore.getState().isBackupNeeded()).toBe(true);
+    });
+
+    it('does not report backup needed when last backup was recent and sessions low', () => {
+      const twoDaysAgo = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString();
+      useAppStore.setState({ lastBackupDate: twoDaysAgo, sessionsSinceBackup: 3 });
+      expect(useAppStore.getState().isBackupNeeded()).toBe(false);
+    });
+
+    it('reports backup needed when last backup is null and sessions >= threshold', () => {
+      useAppStore.setState({ lastBackupDate: null, sessionsSinceBackup: 10 });
+      expect(useAppStore.getState().isBackupNeeded()).toBe(true);
+    });
+  });
+
+  describe('backup reminder dismissal', () => {
+    it('starts with no dismissal', () => {
+      expect(useAppStore.getState().backupReminderDismissedAt).toBeNull();
+    });
+
+    it('records dismissal timestamp', () => {
+      useAppStore.getState().dismissBackupReminder();
+      expect(useAppStore.getState().backupReminderDismissedAt).toBeTruthy();
+    });
+
+    it('resets dismissal when a new session ends', () => {
+      useAppStore.getState().dismissBackupReminder();
+      expect(useAppStore.getState().backupReminderDismissedAt).toBeTruthy();
+
+      useAppStore.getState().startSession();
+      useAppStore.getState().endSession();
+      expect(useAppStore.getState().backupReminderDismissedAt).toBeNull();
+    });
   });
 });

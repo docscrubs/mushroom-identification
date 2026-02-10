@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useAppStore } from '@/stores/app-store';
+import { BackupReminder } from '@/components/BackupReminder';
 
 export function HomePage() {
   const isOnline = useAppStore((s) => s.isOnline);
@@ -15,6 +16,8 @@ export function HomePage() {
           {isOnline ? 'Online' : 'Offline'} mode
         </p>
       </div>
+
+      <BackupReminder />
 
       <div className="grid gap-4">
         <Link
