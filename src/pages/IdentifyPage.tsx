@@ -12,6 +12,7 @@ import { extractFeatures, fileToDataUrl } from '@/llm/extract-features';
 import { generateExplanation } from '@/llm/explain';
 import { recordCalibration } from '@/llm/calibration';
 import { buildGuidanceContext, type GuidanceContext } from '@/learning/adaptive-guidance';
+import { SafetyDisclaimer } from '@/components/SafetyDisclaimer';
 
 type SelectOption = { value: string; label: string };
 
@@ -703,6 +704,8 @@ function ResultView({
           )}
         </div>
       )}
+
+      <SafetyDisclaimer compact />
     </div>
   );
 }

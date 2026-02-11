@@ -1,6 +1,8 @@
 import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Layout } from '@/components/Layout';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
+import { OnboardingOverlay } from '@/components/OnboardingOverlay';
 import { HomePage } from '@/pages/HomePage';
 import { IdentifyPage } from '@/pages/IdentifyPage';
 import { LearnPage } from '@/pages/LearnPage';
@@ -63,17 +65,20 @@ export function App() {
   }
 
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route element={<Layout />}>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/identify" element={<IdentifyPage />} />
-          <Route path="/learn" element={<LearnPage />} />
-          <Route path="/train" element={<TrainPage />} />
-          <Route path="/contribute" element={<ContributePage />} />
-          <Route path="/settings" element={<SettingsPage />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
+    <ErrorBoundary>
+      <OnboardingOverlay />
+      <BrowserRouter>
+        <Routes>
+          <Route element={<Layout />}>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/identify" element={<IdentifyPage />} />
+            <Route path="/learn" element={<LearnPage />} />
+            <Route path="/train" element={<TrainPage />} />
+            <Route path="/contribute" element={<ContributePage />} />
+            <Route path="/settings" element={<SettingsPage />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </ErrorBoundary>
   );
 }
