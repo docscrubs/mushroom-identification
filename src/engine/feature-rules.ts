@@ -1501,4 +1501,123 @@ export const featureRules: FeatureRule[] = [
     supporting: false,
     description: 'A ring rules out Lepista',
   },
+
+  // === DESCRIPTION_NOTES RULES (free-text matching) ===
+
+  // --- Russula ---
+  { id: 'notes-russula-distant', field: 'description_notes', match: { type: 'includes', value: 'distant' }, genus: 'Russula', tier: 'moderate', supporting: true, description: 'Distant gills suggest Russula' },
+  { id: 'notes-russula-depressed', field: 'description_notes', match: { type: 'includes', value: 'depressed' }, genus: 'Russula', tier: 'moderate', supporting: true, description: 'Depressed cap centre is typical of mature Russula' },
+  { id: 'notes-russula-dipped', field: 'description_notes', match: { type: 'includes', value: 'dipped' }, genus: 'Russula', tier: 'moderate', supporting: true, description: 'Cap dipped in centre suggests Russula' },
+  { id: 'notes-russula-brittle-gills', field: 'description_notes', match: { type: 'includes', value: 'brittle gills' }, genus: 'Russula', tier: 'moderate', supporting: true, description: 'Brittle gills that flake suggest Russula' },
+  { id: 'notes-russula-taste-test', field: 'description_notes', match: { type: 'includes', value: 'taste test' }, genus: 'Russula', tier: 'moderate', supporting: true, description: 'Taste test is characteristic Russula identification method' },
+  { id: 'notes-russula-snaps-chalk', field: 'description_notes', match: { type: 'includes', value: 'snaps like chalk' }, genus: 'Russula', tier: 'moderate', supporting: true, description: 'Flesh snapping like chalk is definitive Russula trait' },
+
+  // --- Lactarius ---
+  { id: 'notes-lactarius-milk', field: 'description_notes', match: { type: 'includes', value: 'milk' }, genus: 'Lactarius', tier: 'strong', supporting: true, description: 'Milk/latex when cut is definitive for Lactarius' },
+  { id: 'notes-lactarius-latex', field: 'description_notes', match: { type: 'includes', value: 'latex' }, genus: 'Lactarius', tier: 'strong', supporting: true, description: 'Latex exudation confirms Lactarius' },
+  { id: 'notes-lactarius-exude', field: 'description_notes', match: { type: 'includes', value: 'exude' }, genus: 'Lactarius', tier: 'strong', supporting: true, description: 'Exuding liquid when cut suggests Lactarius' },
+  { id: 'notes-lactarius-concentric', field: 'description_notes', match: { type: 'includes', value: 'concentric' }, genus: 'Lactarius', tier: 'moderate', supporting: true, description: 'Concentric bands on cap suggest Lactarius' },
+  { id: 'notes-lactarius-bands', field: 'description_notes', match: { type: 'includes', value: 'bands' }, genus: 'Lactarius', tier: 'moderate', supporting: true, description: 'Colour bands on cap suggest Lactarius' },
+  { id: 'notes-lactarius-zones', field: 'description_notes', match: { type: 'includes', value: 'zones' }, genus: 'Lactarius', tier: 'moderate', supporting: true, description: 'Colour zones on cap suggest Lactarius' },
+  { id: 'notes-lactarius-rings-colour', field: 'description_notes', match: { type: 'includes', value: 'rings of colour' }, genus: 'Lactarius', tier: 'moderate', supporting: true, description: 'Rings of colour on cap suggest Lactarius' },
+  { id: 'notes-lactarius-depressed', field: 'description_notes', match: { type: 'includes', value: 'depressed' }, genus: 'Lactarius', tier: 'moderate', supporting: true, description: 'Depressed cap centre is typical of Lactarius' },
+  { id: 'notes-lactarius-inrolled', field: 'description_notes', match: { type: 'includes', value: 'inrolled' }, genus: 'Lactarius', tier: 'moderate', supporting: true, description: 'Inrolled margin suggests Lactarius' },
+  { id: 'notes-lactarius-orange-milk', field: 'description_notes', match: { type: 'includes', value: 'orange milk' }, genus: 'Lactarius', tier: 'strong', supporting: true, description: 'Orange milk confirms edible Lactarius (Saffron Milkcap group)' },
+
+  // --- Macrolepiota ---
+  { id: 'notes-macro-snakeskin', field: 'description_notes', match: { type: 'includes', value: 'snakeskin' }, genus: 'Macrolepiota', tier: 'moderate', supporting: true, description: 'Snakeskin pattern on stem confirms Parasol' },
+  { id: 'notes-macro-ball-socket', field: 'description_notes', match: { type: 'includes', value: 'ball and socket' }, genus: 'Macrolepiota', tier: 'moderate', supporting: true, description: 'Ball and socket joint where cap meets stem is diagnostic for Parasol' },
+  { id: 'notes-macro-loose-skirt', field: 'description_notes', match: { type: 'includes', value: 'loose skirt' }, genus: 'Macrolepiota', tier: 'moderate', supporting: true, description: 'Loose moveable skirt/ring suggests Parasol' },
+  { id: 'notes-macro-sliding-ring', field: 'description_notes', match: { type: 'includes', value: 'sliding ring' }, genus: 'Macrolepiota', tier: 'moderate', supporting: true, description: 'Ring that slides up and down stem suggests Parasol' },
+  { id: 'notes-macro-moveable-ring', field: 'description_notes', match: { type: 'includes', value: 'moveable ring' }, genus: 'Macrolepiota', tier: 'moderate', supporting: true, description: 'Moveable ring on stem suggests Parasol' },
+
+  // --- Marasmius ---
+  { id: 'notes-marasmius-tough-stem', field: 'description_notes', match: { type: 'includes', value: 'tough stem' }, genus: 'Marasmius', tier: 'moderate', supporting: true, description: 'Tough wiry stem suggests Fairy Ring Champignon' },
+  { id: 'notes-marasmius-tie-knot', field: 'description_notes', match: { type: 'includes', value: 'tie' }, genus: 'Marasmius', tier: 'moderate', supporting: true, description: 'Stem that can be tied in a knot suggests Marasmius' },
+  { id: 'notes-marasmius-umbo', field: 'description_notes', match: { type: 'includes', value: 'umbo' }, genus: 'Marasmius', tier: 'moderate', supporting: true, description: 'Nipple-like umbo on cap suggests Marasmius' },
+  { id: 'notes-marasmius-fairy-ring', field: 'description_notes', match: { type: 'includes', value: 'fairy ring' }, genus: 'Marasmius', tier: 'moderate', supporting: true, description: 'Fairy ring growth pattern is characteristic of Marasmius' },
+  { id: 'notes-marasmius-revive', field: 'description_notes', match: { type: 'includes', value: 'revive' }, genus: 'Marasmius', tier: 'moderate', supporting: true, description: 'Reviving when wetted is diagnostic for Marasmius' },
+  { id: 'notes-marasmius-distant', field: 'description_notes', match: { type: 'includes', value: 'distant' }, genus: 'Marasmius', tier: 'moderate', supporting: true, description: 'Distant widely-spaced gills suggest Marasmius' },
+
+  // --- Cantharellus ---
+  { id: 'notes-cantharellus-false-gills', field: 'description_notes', match: { type: 'includes', value: 'false gills' }, genus: 'Cantharellus', tier: 'moderate', supporting: true, description: 'False gills (folds/ridges, not blades) are diagnostic for chanterelle' },
+  { id: 'notes-cantharellus-forked-ridges', field: 'description_notes', match: { type: 'includes', value: 'forked ridges' }, genus: 'Cantharellus', tier: 'moderate', supporting: true, description: 'Forked ridges underneath confirm chanterelle' },
+  { id: 'notes-cantharellus-folds', field: 'description_notes', match: { type: 'includes', value: 'folds' }, genus: 'Cantharellus', tier: 'moderate', supporting: true, description: 'Fold-like structures under cap suggest chanterelle' },
+  { id: 'notes-cantharellus-apricot', field: 'description_notes', match: { type: 'includes', value: 'apricot' }, genus: 'Cantharellus', tier: 'moderate', supporting: true, description: 'Apricot smell is characteristic of chanterelle' },
+
+  // --- Amanita ---
+  { id: 'notes-amanita-volva', field: 'description_notes', match: { type: 'includes', value: 'volva' }, genus: 'Amanita', tier: 'strong', supporting: true, description: 'Volva at base is a strong Amanita signal' },
+  { id: 'notes-amanita-cup-base', field: 'description_notes', match: { type: 'includes', value: 'cup at base' }, genus: 'Amanita', tier: 'strong', supporting: true, description: 'Cup-like structure at base suggests Amanita volva' },
+  { id: 'notes-amanita-warts', field: 'description_notes', match: { type: 'includes', value: 'warts' }, genus: 'Amanita', tier: 'strong', supporting: true, description: 'Wart-like patches on cap suggest Amanita veil remnants' },
+  { id: 'notes-amanita-veil-patches', field: 'description_notes', match: { type: 'includes', value: 'veil patches' }, genus: 'Amanita', tier: 'strong', supporting: true, description: 'Veil patches on cap are typical of Amanita' },
+  { id: 'notes-amanita-swollen-base', field: 'description_notes', match: { type: 'includes', value: 'swollen base' }, genus: 'Amanita', tier: 'strong', supporting: true, description: 'Swollen bulbous base suggests Amanita' },
+  { id: 'notes-amanita-egg', field: 'description_notes', match: { type: 'includes', value: 'egg-like' }, genus: 'Amanita', tier: 'strong', supporting: true, description: 'Egg-like universal veil is diagnostic for Amanita' },
+
+  // --- Agaricus ---
+  { id: 'notes-agaricus-yellow-stain', field: 'description_notes', match: { type: 'includes', value: 'yellow stain' }, genus: 'Agaricus', tier: 'strong', supporting: false, description: 'Yellow staining at base indicates toxic A. xanthodermus' },
+  { id: 'notes-agaricus-stain-yellow', field: 'description_notes', match: { type: 'includes', value: 'stain yellow' }, genus: 'Agaricus', tier: 'strong', supporting: false, description: 'Yellow staining indicates toxic A. xanthodermus' },
+  { id: 'notes-agaricus-phenol', field: 'description_notes', match: { type: 'includes', value: 'phenol' }, genus: 'Agaricus', tier: 'strong', supporting: false, description: 'Phenol/chemical smell indicates toxic Agaricus' },
+  { id: 'notes-agaricus-carbolic', field: 'description_notes', match: { type: 'includes', value: 'carbolic' }, genus: 'Agaricus', tier: 'strong', supporting: false, description: 'Carbolic smell indicates toxic Agaricus' },
+  { id: 'notes-agaricus-anise', field: 'description_notes', match: { type: 'includes', value: 'anise' }, genus: 'Agaricus', tier: 'moderate', supporting: true, description: 'Anise smell suggests edible Agaricus species' },
+  { id: 'notes-agaricus-almond', field: 'description_notes', match: { type: 'includes', value: 'almond' }, genus: 'Agaricus', tier: 'moderate', supporting: true, description: 'Almond smell suggests edible Agaricus species' },
+
+  // --- Coprinopsis ---
+  { id: 'notes-coprinopsis-deliquesce', field: 'description_notes', match: { type: 'includes', value: 'deliquesce' }, genus: 'Coprinopsis', tier: 'strong', supporting: true, description: 'Deliquescence is diagnostic for ink caps' },
+  { id: 'notes-coprinopsis-dissolving', field: 'description_notes', match: { type: 'includes', value: 'dissolving' }, genus: 'Coprinopsis', tier: 'strong', supporting: true, description: 'Gills dissolving into liquid confirms ink cap' },
+  { id: 'notes-coprinopsis-inky', field: 'description_notes', match: { type: 'includes', value: 'inky' }, genus: 'Coprinopsis', tier: 'strong', supporting: true, description: 'Inky black liquid from gills is diagnostic for ink caps' },
+
+  // --- Boletus ---
+  { id: 'notes-boletus-reticulated', field: 'description_notes', match: { type: 'includes', value: 'reticulated' }, genus: 'Boletus', tier: 'moderate', supporting: true, description: 'Reticulated net pattern on stem suggests Boletus' },
+  { id: 'notes-boletus-net-pattern', field: 'description_notes', match: { type: 'includes', value: 'net pattern' }, genus: 'Boletus', tier: 'moderate', supporting: true, description: 'Net pattern on stem suggests Boletus' },
+  { id: 'notes-boletus-spongy', field: 'description_notes', match: { type: 'includes', value: 'spongy' }, genus: 'Boletus', tier: 'moderate', supporting: true, description: 'Spongy pore surface suggests bolete' },
+  { id: 'notes-boletus-red-pores', field: 'description_notes', match: { type: 'includes', value: 'red pores' }, genus: 'Boletus', tier: 'moderate', supporting: false, description: 'Red pores indicate potentially toxic bolete' },
+
+  // --- Leccinum ---
+  { id: 'notes-leccinum-scabers', field: 'description_notes', match: { type: 'includes', value: 'scabers' }, genus: 'Leccinum', tier: 'moderate', supporting: true, description: 'Scabers on stem are diagnostic for Leccinum' },
+  { id: 'notes-leccinum-scabrous', field: 'description_notes', match: { type: 'includes', value: 'scabrous' }, genus: 'Leccinum', tier: 'moderate', supporting: true, description: 'Scabrous rough stem suggests Leccinum' },
+  { id: 'notes-leccinum-rough-scale', field: 'description_notes', match: { type: 'includes', value: 'rough scale' }, genus: 'Leccinum', tier: 'moderate', supporting: true, description: 'Rough scales on stem suggest Leccinum' },
+
+  // --- Hydnum ---
+  { id: 'notes-hydnum-spines', field: 'description_notes', match: { type: 'includes', value: 'spines underneath' }, genus: 'Hydnum', tier: 'moderate', supporting: true, description: 'Spines underneath cap are diagnostic for Hedgehog Fungus' },
+  { id: 'notes-hydnum-teeth', field: 'description_notes', match: { type: 'includes', value: 'teeth underneath' }, genus: 'Hydnum', tier: 'moderate', supporting: true, description: 'Teeth underneath cap are diagnostic for Hedgehog Fungus' },
+
+  // --- Laetiporus ---
+  { id: 'notes-laetiporus-bracket', field: 'description_notes', match: { type: 'includes', value: 'bracket' }, genus: 'Laetiporus', tier: 'moderate', supporting: true, description: 'Bracket growth on wood suggests Chicken of the Woods' },
+  { id: 'notes-laetiporus-shelf', field: 'description_notes', match: { type: 'includes', value: 'shelf' }, genus: 'Laetiporus', tier: 'moderate', supporting: true, description: 'Shelf-like growth on wood suggests Chicken of the Woods' },
+
+  // --- Fistulina ---
+  { id: 'notes-fistulina-bleeds-red', field: 'description_notes', match: { type: 'includes', value: 'bleeds red' }, genus: 'Fistulina', tier: 'moderate', supporting: true, description: 'Bleeding red fluid is diagnostic for Beefsteak Fungus' },
+  { id: 'notes-fistulina-marbled', field: 'description_notes', match: { type: 'includes', value: 'marbled flesh' }, genus: 'Fistulina', tier: 'moderate', supporting: true, description: 'Marbled flesh like steak is diagnostic for Beefsteak Fungus' },
+  { id: 'notes-fistulina-ox-tongue', field: 'description_notes', match: { type: 'includes', value: 'ox tongue' }, genus: 'Fistulina', tier: 'moderate', supporting: true, description: 'Ox tongue appearance suggests Beefsteak Fungus' },
+
+  // --- Lepista ---
+  { id: 'notes-lepista-violet', field: 'description_notes', match: { type: 'includes', value: 'violet' }, genus: 'Lepista', tier: 'moderate', supporting: true, description: 'Violet/lilac colour suggests Blewit' },
+  { id: 'notes-lepista-lilac', field: 'description_notes', match: { type: 'includes', value: 'lilac' }, genus: 'Lepista', tier: 'moderate', supporting: true, description: 'Lilac colour suggests Blewit' },
+  { id: 'notes-lepista-blue-purple', field: 'description_notes', match: { type: 'includes', value: 'blue-purple' }, genus: 'Lepista', tier: 'moderate', supporting: true, description: 'Blue-purple tinge suggests Blewit' },
+
+  // --- Armillaria ---
+  { id: 'notes-armillaria-bootlace', field: 'description_notes', match: { type: 'includes', value: 'bootlace' }, genus: 'Armillaria', tier: 'moderate', supporting: true, description: 'Bootlace rhizomorphs are diagnostic for Honey Fungus' },
+  { id: 'notes-armillaria-rhizomorph', field: 'description_notes', match: { type: 'includes', value: 'rhizomorph' }, genus: 'Armillaria', tier: 'moderate', supporting: true, description: 'Rhizomorphs suggest Honey Fungus' },
+
+  // --- Craterellus ---
+  { id: 'notes-craterellus-dark-funnel', field: 'description_notes', match: { type: 'includes', value: 'dark funnel' }, genus: 'Craterellus', tier: 'moderate', supporting: true, description: 'Dark funnel shape suggests Horn of Plenty' },
+  { id: 'notes-craterellus-black-trumpet', field: 'description_notes', match: { type: 'includes', value: 'black trumpet' }, genus: 'Craterellus', tier: 'moderate', supporting: true, description: 'Black trumpet appearance suggests Horn of Plenty' },
+  { id: 'notes-craterellus-smooth-underside', field: 'description_notes', match: { type: 'includes', value: 'smooth underside' }, genus: 'Craterellus', tier: 'moderate', supporting: true, description: 'Smooth underside (no gills) suggests Horn of Plenty' },
+
+  // --- Sparassis ---
+  { id: 'notes-sparassis-cauliflower', field: 'description_notes', match: { type: 'includes', value: 'cauliflower' }, genus: 'Sparassis', tier: 'moderate', supporting: true, description: 'Cauliflower-like growth suggests Sparassis' },
+  { id: 'notes-sparassis-brain', field: 'description_notes', match: { type: 'includes', value: 'brain-like' }, genus: 'Sparassis', tier: 'moderate', supporting: true, description: 'Brain-like lobed mass suggests Sparassis' },
+  { id: 'notes-sparassis-lobed', field: 'description_notes', match: { type: 'includes', value: 'lobed mass' }, genus: 'Sparassis', tier: 'moderate', supporting: true, description: 'Lobed mass growth form suggests Sparassis' },
+
+  // --- Calvatia ---
+  { id: 'notes-calvatia-puffball', field: 'description_notes', match: { type: 'includes', value: 'puffball' }, genus: 'Calvatia', tier: 'moderate', supporting: true, description: 'Puffball growth form suggests Calvatia/Lycoperdon' },
+  { id: 'notes-calvatia-white-inside', field: 'description_notes', match: { type: 'includes', value: 'uniformly white inside' }, genus: 'Calvatia', tier: 'moderate', supporting: true, description: 'Uniformly white interior confirms safe puffball' },
+  { id: 'notes-calvatia-pure-white', field: 'description_notes', match: { type: 'includes', value: 'pure white interior' }, genus: 'Calvatia', tier: 'moderate', supporting: true, description: 'Pure white interior confirms safe puffball' },
+
+  // --- Pleurotus ---
+  { id: 'notes-pleurotus-lateral', field: 'description_notes', match: { type: 'includes', value: 'lateral stem' }, genus: 'Pleurotus', tier: 'moderate', supporting: true, description: 'Lateral/off-centre stem suggests Oyster Mushroom' },
+  { id: 'notes-pleurotus-off-centre', field: 'description_notes', match: { type: 'includes', value: 'off-centre stem' }, genus: 'Pleurotus', tier: 'moderate', supporting: true, description: 'Off-centre stem suggests Oyster Mushroom' },
+
+  // --- Macrolepiota (striped stem variant) ---
+  { id: 'notes-macro-striped', field: 'description_notes', match: { type: 'includes', value: 'striped' }, genus: 'Macrolepiota', tier: 'moderate', supporting: true, description: 'Striped/patterned stem may suggest Parasol snakeskin pattern' },
 ];

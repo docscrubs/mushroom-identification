@@ -50,5 +50,6 @@ export interface GenusProfile {
     heuristic_id: string;
     description: string;
   }>;
+  identification_narrative?: string;
   notes: string;
 }

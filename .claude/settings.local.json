@@ -28,7 +28,23 @@
       "Bash(npx vercel:*)",
       "Bash(npx tsx:*)",
       "Bash(del c:UsersGavindevmushroom-identificationsrcdataminimal.test.ts)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "WebFetch(domain:en.wikipedia.org)",
+      "Bash(timeout:*)",
+      "Bash(findstr:*)",
+      "Bash(powershell -Command \"$input | Select-String -NotMatch '.test.ts'\":*)",
+      "WebFetch(domain:docs.z.ai)",
+      "Bash(dir:*)",
+      "Bash(git -C \"c:\\\\Users\\\\gscru\\\\dev\\\\mushroom-identification\" stash list)",
+      "Bash(git -C \"c:\\\\Users\\\\gscru\\\\dev\\\\mushroom-identification\" diff src/stores/app-store.ts)",
+      "Bash(git -C \"c:\\\\Users\\\\gscru\\\\dev\\\\mushroom-identification\" log --oneline -5)",
+      "Bash(git -C:*)",
+      "Bash(git -C \"c:\\\\Users\\\\gscru\\\\dev\\\\mushroom-identification\" stash pop:*)",
+      "Bash(\"c:/Users/gscru/dev/mushroom-identification/src/stores/minimal.test.ts\" << 'EOF'\nimport { describe, it, expect } from 'vitest';\n\ndescribe\\('Minimal', \\(\\) => {\n  it\\('works', \\(\\) => {\n    expect\\(1 + 1\\).toBe\\(2\\);\n  }\\);\n}\\);\nEOF)",
+      "Bash(\"c:/Users/gscru/dev/mushroom-identification/src/llm/minimal.test.ts\" << 'EOF'\nimport { describe, it, expect } from 'vitest';\n\ndescribe\\('Minimal', \\(\\) => {\n  it\\('works', \\(\\) => {\n    expect\\(1 + 1\\).toBe\\(2\\);\n  }\\);\n}\\);\nEOF)",
+      "Bash(del \"c:\\\\Users\\\\gscru\\\\dev\\\\mushroom-identification\\\\src\\\\llm\\\\minimal.test.ts\")",
+      "Bash(del \"c:\\\\Users\\\\gscru\\\\dev\\\\mushroom-identification\\\\src\\\\stores\\\\minimal.test.ts\")",
+      "Bash(del \"c:\\\\Users\\\\gscru\\\\dev\\\\mushroom-identification\\\\nul\")"
     ]
   }
 }

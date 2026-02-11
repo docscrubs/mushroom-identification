@@ -104,7 +104,7 @@ The critical design principle: **the deterministic rule engine handles ALL safet
 | **Knowledge Base format** | YAML (source) -> JSON (runtime) | Human-editable, version-controllable, parseable in-browser via `js-yaml` |
 | **Rule Engine** | Custom TypeScript engine | Our rules have domain-specific semantics (confidence markers, safety levels, prerequisites) that generic engines don't model well |
 | **Spaced Repetition** | `ts-fsrs` | Modern FSRS algorithm; runs client-side; 20-30% fewer reviews than SM-2 at same retention |
-| **LLM API** | Anthropic Claude API (primary) | Best reasoning for nuanced identification; prompt caching reduces cost 50-90% |
+| **LLM API** | z.ai (OpenAI-compatible endpoint) | User-provided key; OpenAI-compatible chat completions format; single provider for simplicity |
 | **State Management** | Zustand + Dexie (persistence) | Lightweight; stores serialize cleanly to IndexedDB |
 | **Camera** | Native `<input type="file" capture="environment">` | Simplest cross-platform approach; works iOS + Android |
 | **Styling** | Tailwind CSS | Utility-first; fast to prototype; good mobile defaults |
@@ -649,7 +649,7 @@ The LLM is a powerful but expensive and connectivity-dependent resource. Call it
 3. **Spaced repetition scheduling** -- FSRS algorithm, not LLM judgment.
 
 **CONDITIONALLY use LLM for:**
-1. **Photo analysis** -- If the user uploads a photo and we want to extract features from it. Note: this requires a multimodal model (Claude's vision capability).
+1. **Photo analysis** -- If the user uploads a photo and we want to extract features from it. Note: this requires a multimodal model (z.ai's vision capability).
 2. **Free-form questions** -- "What mushrooms grow near birch in October?" -- The rule engine can filter the KB, but the LLM can generate a more natural response.
 
 ### 4.2 Prompt Architecture
@@ -685,9 +685,9 @@ USER MESSAGE:
 
 | Strategy | Expected Saving | Implementation |
 |----------|----------------|----------------|
-| **Prompt caching** | 50-90% on input tokens | Place system prompt + genus profiles at start of every conversation. Anthropic caches prompts >1024 tokens; cached reads cost ~10% of normal. |
+| **Prompt caching** | 50-90% on input tokens | Place system prompt + genus profiles at start of every call. Leverage any provider-side caching for repeated prefixes. |
 | **Rule engine first** | 100% (no API call) | If the rule engine can resolve the identification entirely, skip the LLM call. Estimate: 40-60% of sessions need no LLM call. |
-| **Model routing** | 80% for simple queries | Route simple follow-up questions ("what does the spore print look like?") to Claude Haiku. Reserve Sonnet/Opus for complex identifications. |
+| **Model routing** | 80% for simple queries | Route simple follow-up questions to a smaller/cheaper model if z.ai offers one. Reserve the best model for complex identifications. |
 | **Response caching** | Near 100% for repeated queries | Cache LLM responses in IndexedDB keyed by (rule_engine_output_hash + user_message_hash). Common questions get instant cached answers. |
 | **Compact rule context** | 20-40% token reduction | Send only relevant genus profiles and heuristics, not the entire KB. The rule engine pre-selects which knowledge to include. |
 | **Max token limits** | Variable | Set `max_tokens` to 500 for explanations, 200 for follow-up answers. Output tokens cost 3-5x input. |
@@ -1136,20 +1136,88 @@ NETWORK ONLY:
 
 ### Phase 4: LLM Integration
 
-**Goal**: Claude API integration for conversational identification and teaching.
+**Goal**: LLM integration for conversational identification and teaching.
 
-- [ ] Set up Anthropic API client (with key management)
-- [ ] Build prompt template system (system prompt + session context + query context)
-- [ ] Implement prompt caching (static system prompt + genus profiles at top)
-- [ ] Implement model routing (Haiku for simple queries, Sonnet for complex)
-- [ ] Build feature extraction from natural language descriptions
-- [ ] Build conversational disambiguation mode
-- [ ] Build natural language explanation generator (grounded in rule engine output)
-- [ ] Implement LLM response caching in IndexedDB
-- [ ] Build photo analysis integration (multimodal)
-- [ ] Cost monitoring and budget controls
+#### Design Decisions (locked in)
 
-**Deliverable**: Full online identification experience with conversational UI.
+**1. API Target: z.ai (OpenAI-compatible)**
+- Using z.ai's chat completions endpoint (OpenAI-compatible API format)
+- User-provided API key, stored encrypted in IndexedDB
+- No multi-provider abstraction — z.ai only for now
+- Update `vite.config.ts` workbox NetworkOnly pattern from `api.anthropic.com` to z.ai endpoint
+
+**2. Stateless Conversation Model**
+- Each LLM call is self-contained — no multi-turn conversation history maintained
+- Full context injected per call: rule engine output, observation data, genus profiles
+- Simpler implementation, easier to cache, no state management complexity
+- Can revisit if calibration shows multi-turn would significantly improve results
+
+**3. Orchestration: Pattern C (UI orchestrates, LLM gets one smart call per turn)**
+- UI is the orchestrator — it decides when to call the LLM and what to do with results
+- LLM gets one "smart call" per user action with rich context
+- Flow:
+  - Turn 1: UI sends photo/text to LLM → LLM returns structured features + direct opinion → UI feeds features to rule engine → UI assembles and displays combined response
+  - Turn 2+: User answers disambiguation questions → rule engine updates scores → LLM explains results (or offline templates if no connectivity)
+- Safety invariant: LLM NEVER makes safety decisions. All toxicity warnings, lookalike flags, and edibility gates remain deterministic rule engine logic
+- No tool-use/function-calling needed — single structured JSON response from LLM
+
+**4. Dual Output: Structured Features + Direct LLM Identification (for calibration)**
+- Every LLM call returns TWO outputs:
+  1. **Structured observation fields** — extracted features that feed the rule engine (cap_color, gill_type, etc.)
+  2. **Direct species identification** — the LLM's own opinion on what the mushroom is, with confidence and reasoning
+- The direct identification is stored separately and NEVER used for safety decisions
+- Comparing rule engine results vs LLM direct opinion over time gives calibration data on system accuracy
+- Enables future analysis: where does the rule engine outperform the LLM, and vice versa?
+
+**5. Form Integration: LLM Pre-fills, User Overrides**
+- When the LLM extracts features from photos/descriptions, it populates the existing structured observation form
+- User can see what the LLM extracted and correct any field
+- User input ALWAYS takes priority over LLM extraction
+- If user has already filled a field manually, LLM extraction does not overwrite it
+- This gives the user transparency and control over what feeds the rule engine
+
+**6. Feature Variation: Current Model + LLM Direct Opinion**
+- Keep the current single-value observation model (e.g., `cap_color: "brown"`)
+- The LLM's direct identification opinion naturally captures nuance that string matching misses (e.g., colour variation within a species, age-related changes)
+- If calibration data later shows the structured extraction is a bottleneck, we can extend the observation model with confidence annotations or multi-value fields
+- Pragmatic: don't over-engineer the observation model until we have data showing it matters
+
+**7. Multi-Photo Support**
+- User can upload 2-3 photos per identification (cap top, underside/gills, stem base)
+- All photos sent in a single LLM call for feature extraction
+- LLM instructed to extract features from all images, noting which photo each observation came from
+- Improves extraction accuracy without increasing API call count
+
+#### Tasks
+
+- [x] Set up z.ai API client with user-provided key management (stored in IndexedDB)
+- [x] Build prompt template system (system prompt + session context + query context)
+- [x] Build structured JSON response schema (observation fields + direct identification)
+- [x] Build feature extraction from photos (multi-photo support)
+- [x] Build feature extraction from natural language descriptions
+- [x] Integrate LLM pre-fill into observation form (user overrides)
+- [x] Build natural language explanation generator (grounded in rule engine output)
+- [x] Implement LLM response caching in IndexedDB
+- [x] Build calibration data capture (rule engine vs LLM direct opinion)
+- [x] Cost monitoring and budget controls
+
+**Deliverable**: Full online identification experience with conversational UI, dual-output calibration, and graceful offline degradation.
+
+### Phase 4b: Narrative Descriptions & Free-Text Rule Matching
+
+**Goal**: Harness rich natural language descriptions (user text + foraging rules of thumb) for identification, both online and offline.
+
+- [x] Add `description_notes` field to `Observation` type for free-text diagnostic notes
+- [x] Add `identification_narrative` field to `GenusProfile` type
+- [x] Write rich identification narratives for all 20 genera incorporating practical foraging rules of thumb (taste test, yellow staining, milk colour, snakeskin, ball and socket, etc.)
+- [x] Add ~80 feature rules matching diagnostic terms in `description_notes` (e.g., "milk" → Lactarius strong, "deliquesce" → Coprinopsis strong, "yellow stain" → Agaricus exclusion)
+- [x] Update LLM system prompt to use narratives as genus context
+- [x] Add `description_notes` to LLM extraction schema with instruction to preserve user text verbatim
+- [x] Make text description textarea always visible (works offline without API key)
+- [x] Wire user text into `observation.description_notes` before rule engine runs
+- [x] Bump KB_VERSION to 3 for re-seeding
+
+**Deliverable**: User text descriptions like "distant gills, cap dipped in centre, concentric colour bands" now boost correct genera (Russula, Lactarius) even fully offline. ~80 description_notes rules cover all 20 genera. LLM prompts include narratives for richer context.
 
 ### Phase 5: Adaptive Learning
 
@@ -1164,6 +1232,8 @@ NETWORK ONLY:
 - [ ] Build competency dashboard (user's progress view)
 - [ ] Implement seasonal refresh prompts
 - [ ] Build decay detection and re-engagement
+
+**Notes from Phase 4b**: The `identification_narrative` field on each genus is a rich source of training content — flashcard/quiz modules can pull from narratives to generate questions (e.g., "What's the key feature of Lactarius?" → "All species exude milk"). The `description_notes` field could also feed competency evidence — if a user correctly types diagnostic terms ("distant gills, depressed cap"), that demonstrates genus recognition competency.
 
 **Deliverable**: Complete learning system that adapts to user's demonstrated knowledge.
 

@@ -158,6 +158,80 @@ describe('Seed Genera', () => {
     });
   });
 
+  describe('Identification narratives', () => {
+    it('every genus has an identification_narrative', () => {
+      for (const g of seedGenera) {
+        expect(g.identification_narrative, `${g.genus} missing identification_narrative`).toBeTruthy();
+      }
+    });
+
+    it('each narrative is at least 200 characters', () => {
+      for (const g of seedGenera) {
+        expect(
+          g.identification_narrative!.length,
+          `${g.genus} narrative too short (${g.identification_narrative?.length ?? 0} chars)`,
+        ).toBeGreaterThanOrEqual(200);
+      }
+    });
+
+    it('Russula narrative mentions brittle and taste test', () => {
+      const russula = seedGenera.find((g) => g.genus === 'Russula');
+      expect(russula!.identification_narrative).toMatch(/brittle/i);
+      expect(russula!.identification_narrative).toMatch(/taste test/i);
+    });
+
+    it('Lactarius narrative mentions milk and concentric', () => {
+      const lactarius = seedGenera.find((g) => g.genus === 'Lactarius');
+      expect(lactarius!.identification_narrative).toMatch(/milk/i);
+      expect(lactarius!.identification_narrative).toMatch(/concentric/i);
+    });
+
+    it('Cantharellus narrative mentions false gills', () => {
+      const cantharellus = seedGenera.find((g) => g.genus === 'Cantharellus');
+      expect(cantharellus!.identification_narrative).toMatch(/false gills/i);
+    });
+
+    it('Agaricus narrative mentions yellow stain', () => {
+      const agaricus = seedGenera.find((g) => g.genus === 'Agaricus');
+      expect(agaricus!.identification_narrative).toMatch(/yellow stain/i);
+    });
+
+    it('Macrolepiota narrative mentions snakeskin and ball and socket', () => {
+      const macro = seedGenera.find((g) => g.genus === 'Macrolepiota');
+      expect(macro!.identification_narrative).toMatch(/snakeskin/i);
+      expect(macro!.identification_narrative).toMatch(/ball and socket/i);
+    });
+
+    it('Amanita narrative mentions volva and egg', () => {
+      const amanita = seedGenera.find((g) => g.genus === 'Amanita');
+      expect(amanita!.identification_narrative).toMatch(/volva/i);
+      expect(amanita!.identification_narrative).toMatch(/egg/i);
+    });
+
+    it('Coprinopsis narrative mentions deliquesce and inky', () => {
+      const coprinopsis = seedGenera.find((g) => g.genus === 'Coprinopsis');
+      expect(coprinopsis!.identification_narrative).toMatch(/deliquesce/i);
+      expect(coprinopsis!.identification_narrative).toMatch(/inky/i);
+    });
+
+    it('Marasmius narrative mentions tough stem and fairy ring', () => {
+      const marasmius = seedGenera.find((g) => g.genus === 'Marasmius');
+      expect(marasmius!.identification_narrative).toMatch(/tough/i);
+      expect(marasmius!.identification_narrative).toMatch(/fairy ring/i);
+    });
+
+    it('Hydnum narrative mentions spines or teeth', () => {
+      const hydnum = seedGenera.find((g) => g.genus === 'Hydnum');
+      expect(hydnum!.identification_narrative).toMatch(/spines|teeth/i);
+    });
+
+    it('Boletus narrative mentions reticulated and red pores', () => {
+      const boletus = seedGenera.find((g) => g.genus === 'Boletus');
+      expect(boletus!.identification_narrative).toMatch(/reticulated/i);
+      expect(boletus!.identification_narrative).toMatch(/red pores/i);
+    });
+  });
+
   describe('Toxic species coverage', () => {
     it('Amanita lists Death Cap and Destroying Angel', () => {
       const amanita = seedGenera.find((g) => g.genus === 'Amanita');

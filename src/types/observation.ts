@@ -35,6 +35,11 @@ export interface Observation {
   region?: string | null;
   growth_pattern?: string | null;
 
+  // Free-text diagnostic notes
+  /** Free-text diagnostic notes from user description + LLM extraction.
+   *  Matched by rules using 'includes'. */
+  description_notes?: string | null;
+
   // Meta
   photo_available?: boolean;
   observation_conditions?: string;

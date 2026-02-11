@@ -6,7 +6,7 @@ import { seedHeuristics } from '@/data/seed-heuristics';
  * Bump this version whenever seed data changes (e.g., new fields, new species).
  * When the stored version is older, the KB is cleared and re-seeded.
  */
-export const KB_VERSION = 2;
+export const KB_VERSION = 3;
 const KB_VERSION_KEY = 'mushroom-kb-version';
 
 /**

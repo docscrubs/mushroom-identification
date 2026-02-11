@@ -57,6 +57,7 @@ export const seedGenera: GenusProfile[] = [
       { heuristic_id: 'amanita_recognition_warning', description: 'Recognising Amanita features: volva, ring, white gills' },
       { heuristic_id: 'death_cap_habitat_alert', description: 'Death Cap habitat and ecological context' },
     ],
+    identification_narrative: 'All Amanita emerge from an egg-like universal veil. The key feature is the volva — a cup or bag at the swollen base of the stem. You MUST dig up the stem base to check for it; never cut at ground level. Look for concentric rings, patches, or scales at the swollen base, and patches or warts on the cap surface (these may wash off in rain). Most species have a ring or skirt on the stem, though Grisettes lack this. Gills are always white or pale and FREE — not attached to the stem. Spore print is always white. Amanita always grows on soil with trees (mycorrhizal), never directly on wood. The Death Cap (A. phalloides) has a greenish-yellow cap and prominent volva; the Destroying Angel (A. virosa) is pure white throughout. Any white mushroom with a ring, free white gills, and a volva-like base should be treated with extreme caution. Young Amanita can resemble small puffballs when still in the egg stage — always slice puffballs in half to check for internal gill structure.',
     notes: 'Amanita is the most dangerous genus in the UK. Beginners must learn to recognise the volva and ring combination. NEVER eat any Amanita unless you are absolutely certain of the species.',
   },
   {
@@ -102,6 +103,7 @@ export const seedGenera: GenusProfile[] = [
       { heuristic_id: 'agaricus_vs_amanita_discrimination', description: 'Critical discrimination between Agaricus and Amanita' },
       { heuristic_id: 'agaricus_yellow_stain_test', description: 'Test for Yellow-staining Mushroom (A. xanthodermus)' },
     ],
+    identification_narrative: 'Agaricus looks like the shop-bought mushroom — the "mushroom-shaped mushroom" with a ring on the stem and pink-to-brown gills. The Yellow Staining Test is critical: score the cap surface or cut the base of the stem — toxic species (A. xanthodermus) stain bright chrome yellow within minutes. The smell test is equally important: crush the flesh at the base of the stem — a phenol, carbolic, or ink-like chemical smell indicates a toxic Yellow Stainer, while anise or almond smell suggests an edible species. Gills are pink when young turning chocolate brown when mature; they are NEVER white. If you find white gills on what looks like an Agaricus, suspect Amanita instead — this confusion kills people. The microwave test can confirm: place a piece of cap in the microwave for 10 seconds — if it stains yellow and produces a chemical smell, it is a toxic stainer. Dark brown or chocolate spore print. No volva at the base. Common in grassland, meadows, lawns, and gardens.',
     notes: 'Agaricus is the genus of the common shop mushroom. Critical to distinguish from Amanita. Always check: no volva, gills never pure white, dark spore print.',
   },
 
@@ -155,6 +157,7 @@ export const seedGenera: GenusProfile[] = [
     foraging_heuristics: [
       { heuristic_id: 'russula_taste_test', description: 'The taste test for Russula edibility' },
     ],
+    identification_narrative: 'Russula has no deadly species in the UK, making the nibble-and-spit taste test safe IF you are certain it is a Russula. The taste test: chew a tiny piece on the tip of your tongue for 5-15 seconds, then spit it out — if it is spicy or hot within 30 seconds, the species is inedible; if mild or nutty, it is edible. Brittle flesh that snaps cleanly like chalk is the defining genus feature — gills flake away when brushed sideways, breaking off like sliced almonds. Exception: R. cyanoxantha (Charcoal Burner) has unusually pliable, non-crumbling gills. The cap is often depressed or dipped in the centre when mature, and may show concentric colour zones radiating from the centre. Distant gills are common. No ring, no volva. Cap colours are hugely variable — red, green, purple, yellow, white. White to cream spore print. Always on soil with trees, never on wood. Very common in UK woodland from July to November.',
     notes: 'Russula is an excellent genus for beginners: easy to recognize at genus level (brittle flesh test), no deadly toxic species in UK, simple taste test separates edible from inedible, very common.',
   },
   {
@@ -199,6 +202,7 @@ export const seedGenera: GenusProfile[] = [
       { heuristic_id: 'bolete_blue_staining_caution', description: 'Caution with blue-staining boletes' },
       { heuristic_id: 'bolete_red_pore_test', description: 'Red pore danger test for boletes' },
     ],
+    identification_narrative: 'Boletes have pores — a spongy layer of tubes underneath the cap instead of gills. This is their defining feature and is easy to spot. The main safety rules: avoid any bolete with red pores, as these are associated with toxic species like Satan\'s Bolete. Also avoid boletes that stain rapid vivid blue when the flesh is cut — this signals potential toxicity (though some blue-staining species are edible when cooked, they are not for beginners). The Penny Bun or Cep (B. edulis) is the king of edible mushrooms: look for a fine white reticulated net pattern on the upper stem, brown cap, firm white flesh that does not change colour when cut. Always in woodland with trees (mycorrhizal). Central stem, fleshy substantial cap. Distinguish from Leccinum by the reticulated stem — Leccinum has rough scabers or scales instead.',
     notes: 'Boletes are generally beginner-friendly because of the distinctive pore surface. Very few are seriously toxic. The main rule: avoid any bolete with red pores.',
   },
   {
@@ -240,6 +244,7 @@ export const seedGenera: GenusProfile[] = [
     foraging_heuristics: [
       { heuristic_id: 'chanterelle_vs_false_chanterelle', description: 'Distinguish true Chanterelle from False Chanterelle' },
     ],
+    identification_narrative: 'All UK chanterelles are edible. The key identifier is false gills — these are just blunt folds or forked ridges running down the stem, not true blade-like gills that you could separate individually. The ridges are decurrent (running down the stem). True chanterelle has an apricot-like or fruity smell and white flesh when cut in half. The False Chanterelle (Hygrophoropsis aurantiaca) is the main lookalike: it is more orangey-yellow with concolorous flesh (not white inside), has crowded REAL thin gills, and smells earthy rather than fruity. The Jack O\'Lantern (Omphalotus olearius) is very rare in Britain, grows directly on deciduous wood (not soil), has true gills, and is darker orange. Chanterelles grow in woodland on soil among moss and leaf litter, always mycorrhizal with trees. Egg-yellow to golden colour. Funnel or trumpet-shaped when mature.',
     notes: 'Chanterelle is a choice edible with few dangerous lookalikes. Key identification: forked ridges (not true gills), apricot smell, egg-yellow colour.',
   },
   {
@@ -282,6 +287,7 @@ export const seedGenera: GenusProfile[] = [
     foraging_heuristics: [
       { heuristic_id: 'lactarius_milk_color', description: 'Milk colour test for Lactarius identification' },
     ],
+    identification_narrative: 'Lactarius is the genus where ALL species exude milk (latex) when the flesh is cut or gills are damaged — milk colour is the single most important identifier. In the UK, orange milk is always edible (Saffron Milkcap and relatives). Avoid species with yellow, white, or clear acrid milk. Orange milk changes colour over 30 minutes: turning red suggests L. deliciosus, turning green suggests L. deterrimus — this helps identify the exact species. The cap is typically convex with a central depression showing concentric bands or zones of colour, with an initially inrolled margin. Flesh is brittle like chalk (same as Russula), and gills are often brittle too. Decurrent gills. No ring, no volva. Distinguished from Russula by the presence of milk — break a gill and watch for liquid. Always mycorrhizal with trees in woodland. Common from July to November.',
     notes: 'Lactarius is distinguished from Russula by the presence of milk. Milk colour is the key identification feature: orange/carrot = good, white/acrid = avoid.',
   },
   {
@@ -323,6 +329,7 @@ export const seedGenera: GenusProfile[] = [
     foraging_heuristics: [
       { heuristic_id: 'grassland_vs_woodland_context', description: 'Habitat context for identification' },
     ],
+    identification_narrative: 'Oyster mushrooms grow in shelf-like overlapping clusters on dead or living wood. They have decurrent gills running down a short lateral or off-centre stem, or sometimes no stem at all. The cap is shell-shaped or fan-shaped, grey to blue-grey when fresh, fading to buff. White to pale lilac spore print. Pleasant mushroomy or anise smell. Key features: growth directly on wood (never on soil), the short lateral stem, and the clustered shelf-like habit. Crepidotus is a smaller lookalike but has a brown spore print and is much smaller. A very safe beginner mushroom. Common from September through to January — one of the few mushrooms that fruits into winter.',
     notes: 'Oyster mushrooms are beginner-friendly: distinctive growth on wood in shelf-like clusters, very few dangerous lookalikes.',
   },
   {
@@ -370,6 +377,7 @@ export const seedGenera: GenusProfile[] = [
       { heuristic_id: 'macrolepiota_vs_lepiota_vs_amanita', description: 'Parasol vs small Lepiota vs Amanita discrimination' },
       { heuristic_id: 'avoid_small_lepiota', description: 'Avoid all small (<10cm) lepiota-like mushrooms' },
     ],
+    identification_narrative: 'Parasol mushrooms are big — typically 15cm or more across when mature. The most important field test is the ball and socket joint: pull the stipe from the cap and look for a clean ball and socket separation where they meet. The stem has a distinctive snakeskin pattern of brown scales that distinguishes the true Parasol from the Shaggy Parasol (Chlorophyllum rhacodes, which lacks this pattern). The ring is a loose skirt that slides up and down the stem freely. Big flappy free gills. No volva at the base — if you find a volva, suspect Amanita. CRITICAL: never pick small specimens (<10cm cap). Small Lepiota species look similar but are DEADLY TOXIC. Only pick large specimens with confirmed snakeskin stem, moveable ring, ball and socket joint, and no volva. Grassland, meadow, and woodland edges on soil.',
     notes: 'Parasol is a choice edible but CRITICAL to distinguish from deadly small Lepiota species and Amanita. Only pick large specimens (>10cm cap) with confirmed snakeskin stem and NO volva.',
   },
   {
@@ -407,6 +415,7 @@ export const seedGenera: GenusProfile[] = [
       { heuristic_id: 'coprinopsis_alcohol_warning', description: 'Ink cap + alcohol interaction warning' },
       { heuristic_id: 'coprinopsis_freshness_check', description: 'Freshness check for edible ink caps' },
     ],
+    identification_narrative: 'Ink caps are identified by their gills that deliquesce — dissolving into a black inky liquid, sometimes within hours of picking. This auto-digestion is unique and unmistakable. The cap is typically bell-shaped or conical, thin-fleshed and brittle. Spore print is very dark: purple-brown to black. Often found on wood chips, lawns, dung, or decaying wood, frequently in dense clusters. The Shaggy Ink Cap (Coprinus comatus) is a good edible but must be eaten very young before the inky gills begin to dissolve. The Common Ink Cap (C. atramentaria) is TOXIC with alcohol — it contains coprine which blocks alcohol metabolism, causing severe nausea, flushing, and palpitations. Avoid alcohol for 3 days before and after eating any ink cap species. Very common and widespread from spring through autumn.',
     notes: 'Ink caps are distinctive due to deliquescence. Critical safety warning: Common Ink Cap causes severe illness with alcohol. Shaggy Ink Cap is technically safe but must be eaten very fresh.',
   },
   {
@@ -441,6 +450,7 @@ export const seedGenera: GenusProfile[] = [
     foraging_heuristics: [
       { heuristic_id: 'mycorrhizal_tree_association', description: 'Tree association guide for mycorrhizal species' },
     ],
+    identification_narrative: 'Hedgehog Fungus has spines or teeth hanging down under the cap instead of gills or pores. This is virtually unique among UK mushrooms and makes it one of the safest species for beginners — there are no dangerous lookalikes with this feature. The cap is cream to pale orange, irregularly shaped, and often wavy-edged. No ring, no volva. The spines are pale, brittle, and break off easily when rubbed. White spore print. Grows on soil in woodland, mycorrhizal with beech, oak, birch, and pine. Fruits from August to December, sometimes persisting into mild winters. Excellent edible with firm texture and mild nutty flavour.',
     notes: 'Hydnum is one of the safest genera for beginners: the teeth under the cap are unique and have no dangerous lookalikes in the UK.',
   },
 
@@ -478,6 +488,7 @@ export const seedGenera: GenusProfile[] = [
     foraging_heuristics: [
       { heuristic_id: 'laetiporus_host_tree_check', description: 'Host tree safety check (avoid yew/eucalyptus)' },
     ],
+    identification_narrative: 'Chicken of the Woods is a large bracket fungus with bright sulphur-yellow and orange overlapping shelves growing directly on living or dead wood. The upper surface is bright orange fading to yellow at the growing edges; the pore surface underneath is sulphur yellow. No gills — it has a fine pore surface. No stem. CRITICAL: AVOID if growing on yew — the fungus may absorb toxic compounds from the tree. Also avoid on eucalyptus. No dangerous lookalikes in the UK; the combination of bright colours and bracket growth form on wood is distinctive. Only eat when young and soft — older specimens become tough and chalky. Can cause GI upset in some people, so try a small amount first. Common from May through October.',
     notes: 'Distinctive and popular edible. Avoid specimens growing on yew or eucalyptus. Only eat when young and soft. Can cause GI upset in some individuals — try a small amount first.',
   },
   {
@@ -513,6 +524,7 @@ export const seedGenera: GenusProfile[] = [
     foraging_heuristics: [
       { heuristic_id: 'mycorrhizal_tree_association', description: 'Found specifically on oak and sweet chestnut' },
     ],
+    identification_narrative: 'Beefsteak Fungus is found low on oak trunks and stumps, occasionally on sweet chestnut. It looks remarkably like a tongue of raw beef or ox tongue growing from the tree. When the flesh is sliced, it has a marbled texture like braising steak with distinct layers. It bleeds red — dripping a red fluid that looks like blood when cut. The individual pore tubes on the underside are separable (not fused together as in boletes). Upper surface is rough and sticky. No dangerous lookalikes in the UK — the combination of red bracket on oak, bleeding red fluid, and marbled flesh is unique. Edible but can be sour or acidic; best sliced thin. Fruits August to November.',
     notes: 'Beefsteak fungus is unmistakable: it looks like a tongue of raw beef growing from a tree. Safe, no dangerous lookalikes.',
   },
   {
@@ -554,6 +566,7 @@ export const seedGenera: GenusProfile[] = [
     foraging_heuristics: [
       { heuristic_id: 'marasmius_vs_clitocybe_rivulosa', description: 'Critical discrimination: Fairy Ring Champignon vs Fool\'s Funnel' },
     ],
+    identification_narrative: 'Fairy Ring Champignon grows on grass from June in rings or arcs — the fairy ring growth pattern is very characteristic. The stem is really tough — you can tie it in a knot without it snapping, unlike most other small grassland mushrooms. The cap has a nipple-like umbo (bump) in the centre and does not come off cleanly in one piece when detached from the stem. Gills are widely spaced (distant) and completely detached from the stem (adnexed), NOT decurrent — this is critical because the deadly lookalike Clitocybe rivulosa (Fool\'s Funnel) has decurrent gills running down a fragile stem. The mushroom revives when wetted after drying out. Buff or tan cap, often darker in centre. White spore print. CRITICAL lookalike: Clitocybe rivulosa also grows in rings on lawns and is deadly. Always confirm: tough stem, free/adnexed gills, umbo on cap.',
     notes: 'Fairy ring champignon is a good edible but CRITICAL lookalike hazard: Clitocybe rivulosa (deadly) also grows in rings on lawns. Must confirm tough stem and free gills.',
   },
   {
@@ -589,6 +602,7 @@ export const seedGenera: GenusProfile[] = [
       { heuristic_id: 'mycorrhizal_tree_association', description: 'Found among beech and oak leaf litter' },
       { heuristic_id: 'uk_seasonal_fruiting_guide', description: 'Peak season September-December' },
     ],
+    identification_narrative: 'Horn of Plenty is a dark funnel-shaped mushroom — often black, dark brown, or charcoal grey. The underside is smooth to slightly wrinkled with no gills, pores, or teeth. It is also known as the Black Trumpet. Grows in troops among woodland leaf litter, typically under beech and oak. Hard to spot due to its dark colour camouflaging among fallen leaves — you often need to look carefully at ground level. Hollow right down to the base. No dangerous lookalikes in the UK. A choice edible that dries beautifully and has an intense flavour. Fruits September to December.',
     notes: 'Horn of Plenty is a choice edible with no dangerous lookalikes. The dark colour and smooth fertile surface are distinctive. Often hard to spot in leaf litter.',
   },
   {
@@ -624,6 +638,7 @@ export const seedGenera: GenusProfile[] = [
     foraging_heuristics: [
       { heuristic_id: 'mycorrhizal_tree_association', description: 'Found at base of conifer trunks (pine, spruce)' },
     ],
+    identification_narrative: 'Cauliflower Fungus is a large pale cauliflower-like or brain-like lobed mass growing at the base of conifer trees, typically pine or spruce. It can grow very large — up to 40cm across. The growth form is unique: a mass of wavy, flattened, lobed fronds with no gills, pores, or conventional cap. Cream to pale yellow, browning with age. No dangerous lookalikes in the UK — the unique growth form is unmistakable. Pleasant mushroomy smell. Needs thorough washing as debris collects in the folds. Good edible. Fruits August to November. Always associated with conifers.',
     notes: 'Cauliflower fungus is unmistakable — no other UK fungus looks like a pale cauliflower growing at the base of a tree. Very safe for beginners.',
   },
   {
@@ -667,6 +682,7 @@ export const seedGenera: GenusProfile[] = [
       { heuristic_id: 'puffball_interior_check', description: 'Interior colour check for edibility' },
       { heuristic_id: 'puffball_vs_amanita_egg', description: 'Discrimination between puffball and Amanita egg' },
     ],
+    identification_narrative: 'Puffballs are round or ball-shaped with no visible gills, pores, or cap. The CRITICAL safety check: always cut in half. The interior must be uniformly pure white and firm throughout — like a marshmallow. If the interior shows any purple-black colouring or marbling, it may be an Earthball (Scleroderma), which is poisonous and has a thick warty skin. Even more dangerously, if you see any internal structure resembling a tiny mushroom shape — the outline of a cap, stem, or gills — it is a young Amanita still in its egg stage, which is potentially deadly. Ensure the interior is completely uniform white with no differentiated structures. Edible when young (pure white inside). Giant Puffball can grow very large. Common in grassland and meadows from July to November.',
     notes: 'Giant puffball is edible when young but CRITICAL safety check: always slice in half. If there is any internal structure (silhouette of a cap or gills), it may be an Amanita egg (deadly).',
   },
   {
@@ -708,6 +724,7 @@ export const seedGenera: GenusProfile[] = [
     foraging_heuristics: [
       { heuristic_id: 'mycorrhizal_tree_association', description: 'Tree association guide (Leccinum with birch, oak, etc.)' },
     ],
+    identification_narrative: 'Leccinum are boletes with a sponge-like pore surface under the cap (not gills). The distinguishing feature from Boletus is the stem: Leccinum has rough scales or scabers (small rough projections) covering the stem surface, while Boletus has a reticulated net pattern. Often specifically associated with birch trees — the Brown Birch Bolete and Orange Birch Bolete are common and good edibles. Flesh may discolour when cut — turning dark or grey, which is normal for this genus. Cap often orange-brown (birch species) or darker. Always cook thoroughly. Woodland habitat, mycorrhizal. Common from July to November.',
     notes: 'Leccinum boletes are generally safe edibles. The rough scabers on the stem distinguish them from Boletus. Always cook thoroughly.',
   },
 
@@ -752,6 +769,7 @@ export const seedGenera: GenusProfile[] = [
       { heuristic_id: 'armillaria_vs_galerina', description: 'Critical discrimination: Honey Fungus vs Funeral Bell (Galerina)' },
       { heuristic_id: 'galerina_marginata_warning', description: 'Funeral Bell avoidance warning' },
     ],
+    identification_narrative: 'Honey Fungus grows in clusters on wood or at the base of trees, with honey-beige-brown caps often darker in the centre. A ring on the stem is typical, and gills are pale. Look for bootlace-like black rhizomorphs (thick dark strands) in the soil or under bark near the fruiting bodies — these are the vegetative mycelium and are diagnostic for Armillaria. White spore print. CRITICAL lookalike: Galerina marginata (Funeral Bell) is DEADLY and also grows on wood with a ring. The key distinction is spore print colour: Armillaria = white, Galerina = rusty brown. Never eat without confirming a white spore print. Must be cooked thoroughly — toxic raw. Common and widespread from September to December.',
     notes: 'Honey fungus is edible but has a DEADLY lookalike in Galerina marginata. Spore print is critical: Armillaria = white, Galerina = rusty brown. Not recommended for beginners.',
   },
   {
@@ -799,6 +817,7 @@ export const seedGenera: GenusProfile[] = [
     foraging_heuristics: [
       { heuristic_id: 'clitocybe_rivulosa_warning', description: 'Fool\'s Funnel / Ivory Funnel avoidance warning' },
     ],
+    identification_narrative: 'Clitocybe is a dangerous genus containing several deadly species including Fool\'s Funnel (C. rivulosa) and Ivory Funnel (C. dealbata), both of which contain high levels of muscarine. These are small white funnel-shaped mushrooms with decurrent gills running down the stem, no ring, and white to cream spore print. Some deadly species grow in rings on lawns — dangerously similar to the edible Fairy Ring Champignon (Marasmius oreades). Key distinction: Clitocybe has decurrent gills and a fragile stem; Marasmius has free/adnexed gills and a tough wiry stem you can tie in a knot. NOT recommended for eating by anyone except experts. Common in woodland, gardens, and lawns from September to December.',
     notes: 'Clitocybe is a dangerous genus for beginners. Several species are deadly. NOT recommended for eating unless very experienced. C. rivulosa is one of the UK\'s most dangerous mushrooms.',
   },
   {
@@ -847,6 +866,7 @@ export const seedGenera: GenusProfile[] = [
       { heuristic_id: 'lepista_vs_cortinarius', description: 'Critical discrimination: Blewit vs Webcap (Cortinarius)' },
       { heuristic_id: 'cortinarius_avoidance', description: 'Webcap avoidance — deadly kidney toxin' },
     ],
+    identification_narrative: 'Blewits are identified by their distinctive violet or blue-purple tinge, especially on the gills and stem. Wood Blewit (L. nuda) has an all-over lilac colour when fresh and loves holly trees; Field Blewit (L. saeva) has a greyish-brown cap (not violet) but a lilac stem, and prefers calcareous grassland. Both have a pleasant perfumed or floral smell and a pale pink spore print. No ring. Both MUST be cooked — they are toxic raw. CRITICAL lookalike: Cortinarius (Webcaps) can have similar violet colours but has a rusty brown spore print and a cobweb-like veil (cortina) from stem to cap margin in young specimens. Some Cortinarius species are deadly (Deadly Webcap causes kidney failure). Always confirm: pink spore print (not rusty brown), no cortina, perfumed smell. Late season: October to December.',
     notes: 'Blewits are good edibles but require care to distinguish from Cortinarius (some deadly) and Clitocybe. Key: lilac stem, pink spore print, perfumed smell. Must be cooked.',
   },
 ];
