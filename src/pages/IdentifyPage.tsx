@@ -11,6 +11,7 @@ import { db } from '@/db/database';
 import { extractFeatures, fileToDataUrl } from '@/llm/extract-features';
 import { generateExplanation } from '@/llm/explain';
 import { recordCalibration } from '@/llm/calibration';
+import { buildGuidanceContext, type GuidanceContext } from '@/learning/adaptive-guidance';
 
 type SelectOption = { value: string; label: string };
 
@@ -87,6 +88,7 @@ export function IdentifyPage() {
   const [textDescription, setTextDescription] = useState('');
   const [aiSuggestedFields, setAiSuggestedFields] = useState<Set<string>>(new Set());
   const [llmExplanation, setLlmExplanation] = useState<LLMExplanation | null>(null);
+  const [guidance, setGuidance] = useState<GuidanceContext | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const hasApiKey = useAppStore((s) => s.hasApiKey);
@@ -171,7 +173,7 @@ export function IdentifyPage() {
     }
   }
 
-  function handleIdentify() {
+  async function handleIdentify() {
     // Merge user text description into observation so the rule engine can match against it
     let obsForEngine = observation;
     if (textDescription) {
@@ -187,9 +189,17 @@ export function IdentifyPage() {
     setResult(r);
     setLlmExplanation(null);
 
+    // Build adaptive guidance from user's competency records
+    const candidateGenera = r.candidates
+      .filter((c) => c.score > 0)
+      .map((c) => c.genus);
+    const competencies = await db.competencies.toArray();
+    const guidance = buildGuidanceContext(competencies, candidateGenera);
+    setGuidance(guidance);
+
     // If API key is configured, attempt LLM explanation in background (silently fails offline)
     if (hasApiKey) {
-      generateExplanation(db, r, observation).then((explanation) => {
+      generateExplanation(db, r, observation, guidance).then((explanation) => {
         setLlmExplanation(explanation);
       });
 
@@ -207,6 +217,7 @@ export function IdentifyPage() {
     setPhotoFiles([]);
     setTextDescription('');
     setAiSuggestedFields(new Set());
+    setGuidance(null);
     setUserEditedFields(new Set());
     setLlmExplanation(null);
     setLlmError(null);
@@ -443,6 +454,7 @@ export function IdentifyPage() {
           result={result}
           observation={observation}
           llmExplanation={llmExplanation}
+          guidance={guidance}
         />
       )}
     </div>
@@ -453,12 +465,14 @@ function ResultView({
   result,
   observation,
   llmExplanation,
+  guidance,
 }: {
   result: IdentificationResult;
   observation: Observation;
   llmExplanation: LLMExplanation | null;
+  guidance: GuidanceContext | null;
 }) {
-  const explanation = generateOfflineExplanation(result, observation);
+  const explanation = generateOfflineExplanation(result, observation, guidance?.overallLevel);
   const activeCandidates = result.candidates.filter(
     (c) => !c.contradicting_evidence.some((e) => e.tier === 'exclusionary') && c.score > 0,
   );

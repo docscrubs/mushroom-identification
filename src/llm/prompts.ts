@@ -1,4 +1,5 @@
 import type { Observation, IdentificationResult, LLMMessage, LLMContentPart } from '@/types';
+import type { GuidanceContext } from '@/learning/adaptive-guidance';
 import { seedGenera } from '@/data/seed-genera';
 
 /**
@@ -138,10 +139,15 @@ export function buildExtractionMessages(
 export function buildExplanationMessages(
   result: IdentificationResult,
   observation: Observation,
+  guidance?: GuidanceContext,
 ): LLMMessage[] {
+  const guidanceHint = guidance?.promptHint
+    ? `\n\n${guidance.promptHint}`
+    : '';
+
   const systemPrompt = `You are explaining a mushroom identification result to a UK forager. The app's rule engine has produced the following identification. Generate a clear, helpful natural language explanation.
 
-CRITICAL: NEVER contradict the rule engine's safety assessment. The rule engine's safety warnings and toxicity classifications are authoritative. Your job is to explain them clearly, not to second-guess them.
+CRITICAL: NEVER contradict the rule engine's safety assessment. The rule engine's safety warnings and toxicity classifications are authoritative. Your job is to explain them clearly, not to second-guess them.${guidanceHint}
 
 Respond with valid JSON:
 {

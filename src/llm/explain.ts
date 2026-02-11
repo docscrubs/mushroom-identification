@@ -1,5 +1,6 @@
 import type { Observation, IdentificationResult, LLMExplanation } from '@/types';
 import type { MushroomDB } from '@/db/database';
+import type { GuidanceContext } from '@/learning/adaptive-guidance';
 import { getApiKey, getSettings } from './api-key';
 import { callLLM } from './api-client';
 import { getCachedResponse, setCachedResponse, buildCacheKey } from './cache';
@@ -16,12 +17,13 @@ export async function generateExplanation(
   db: MushroomDB,
   result: IdentificationResult,
   observation: Observation,
+  guidance?: GuidanceContext,
 ): Promise<LLMExplanation | null> {
   const apiKey = await getApiKey(db);
   if (!apiKey) return null;
 
   const settings = await getSettings(db);
-  const messages = buildExplanationMessages(result, observation);
+  const messages = buildExplanationMessages(result, observation, guidance);
 
   // Check cache
   const cacheKey = buildCacheKey(messages);

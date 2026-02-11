@@ -1232,9 +1232,9 @@ NETWORK ONLY:
 - [x] Build decay detection (confident→learning after 180d, expert→confident after 365d)
 - [x] Seed review cards automatically from knowledge base on app load
 - [x] Fix vitest pool configuration for Node 24 compatibility (vmForks)
-- [ ] Implement adaptive guidance (adjust explanations based on competency)
-- [ ] Implement seasonal refresh prompts
-- [ ] Build training module viewer (explanations, visual comparisons, quizzes)
+- [x] Implement adaptive guidance (adjust explanations based on competency)
+- [x] Implement seasonal refresh prompts
+- [x] Build training module viewer (explanations, visual comparisons, quizzes)
 
 **Notes from Phase 4b**: The `identification_narrative` field on each genus is a rich source of training content — flashcard/quiz modules can pull from narratives to generate questions (e.g., "What's the key feature of Lactarius?" → "All species exude milk"). The `description_notes` field could also feed competency evidence — if a user correctly types diagnostic terms ("distant gills, depressed cap"), that demonstrates genus recognition competency.
 

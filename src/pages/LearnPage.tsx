@@ -13,6 +13,12 @@ import {
   getReviewStats,
 } from '@/learning/review-session';
 import { getCompetencyLevel } from '@/learning/competency';
+import {
+  getCurrentSeasonMonth,
+  getSeasonalRefreshPrompt,
+  type SeasonalRefreshPrompt,
+} from '@/learning/seasonal-refresh';
+import { seedGenera } from '@/data/seed-genera';
 
 type ViewMode = 'dashboard' | 'reviewing';
 
@@ -29,6 +35,7 @@ export function LearnPage() {
   const [totalCards, setTotalCards] = useState(0);
   const [competencies, setCompetencies] = useState<CompetencyRecord[]>([]);
   const [stats, setStats] = useState<ReviewStatsData | null>(null);
+  const [seasonalPrompt, setSeasonalPrompt] = useState<SeasonalRefreshPrompt | null>(null);
 
   // Review state
   const [session, setSession] = useState<ReviewSession | null>(null);
@@ -50,6 +57,10 @@ export function LearnPage() {
       setTotalCards(total);
       setCompetencies(comps);
       setStats(reviewStats);
+
+      // Seasonal refresh prompt
+      const month = getCurrentSeasonMonth();
+      setSeasonalPrompt(getSeasonalRefreshPrompt(seedGenera, month));
     } finally {
       setLoading(false);
     }
@@ -160,6 +171,21 @@ export function LearnPage() {
         )}
       </div>
 
+      {/* Seasonal prompt */}
+      {seasonalPrompt && (
+        <div className="rounded-lg bg-emerald-50 border border-emerald-200 p-4 space-y-2">
+          <h3 className="text-sm font-semibold text-emerald-800">
+            What&apos;s in Season
+          </h3>
+          <p className="text-sm text-emerald-700">{seasonalPrompt.message}</p>
+          {seasonalPrompt.approaching.length > 0 && (
+            <p className="text-xs text-emerald-600">
+              Brush up on {seasonalPrompt.approaching.join(', ')} before they start fruiting.
+            </p>
+          )}
+        </div>
+      )}
+
       {/* Review Stats */}
       {stats && stats.total_reviews > 0 && (
         <div className="rounded-lg bg-white border border-stone-200 p-5 space-y-3">
@@ -194,6 +220,17 @@ export function LearnPage() {
           </div>
         </div>
       )}
+
+      {/* Training modules link */}
+      <Link
+        to="/train"
+        className="block rounded-lg bg-white border border-stone-200 p-4 active:bg-stone-50"
+      >
+        <h3 className="text-sm font-semibold text-amber-800">Genus Training</h3>
+        <p className="text-xs text-stone-500 mt-1">
+          Learn about identification features, lookalikes, and field techniques for all 20 genera.
+        </p>
+      </Link>
 
       {/* Card Deck Info */}
       {totalCards > 0 && (
