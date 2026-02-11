@@ -1244,12 +1244,12 @@ NETWORK ONLY:
 
 **Goal**: Allow users to annotate and extend the knowledge base.
 
-- [ ] Build heuristic annotation UI (personal notes, regional data)
-- [ ] Build exception reporting flow
-- [ ] Build draft heuristic editor with schema validation
-- [ ] Implement contribution storage (separate from core KB)
-- [ ] Build contribution merge logic (overlay on core data at query time)
-- [ ] Build export/backup of user data
+- [x] Build heuristic annotation UI (personal notes, regional data)
+- [x] Build exception reporting flow
+- [x] Build draft heuristic editor with schema validation
+- [x] Implement contribution storage (separate from core KB)
+- [x] Build contribution merge logic (overlay on core data at query time)
+- [x] Build export/backup of user data
 
 **Deliverable**: Users can enrich their local knowledge base.
 

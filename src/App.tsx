@@ -6,6 +6,7 @@ import { IdentifyPage } from '@/pages/IdentifyPage';
 import { LearnPage } from '@/pages/LearnPage';
 import { SettingsPage } from '@/pages/SettingsPage';
 import { TrainPage } from '@/pages/TrainPage';
+import { ContributePage } from '@/pages/ContributePage';
 import { db } from '@/db/database';
 import { loadKnowledgeBase } from '@/db/kb-loader';
 import { hasApiKey } from '@/llm/api-key';
@@ -69,6 +70,7 @@ export function App() {
           <Route path="/identify" element={<IdentifyPage />} />
           <Route path="/learn" element={<LearnPage />} />
           <Route path="/train" element={<TrainPage />} />
+          <Route path="/contribute" element={<ContributePage />} />
           <Route path="/settings" element={<SettingsPage />} />
         </Route>
       </Routes>

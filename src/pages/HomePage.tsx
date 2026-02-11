@@ -56,12 +56,22 @@ export function HomePage() {
         </Link>
 
         <Link
+          to="/contribute"
+          className="block rounded-xl bg-stone-700 p-6 text-white text-center shadow-md active:bg-stone-800"
+        >
+          <div className="text-lg mb-1">My Notes</div>
+          <div className="text-stone-300 text-sm">
+            Annotations, exceptions &amp; backup
+          </div>
+        </Link>
+
+        <Link
           to="/settings"
           className="block rounded-xl bg-stone-200 p-6 text-stone-800 text-center shadow-md active:bg-stone-300"
         >
           <div className="text-lg mb-1">Settings</div>
           <div className="text-stone-500 text-sm">
-            Backup, preferences &amp; data
+            Preferences &amp; API configuration
           </div>
         </Link>
       </div>
