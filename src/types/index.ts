@@ -61,3 +61,11 @@ export type {
   LLMOpinion,
 } from './llm';
 export { DEFAULT_LLM_SETTINGS } from './llm';
+export type {
+  CardType,
+  ReviewCard,
+  ReviewResult,
+  ReviewSession,
+  TrainingModule,
+  TrainingContent,
+} from './learning';

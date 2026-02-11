@@ -1223,15 +1223,18 @@ NETWORK ONLY:
 
 **Goal**: Competency tracking and spaced repetition training.
 
-- [ ] Integrate `ts-fsrs` for spaced repetition scheduling
-- [ ] Build competency tracking model with evidence capture
-- [ ] Implement upgrade/downgrade automation
-- [ ] Build training module viewer (explanations, visual comparisons, quizzes)
-- [ ] Build review/flashcard mode for spaced repetition
+- [x] Integrate `ts-fsrs` for spaced repetition scheduling
+- [x] Build competency tracking model with evidence capture
+- [x] Implement upgrade/downgrade automation
+- [x] Build card generator from genus profiles (genus, feature, safety, discrimination, heuristic cards)
+- [x] Build review/flashcard mode for spaced repetition with DB persistence
+- [x] Build competency dashboard (user's progress view)
+- [x] Build decay detection (confident→learning after 180d, expert→confident after 365d)
+- [x] Seed review cards automatically from knowledge base on app load
+- [x] Fix vitest pool configuration for Node 24 compatibility (vmForks)
 - [ ] Implement adaptive guidance (adjust explanations based on competency)
-- [ ] Build competency dashboard (user's progress view)
 - [ ] Implement seasonal refresh prompts
-- [ ] Build decay detection and re-engagement
+- [ ] Build training module viewer (explanations, visual comparisons, quizzes)
 
 **Notes from Phase 4b**: The `identification_narrative` field on each genus is a rich source of training content — flashcard/quiz modules can pull from narratives to generate questions (e.g., "What's the key feature of Lactarius?" → "All species exude milk"). The `description_notes` field could also feed competency evidence — if a user correctly types diagnostic terms ("distant gills, depressed cap"), that demonstrates genus recognition competency.
 

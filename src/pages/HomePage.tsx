@@ -1,9 +1,17 @@
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAppStore } from '@/stores/app-store';
 import { BackupReminder } from '@/components/BackupReminder';
+import { db } from '@/db/database';
+import { getDueCardCount } from '@/learning/review-session';
 
 export function HomePage() {
   const isOnline = useAppStore((s) => s.isOnline);
+  const [dueCount, setDueCount] = useState(0);
+
+  useEffect(() => {
+    getDueCardCount(db).then(setDueCount);
+  }, []);
 
   return (
     <div className="space-y-6">
@@ -34,7 +42,14 @@ export function HomePage() {
           to="/learn"
           className="block rounded-xl bg-amber-700 p-6 text-white text-center shadow-md active:bg-amber-800"
         >
-          <div className="text-2xl mb-1">Learn</div>
+          <div className="text-2xl mb-1">
+            Learn
+            {dueCount > 0 && (
+              <span className="ml-2 inline-block bg-amber-200 text-amber-900 text-sm font-medium px-2 py-0.5 rounded-full">
+                {dueCount}
+              </span>
+            )}
+          </div>
           <div className="text-amber-200 text-sm">
             Training &amp; spaced repetition
           </div>
