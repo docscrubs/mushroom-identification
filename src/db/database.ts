@@ -4,6 +4,7 @@ import type { Heuristic } from '@/types';
 import type { UserModel } from '@/types';
 import type { IdentificationSession } from '@/types';
 import type { UserContribution } from '@/types';
+import type { LLMSettings, LLMUsageRecord } from '@/types';
 
 export interface CachedLLMResponse {
   cache_key: string;
@@ -18,6 +19,8 @@ export class MushroomDB extends Dexie {
   identificationSessions!: Table<IdentificationSession, string>;
   userContributions!: Table<UserContribution, string>;
   llmCache!: Table<CachedLLMResponse, string>;
+  llmSettings!: Table<LLMSettings, string>;
+  llmUsage!: Table<LLMUsageRecord, number>;
 
   constructor(name = 'MushroomID') {
     super(name);
@@ -28,6 +31,16 @@ export class MushroomDB extends Dexie {
       identificationSessions: 'session_id, date',
       userContributions: 'id, type, heuristic_id, status',
       llmCache: 'cache_key, created_at',
+    });
+    this.version(2).stores({
+      genusProfiles: 'genus, *common_names, uk_occurrence',
+      heuristics: 'heuristic_id, category, applies_to.genus, priority',
+      userModels: 'user_id',
+      identificationSessions: 'session_id, date',
+      userContributions: 'id, type, heuristic_id, status',
+      llmCache: 'cache_key, created_at',
+      llmSettings: 'id',
+      llmUsage: '++id, timestamp',
     });
   }
 }

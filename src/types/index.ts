@@ -47,3 +47,17 @@ export type {
   ContributionStatus,
 } from './user';
 export type { IdentificationSession } from './session';
+export type {
+  LLMSettings,
+  LLMContentPart,
+  LLMMessage,
+  LLMRequest,
+  LLMResponse,
+  FieldConfidence,
+  LLMDirectIdentification,
+  LLMExtractionResult,
+  LLMExplanation,
+  LLMUsageRecord,
+  LLMOpinion,
+} from './llm';
+export { DEFAULT_LLM_SETTINGS } from './llm';

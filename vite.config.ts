@@ -34,7 +34,7 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,ico,png,svg,json,jpg}'],
         runtimeCaching: [
           {
-            urlPattern: /^https:\/\/api\.anthropic\.com\/.*/i,
+            urlPattern: /^https:\/\/api\.z\.ai\/.*/i,
             handler: 'NetworkOnly',
           },
         ],

@@ -7,6 +7,7 @@ import { LearnPage } from '@/pages/LearnPage';
 import { SettingsPage } from '@/pages/SettingsPage';
 import { db } from '@/db/database';
 import { loadKnowledgeBase } from '@/db/kb-loader';
+import { hasApiKey } from '@/llm/api-key';
 import { useAppStore } from '@/stores/app-store';
 
 export function App() {
@@ -17,6 +18,10 @@ export function App() {
   useEffect(() => {
     async function init() {
       await loadKnowledgeBase(db);
+
+      // Check if an API key is stored so AI features are available immediately
+      const keyExists = await hasApiKey(db);
+      useAppStore.getState().setHasApiKey(keyExists);
 
       // Request persistent storage so browser won't evict our data
       if (navigator.storage?.persist) {
@@ -29,15 +34,17 @@ export function App() {
   }, [setInitialized]);
 
   useEffect(() => {
-    const handleOnline = () => setOnline(true);
-    const handleOffline = () => setOnline(false);
-    setOnline(navigator.onLine);
+    const sync = () => setOnline(navigator.onLine);
+    sync();
 
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
+    window.addEventListener('online', sync);
+    window.addEventListener('offline', sync);
+    // Re-check on tab focus — browser events can miss connectivity changes
+    document.addEventListener('visibilitychange', sync);
     return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
+      window.removeEventListener('online', sync);
+      window.removeEventListener('offline', sync);
+      document.removeEventListener('visibilitychange', sync);
     };
   }, [setOnline]);
 

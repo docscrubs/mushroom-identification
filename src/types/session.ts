@@ -1,5 +1,6 @@
 import type { Observation } from './observation';
 import type { IdentificationResult } from './identification';
+import type { LLMOpinion } from './llm';
 
 /** An identification session record */
 export interface IdentificationSession {
@@ -13,4 +14,6 @@ export interface IdentificationSession {
     notes?: string;
   };
   competencies_demonstrated?: string[];
+  /** LLM's direct identification opinion, stored for calibration */
+  llm_opinion?: LLMOpinion;
 }
