@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import { fileToDataUrl } from '@/llm/image-utils';
 
 interface ChatInputProps {
   onSend: (text: string, photos: string[]) => void;
@@ -27,7 +28,7 @@ export function ChatInput({ onSend, loading, disabled }: ChatInputProps) {
     }
   }
 
-  function handlePhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handlePhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
     const files = e.target.files;
     if (!files) return;
 
@@ -35,14 +36,15 @@ export function ChatInput({ onSend, loading, disabled }: ChatInputProps) {
     const toProcess = Array.from(files).slice(0, remaining);
 
     for (const file of toProcess) {
-      const reader = new FileReader();
-      reader.onload = () => {
+      try {
+        const dataUrl = await fileToDataUrl(file);
         setPhotos((prev) => {
           if (prev.length >= 3) return prev;
-          return [...prev, reader.result as string];
+          return [...prev, dataUrl];
         });
-      };
-      reader.readAsDataURL(file);
+      } catch {
+        // Skip files that fail to load/compress
+      }
     }
 
     // Reset file input

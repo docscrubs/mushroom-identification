@@ -102,6 +102,7 @@ export async function sendMessage(
   // 8. Select model (vision if photos in this message)
   const hasPhotos = photos && photos.length > 0;
   const model = hasPhotos ? settings.vision_model : settings.model;
+  const timeoutMs = hasPhotos ? 120_000 : 60_000; // Vision needs longer for image processing
 
   // 9. Call LLM
   let llmResponse: LLMResponse;
@@ -115,7 +116,7 @@ export async function sendMessage(
       },
       apiKey,
       settings.endpoint,
-      60_000, // 60s timeout for large context
+      timeoutMs,
     );
   } catch (err) {
     // Save user message even on error
