@@ -1,0 +1,17 @@
+{
+  "id": "placeholder-08",
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "content": "**What you're thinking**\n\nSmall white funnel-shaped mushrooms growing in a ring on a lawn is a concerning description. This matches **Clitocybe rivulosa (Fool's Funnel)** — a poisonous species that causes muscarine poisoning and can be potentially fatal.\n\n**Key candidates**\n\n1. **Clitocybe rivulosa / C. dealbata (Fool's Funnel / Ivory Funnel)** — POISONOUS, potentially fatal. Small white funnel-shaped mushrooms that commonly grow in rings or troops on lawns and grassland. Contains muscarine, which causes profuse sweating, salivation, blurred vision, and in severe cases cardiac and respiratory problems. These often grow in the same fairy rings as the edible Fairy Ring Champignon.\n\n2. **Marasmius oreades (Fairy Ring Champignon)** — Edible and popular. Also grows in fairy rings on lawns. Key differences: buff/tan cap (not white), tougher texture, widely spaced gills.\n\n3. **Clitocybe fragrans** — White, funnel-shaped, aniseed smell. Also contains muscarine.\n\n**What would help**\n\nWhat colour is the cap exactly — is it pure white/cream, or more buff/tan? Also, pick one and check: does the stem snap cleanly, or is it tough and flexible? Fairy Ring Champignon has a tough, flexible stem.\n\n**Safety notes**\n\n⚠️ **WARNING**: Clitocybe rivulosa (Fool's Funnel) is a significant poison risk on lawns. Muscarine poisoning causes dangerous cardiovascular symptoms. These mushrooms frequently co-occur with the edible Fairy Ring Champignon in the same rings. If there's any doubt about identification, leave them alone."
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 130000,
+    "completion_tokens": 340,
+    "total_tokens": 130340
+  }
+}

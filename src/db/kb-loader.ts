@@ -1,12 +1,14 @@
 import type { MushroomDB } from './database';
 import { seedGenera } from '@/data/seed-genera';
 import { seedHeuristics } from '@/data/seed-heuristics';
+import { speciesDataset } from '@/data/species-dataset';
+import { loadSpeciesData } from './species-store';
 
 /**
  * Bump this version whenever seed data changes (e.g., new fields, new species).
  * When the stored version is older, the KB is cleared and re-seeded.
  */
-export const KB_VERSION = 3;
+export const KB_VERSION = 4;
 const KB_VERSION_KEY = 'mushroom-kb-version';
 
 /**
@@ -50,6 +52,9 @@ export async function loadKnowledgeBase(db: MushroomDB): Promise<void> {
       await db.heuristics.bulkAdd(seedHeuristics);
     },
   );
+
+  // Load species dataset (separate transaction — clear + bulk load)
+  await loadSpeciesData(db, speciesDataset);
 
   setStoredKBVersion(KB_VERSION);
 }

@@ -1,0 +1,17 @@
+{
+  "id": "placeholder-wm-2",
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "content": "**What you're thinking**\n\nPale pink/salmon gills and birch trees confirm this. The combination of orange-pink cap with woolly margin, white milk, pale pink gills, and birch association is a strong match for **Lactarius torminosus (Woolly Milkcap)**.\n\n**Identification**\n\nThis is most likely **Lactarius torminosus (Woolly Milkcap)**.\n\n**Supporting evidence:**\n- Orange-pink cap with woolly/fluffy margin ✓\n- White milk when cut ✓\n- Pale pink/salmon gills ✓\n- Growing under birch trees ✓\n\n**Confidence:** High — this combination of features is distinctive.\n\n**What could change this:** If the cap margin is only slightly hairy (not distinctly woolly), it could be Lactarius pubescens, which is paler overall. Both are poisonous, so the distinction doesn't change the safety advice.\n\n**Confusion species:** Lactarius deliciosus (Saffron Milkcap) has a similar orange cap but produces orange milk (not white) and grows under pines (not birch).\n\n**Safety notes**\n\n⚠️ **Lactarius torminosus is poisonous.** It causes significant gastrointestinal symptoms including nausea, vomiting, and diarrhoea if consumed. While it is traditionally eaten in some Nordic countries after extensive parboiling in multiple changes of water, this is not recommended without expert guidance. Do not eat this mushroom raw or simply cooked."
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 131000,
+    "completion_tokens": 310,
+    "total_tokens": 131310
+  }
+}

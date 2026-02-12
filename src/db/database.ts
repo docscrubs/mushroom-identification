@@ -5,8 +5,17 @@ import type { UserModel } from '@/types';
 import type { IdentificationSession } from '@/types';
 import type { UserContribution } from '@/types';
 import type { LLMSettings, LLMUsageRecord } from '@/types';
+import type { DatasetSpecies } from '@/types/species';
 import type { ReviewCard, ReviewSession } from '@/types/learning';
 import type { CompetencyRecord } from '@/types/user';
+
+export interface ConversationRecord {
+  session_id: string;
+  created_at: string;
+  updated_at: string;
+  status: 'active' | 'completed';
+  messages: string; // JSON-serialized ConversationMessage[]
+}
 
 export interface CachedLLMResponse {
   cache_key: string;
@@ -26,6 +35,8 @@ export class MushroomDB extends Dexie {
   reviewCards!: Table<ReviewCard, string>;
   competencies!: Table<CompetencyRecord, string>;
   reviewSessions!: Table<ReviewSession, string>;
+  species!: Table<DatasetSpecies, string>;
+  conversations!: Table<ConversationRecord, string>;
 
   constructor(name = 'MushroomID') {
     super(name);
@@ -59,6 +70,21 @@ export class MushroomDB extends Dexie {
       reviewCards: 'card_id, card_type, genus, due, state, competency_id',
       competencies: 'skill_id, status',
       reviewSessions: 'session_id, started_at',
+    });
+    this.version(4).stores({
+      genusProfiles: 'genus, *common_names, uk_occurrence',
+      heuristics: 'heuristic_id, category, applies_to.genus, priority',
+      userModels: 'user_id',
+      identificationSessions: 'session_id, date',
+      userContributions: 'id, type, heuristic_id, status',
+      llmCache: 'cache_key, created_at',
+      llmSettings: 'id',
+      llmUsage: '++id, timestamp',
+      reviewCards: 'card_id, card_type, genus, due, state, competency_id',
+      competencies: 'skill_id, status',
+      reviewSessions: 'session_id, started_at',
+      species: 'scientific_name, edibility_detail.danger_level',
+      conversations: 'session_id, updated_at, status',
     });
   }
 }

@@ -1,6 +1,15 @@
 import type { Observation } from './observation';
 import type { IdentificationResult } from './identification';
-import type { LLMOpinion } from './llm';
+
+export type FieldConfidence = 'high' | 'medium' | 'low';
+
+export interface LLMOpinion {
+  genus_guess: string | null;
+  species_guess: string | null;
+  confidence: FieldConfidence;
+  reasoning: string;
+  agreed_with_rule_engine: boolean;
+}
 
 /** An identification session record */
 export interface IdentificationSession {

@@ -1,0 +1,17 @@
+{
+  "id": "placeholder-wm-1",
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "content": "**What you're thinking**\n\nAn orange-pink cap with faint fluff around the edge and white milk when cut is very characteristic of a **Lactarius** (Milkcap) species. The woolly/fluffy margin combined with the colour strongly suggests one of the birch-associated milkcaps.\n\n**Key candidates**\n\n1. **Lactarius torminosus (Woolly Milkcap)** — Poisonous. Orange-pink cap with distinctive woolly/shaggy margin, white milk. Strongly associated with birch trees. Causes significant gastrointestinal distress if eaten.\n\n2. **Lactarius pubescens (Pale Woolly Milkcap)** — Toxic. Paler, more whitish-pink with woolly margin. Also under birch.\n\n3. **Lactarius deliciosus (Saffron Milkcap)** — Edible. Orange cap under pines, but this would produce orange/carrot-coloured milk, not white. If the milk is white, this is unlikely.\n\n**What would help**\n\nTwo key questions:\n1. What colour are the gills? (Lactarius torminosus has pale pink/salmon gills)\n2. What trees are nearby — specifically, are there birch trees?\n\n**Safety notes**\n\nBoth Lactarius torminosus and L. pubescens are poisonous and cause nausea, vomiting, and diarrhoea. The white milk is a warning sign — edible milkcaps (like L. deliciosus) produce orange milk. Do not eat this mushroom."
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 130000,
+    "completion_tokens": 290,
+    "total_tokens": 130290
+  }
+}

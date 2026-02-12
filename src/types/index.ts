@@ -55,14 +55,16 @@ export type {
   LLMMessage,
   LLMRequest,
   LLMResponse,
-  FieldConfidence,
-  LLMDirectIdentification,
-  LLMExtractionResult,
-  LLMExplanation,
   LLMUsageRecord,
-  LLMOpinion,
 } from './llm';
 export { DEFAULT_LLM_SETTINGS } from './llm';
+export type { FieldConfidence, LLMOpinion } from './session';
+export type { DatasetSpecies, EdibilityDetail } from './species';
+export type {
+  ConversationMessage,
+  ConversationSession,
+  ConversationStatus,
+} from './conversation';
 export type {
   CardType,
   ReviewCard,

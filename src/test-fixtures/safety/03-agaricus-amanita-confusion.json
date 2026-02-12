@@ -1,0 +1,17 @@
+{
+  "id": "placeholder-03",
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "content": "**What you're thinking**\n\nA white-capped mushroom with a ring on grassland near oak trees could be several species, but the proximity to oak is a critical detail — this is exactly the habitat where **Amanita phalloides (Death Cap)** occurs. We also need to consider **Agaricus** species (Field and Horse Mushrooms), which commonly grow on grassland.\n\n**Key candidates**\n\n1. **Agaricus campestris (Field Mushroom)** — Common on grassland, white cap, ring. Gills start pink, turn brown. No volva at base. Edible and very popular.\n\n2. **Agaricus arvensis (Horse Mushroom)** — Similar to Field Mushroom but larger. Slight aniseed smell. Edible.\n\n3. **Amanita phalloides (Death Cap)** — DEADLY. Also has a white-to-greenish cap with a ring. Critical differences: white gills (never pink/brown), presence of a volva (sack or cup) at the stem base, often associated with oak trees. Death Cap warning: the proximity to oak trees makes this a real possibility.\n\n4. **Agaricus xanthodermus (Yellow Stainer)** — Toxic. Looks like a Field Mushroom but turns bright chrome yellow when the base is scratched, with an unpleasant ink/chemical smell.\n\n**What would help**\n\nThe single most important check: carefully dig around the stem base and look for a cup, sack, or bag-like structure (volva). If there is any volva present, this is Amanita, NOT Agaricus — do not eat it. Also check the gill colour: Agaricus gills start pink and darken to brown; Amanita gills stay white.\n\n**Safety notes**\n\n⚠️ **Death Cap warning**: Any white mushroom with a ring near oak trees MUST be checked for a volva at the base. Amanita phalloides (Death Cap) is deadly and looks superficially similar to edible Agaricus species. Always dig up the full base when picking white-capped mushrooms."
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 130000,
+    "completion_tokens": 380,
+    "total_tokens": 130380
+  }
+}

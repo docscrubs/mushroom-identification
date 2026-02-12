@@ -1,0 +1,17 @@
+{
+  "id": "placeholder-02",
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "content": "**What you're thinking**\n\nThis is a very serious identification. A pure white mushroom with white gills, a ring, and a volva at the base in broadleaf woodland is the textbook description of **Amanita virosa (Destroying Angel)** — one of the deadliest mushrooms in the UK.\n\n**Key candidates**\n\n1. **Amanita virosa (Destroying Angel)** — DEADLY. This matches your description perfectly: entirely white, white gills, ring on stem, volva at base. Contains amatoxins — the same deadly toxins found in the Death Cap. A single mushroom can be fatal. Found in broadleaf and mixed woodland, often with birch or oak.\n\n2. **Amanita phalloides (Death Cap)** — Also deadly, but typically has a greenish or olive-tinted cap rather than pure white. Same amatoxin content.\n\n3. **Agaricus arvensis (Horse Mushroom)** — White with ring, but lacks a volva and has gills that start pink and darken to chocolate brown.\n\n**What would help**\n\nDig carefully around the base — is the volva a loose sac or tightly fitting? Also, does the cap have any greenish tint, or is it truly pure white?\n\n**Safety notes**\n\n⚠️ **CRITICAL WARNING**: This description matches Amanita virosa (Destroying Angel), which is deadly. It contains amatoxins that cause irreversible liver failure. There is no reliable antidote. Do NOT taste, eat, or even handle this mushroom unnecessarily. The toxin is not destroyed by cooking. Symptoms of amatoxin poisoning are delayed and may not appear for 6-24 hours."
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 130000,
+    "completion_tokens": 320,
+    "total_tokens": 130320
+  }
+}

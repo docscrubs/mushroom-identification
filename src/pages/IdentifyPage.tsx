@@ -1,16 +1,12 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import type { Observation, IdentificationResult, Heuristic, LLMExplanation, FollowUpQuestion } from '@/types';
+import type { Observation, IdentificationResult, Heuristic, FollowUpQuestion } from '@/types';
 import { assembleResult } from '@/engine/result-assembler';
 import { featureRules } from '@/engine/feature-rules';
 import { ALL_GENERA } from '@/engine/genera';
 import { getGenusEdibility } from '@/engine/edibility';
 import { generateOfflineExplanation } from '@/engine/explanation-templates';
-import { useAppStore } from '@/stores/app-store';
 import { db } from '@/db/database';
-import { extractFeatures, fileToDataUrl } from '@/llm/extract-features';
-import { generateExplanation } from '@/llm/explain';
-import { recordCalibration } from '@/llm/calibration';
 import { buildGuidanceContext, type GuidanceContext } from '@/learning/adaptive-guidance';
 import { SafetyDisclaimer } from '@/components/SafetyDisclaimer';
 
@@ -126,8 +122,6 @@ export function IdentifyPage() {
   const [result, setResult] = useState<IdentificationResult | null>(null);
   const [photoFiles, setPhotoFiles] = useState<File[]>([]);
   const [textDescription, setTextDescription] = useState('');
-  const [aiSuggestedFields, setAiSuggestedFields] = useState<Set<string>>(new Set());
-  const [llmExplanation, setLlmExplanation] = useState<LLMExplanation | null>(null);
   const [guidance, setGuidance] = useState<GuidanceContext | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -137,11 +131,6 @@ export function IdentifyPage() {
   const observationRef = useRef(observation);
   observationRef.current = observation;
   const resultRef = useRef<HTMLDivElement>(null);
-  const hasApiKey = useAppStore((s) => s.hasApiKey);
-  const llmLoading = useAppStore((s) => s.llmLoading);
-  const llmError = useAppStore((s) => s.llmError);
-  const setLlmLoading = useAppStore((s) => s.setLlmLoading);
-  const setLlmError = useAppStore((s) => s.setLlmError);
 
   // Load heuristics from DB once
   useEffect(() => {
@@ -160,10 +149,7 @@ export function IdentifyPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reIdentifyCounter]);
 
-  // Track manual user edits to prevent AI overwriting
-  const [userEditedFields, setUserEditedFields] = useState<Set<string>>(new Set());
-
-  function updateObs(field: keyof Observation, raw: string, isUserEdit = true) {
+  function updateObs(field: keyof Observation, raw: string) {
     setObservation((prev) => {
       const next = { ...prev };
       if (raw === '') {
@@ -179,63 +165,6 @@ export function IdentifyPage() {
       }
       return next;
     });
-    if (isUserEdit) {
-      setUserEditedFields((prev) => new Set(prev).add(field));
-      // If user edits an AI-suggested field, remove the badge
-      setAiSuggestedFields((prev) => {
-        const next = new Set(prev);
-        next.delete(field);
-        return next;
-      });
-    }
-  }
-
-  async function handleAnalyseWithAI() {
-    setLlmLoading(true);
-    setLlmError(null);
-
-    try {
-      // Convert photos to data URLs
-      const photoDataUrls = await Promise.all(photoFiles.map(fileToDataUrl));
-
-      const outcome = await extractFeatures(
-        db,
-        photoDataUrls,
-        textDescription || null,
-        observation,
-      );
-
-      if (!outcome.ok) {
-        setLlmError(outcome.message);
-        return;
-      }
-
-      // Pre-fill empty fields with AI extraction (user-filled fields NOT overwritten)
-      const extracted = outcome.result.extracted_observations;
-      const newSuggested = new Set<string>();
-
-      setObservation((prev) => {
-        const next = { ...prev };
-        for (const [key, value] of Object.entries(extracted)) {
-          if (value === null || value === undefined || value === '') continue;
-          // Only pre-fill if user hasn't manually edited this field AND field is currently empty
-          const currentValue = prev[key as keyof Observation];
-          const isEmpty = currentValue === undefined || currentValue === null || currentValue === '';
-          if (isEmpty && !userEditedFields.has(key)) {
-            (next as Record<string, unknown>)[key] = value;
-            newSuggested.add(key);
-          }
-        }
-        return next;
-      });
-
-      setAiSuggestedFields(newSuggested);
-
-      // Store extraction result for calibration later
-      useAppStore.getState().setLastExtractionResult(outcome.result);
-    } finally {
-      setLlmLoading(false);
-    }
   }
 
   async function handleIdentify() {
@@ -254,7 +183,6 @@ export function IdentifyPage() {
     }
     const r = assembleResult(obsForEngine, ALL_GENERA, featureRules, heuristics);
     setResult(r);
-    setLlmExplanation(null);
 
     // Build adaptive guidance from user's competency records
     const candidateGenera = r.candidates
@@ -263,19 +191,6 @@ export function IdentifyPage() {
     const competencies = await db.competencies.toArray();
     const guidance = buildGuidanceContext(competencies, candidateGenera);
     setGuidance(guidance);
-
-    // If API key is configured, attempt LLM explanation in background (silently fails offline)
-    if (hasApiKey) {
-      generateExplanation(db, r, observation, guidance).then((explanation) => {
-        setLlmExplanation(explanation);
-      });
-
-      // Record calibration if we have an extraction result
-      const extraction = useAppStore.getState().lastExtractionResult;
-      if (extraction?.direct_identification) {
-        recordCalibration(db, extraction.direct_identification, r, 'session-' + Date.now());
-      }
-    }
   }
 
   function handleReset() {
@@ -283,16 +198,9 @@ export function IdentifyPage() {
     setResult(null);
     setPhotoFiles([]);
     setTextDescription('');
-    setAiSuggestedFields(new Set());
     setGuidance(null);
-    setUserEditedFields(new Set());
-    setLlmExplanation(null);
-    setLlmError(null);
-    useAppStore.getState().setLastExtractionResult(null);
     if (fileInputRef.current) fileInputRef.current.value = '';
   }
-
-  const showAiButton = hasApiKey;
 
   return (
     <div className="space-y-6">
@@ -350,55 +258,55 @@ export function IdentifyPage() {
           </p>
         </Field>
 
-        <FieldWithBadge label="What's under the cap?" aiSuggested={aiSuggestedFields.has('gill_type')}>
+        <Field label="What's under the cap?">
           <Select
             options={GILL_TYPE_OPTIONS}
             value={(observation.gill_type as string) ?? ''}
             onChange={(v) => updateObs('gill_type', v)}
           />
-        </FieldWithBadge>
+        </Field>
 
-        <FieldWithBadge label="Flesh texture" aiSuggested={aiSuggestedFields.has('flesh_texture')}>
+        <Field label="Flesh texture">
           <Select
             options={FLESH_TEXTURE_OPTIONS}
             value={(observation.flesh_texture as string) ?? ''}
             onChange={(v) => updateObs('flesh_texture', v)}
           />
-        </FieldWithBadge>
+        </Field>
 
-        <FieldWithBadge label="Cap shape" aiSuggested={aiSuggestedFields.has('cap_shape')}>
+        <Field label="Cap shape">
           <Select
             options={CAP_SHAPE_OPTIONS}
             value={(observation.cap_shape as string) ?? ''}
             onChange={(v) => updateObs('cap_shape', v)}
           />
-        </FieldWithBadge>
+        </Field>
 
-        <FieldWithBadge label="Ring (skirt) on stem?" aiSuggested={aiSuggestedFields.has('ring_present')}>
+        <Field label="Ring (skirt) on stem?">
           <Select
             options={YES_NO_OPTIONS}
             value={observation.ring_present === true ? 'true' : observation.ring_present === false ? 'false' : ''}
             onChange={(v) => updateObs('ring_present', v)}
           />
-        </FieldWithBadge>
+        </Field>
 
-        <FieldWithBadge label="Volva (cup/bag at base)?" aiSuggested={aiSuggestedFields.has('volva_present')}>
+        <Field label="Volva (cup/bag at base)?">
           <Select
             options={YES_NO_OPTIONS}
             value={observation.volva_present === true ? 'true' : observation.volva_present === false ? 'false' : ''}
             onChange={(v) => updateObs('volva_present', v)}
           />
-        </FieldWithBadge>
+        </Field>
 
-        <FieldWithBadge label="Stem present?" aiSuggested={aiSuggestedFields.has('stem_present')}>
+        <Field label="Stem present?">
           <Select
             options={YES_NO_OPTIONS}
             value={observation.stem_present === true ? 'true' : observation.stem_present === false ? 'false' : ''}
             onChange={(v) => updateObs('stem_present', v)}
           />
-        </FieldWithBadge>
+        </Field>
 
-        <FieldWithBadge label="Gill colour" aiSuggested={aiSuggestedFields.has('gill_color')}>
+        <Field label="Gill colour">
           <input
             type="text"
             placeholder="e.g. white, pink, brown..."
@@ -406,9 +314,9 @@ export function IdentifyPage() {
             value={observation.gill_color ?? ''}
             onChange={(e) => updateObs('gill_color', e.target.value)}
           />
-        </FieldWithBadge>
+        </Field>
 
-        <FieldWithBadge label="Spore print colour" aiSuggested={aiSuggestedFields.has('spore_print_color')}>
+        <Field label="Spore print colour">
           <input
             type="text"
             placeholder="e.g. white, cream, brown..."
@@ -416,9 +324,9 @@ export function IdentifyPage() {
             value={observation.spore_print_color ?? ''}
             onChange={(e) => updateObs('spore_print_color', e.target.value)}
           />
-        </FieldWithBadge>
+        </Field>
 
-        <FieldWithBadge label="Cap colour" aiSuggested={aiSuggestedFields.has('cap_color')}>
+        <Field label="Cap colour">
           <input
             type="text"
             placeholder="e.g. red, brown, white, yellow..."
@@ -426,9 +334,9 @@ export function IdentifyPage() {
             value={observation.cap_color ?? ''}
             onChange={(e) => updateObs('cap_color', e.target.value)}
           />
-        </FieldWithBadge>
+        </Field>
 
-        <FieldWithBadge label="Stem colour" aiSuggested={aiSuggestedFields.has('stem_color')}>
+        <Field label="Stem colour">
           <input
             type="text"
             placeholder="e.g. white, lilac, brown..."
@@ -436,9 +344,9 @@ export function IdentifyPage() {
             value={observation.stem_color ?? ''}
             onChange={(e) => updateObs('stem_color', e.target.value)}
           />
-        </FieldWithBadge>
+        </Field>
 
-        <FieldWithBadge label="Bruising / colour change when cut" aiSuggested={aiSuggestedFields.has('bruising_color')}>
+        <Field label="Bruising / colour change when cut">
           <input
             type="text"
             placeholder="e.g. blue, inky black, pink..."
@@ -446,33 +354,33 @@ export function IdentifyPage() {
             value={observation.bruising_color ?? ''}
             onChange={(e) => updateObs('bruising_color', e.target.value)}
           />
-        </FieldWithBadge>
+        </Field>
 
-        <FieldWithBadge label="Habitat" aiSuggested={aiSuggestedFields.has('habitat')}>
+        <Field label="Habitat">
           <Select
             options={HABITAT_OPTIONS}
             value={(observation.habitat as string) ?? ''}
             onChange={(v) => updateObs('habitat', v)}
           />
-        </FieldWithBadge>
+        </Field>
 
-        <FieldWithBadge label="Growing on" aiSuggested={aiSuggestedFields.has('substrate')}>
+        <Field label="Growing on">
           <Select
             options={SUBSTRATE_OPTIONS}
             value={(observation.substrate as string) ?? ''}
             onChange={(v) => updateObs('substrate', v)}
           />
-        </FieldWithBadge>
+        </Field>
 
-        <FieldWithBadge label="Growth pattern" aiSuggested={aiSuggestedFields.has('growth_pattern')}>
+        <Field label="Growth pattern">
           <Select
             options={GROWTH_PATTERN_OPTIONS}
             value={(observation.growth_pattern as string) ?? ''}
             onChange={(v) => updateObs('growth_pattern', v)}
           />
-        </FieldWithBadge>
+        </Field>
 
-        <FieldWithBadge label="Month found" aiSuggested={false}>
+        <Field label="Month found">
           <Select
             options={MONTH_OPTIONS}
             value={observation.season_month != null ? String(observation.season_month) : ''}
@@ -481,9 +389,9 @@ export function IdentifyPage() {
           <p className="text-xs text-stone-400 mt-1">
             If not set, assumes the current month. Change this for older photos or dried specimens.
           </p>
-        </FieldWithBadge>
+        </Field>
 
-        <FieldWithBadge label="Smell" aiSuggested={aiSuggestedFields.has('smell')}>
+        <Field label="Smell">
           <input
             type="text"
             placeholder="e.g. mushroomy, anise, apricot, earthy..."
@@ -491,38 +399,22 @@ export function IdentifyPage() {
             value={observation.smell ?? ''}
             onChange={(e) => updateObs('smell', e.target.value)}
           />
-        </FieldWithBadge>
+        </Field>
 
         {/* Action buttons */}
-        <div className="flex flex-col gap-3 pt-2">
-          {showAiButton && (
-            <button
-              onClick={handleAnalyseWithAI}
-              disabled={llmLoading || (photoFiles.length === 0 && !textDescription)}
-              className="rounded-lg bg-violet-600 px-4 py-3 text-white font-medium active:bg-violet-700 disabled:opacity-50"
-            >
-              {llmLoading ? 'Analysing...' : 'Analyse with AI'}
-            </button>
-          )}
-
-          {llmError && (
-            <p className="text-sm text-red-600">{llmError}</p>
-          )}
-
-          <div className="flex gap-3">
-            <button
-              onClick={handleIdentify}
-              className="flex-1 rounded-lg bg-green-700 px-4 py-3 text-white font-medium active:bg-green-800"
-            >
-              Identify
-            </button>
-            <button
-              onClick={handleReset}
-              className="rounded-lg bg-stone-200 px-4 py-3 text-stone-700 text-sm active:bg-stone-300"
-            >
-              Reset
-            </button>
-          </div>
+        <div className="flex gap-3 pt-2">
+          <button
+            onClick={handleIdentify}
+            className="flex-1 rounded-lg bg-green-700 px-4 py-3 text-white font-medium active:bg-green-800"
+          >
+            Identify
+          </button>
+          <button
+            onClick={handleReset}
+            className="rounded-lg bg-stone-200 px-4 py-3 text-stone-700 text-sm active:bg-stone-300"
+          >
+            Reset
+          </button>
         </div>
       </div>
 
@@ -537,7 +429,6 @@ export function IdentifyPage() {
           <ResultView
             result={result}
             observation={observation}
-            llmExplanation={llmExplanation}
             guidance={guidance}
             onAnswerQuestion={(feature, value) => {
               updateObs(feature, value);
@@ -553,13 +444,11 @@ export function IdentifyPage() {
 function ResultView({
   result,
   observation,
-  llmExplanation,
   guidance,
   onAnswerQuestion,
 }: {
   result: IdentificationResult;
   observation: Observation;
-  llmExplanation: LLMExplanation | null;
   guidance: GuidanceContext | null;
   onAnswerQuestion: (feature: keyof Observation, value: string) => void;
 }) {
@@ -581,31 +470,6 @@ function ResultView({
         <p className="text-sm font-medium text-green-900">{explanation.summary}</p>
         <p className="text-sm text-green-800 mt-2">{explanation.identification}</p>
       </div>
-
-      {/* LLM-enhanced explanation */}
-      {llmExplanation && (
-        <div className="rounded-lg bg-violet-50 border border-violet-200 p-4 space-y-2">
-          <div className="flex items-center gap-2">
-            <h3 className="font-semibold text-violet-800">AI-Enhanced Explanation</h3>
-            <span className="text-xs px-1.5 py-0.5 rounded bg-violet-200 text-violet-700">AI</span>
-          </div>
-          <p className="text-sm text-violet-900">{llmExplanation.summary}</p>
-          <p className="text-sm text-violet-800 mt-1">{llmExplanation.detailed_explanation}</p>
-          {llmExplanation.safety_emphasis && (
-            <p className="text-sm text-violet-700 mt-1 font-medium">{llmExplanation.safety_emphasis}</p>
-          )}
-          {llmExplanation.suggested_questions.length > 0 && (
-            <div className="mt-2">
-              <p className="text-xs font-medium text-violet-700">You might also want to know:</p>
-              <ul className="mt-1 text-xs text-violet-600 list-disc list-inside">
-                {llmExplanation.suggested_questions.map((q, i) => (
-                  <li key={i}>{q}</li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </div>
-      )}
 
       {/* Safety warnings */}
       {result.safety.warnings.length > 0 && (
@@ -990,30 +854,6 @@ function Field({
   return (
     <label className="block">
       <span className="text-sm font-medium text-stone-700">{label}</span>
-      <div className="mt-1">{children}</div>
-    </label>
-  );
-}
-
-function FieldWithBadge({
-  label,
-  aiSuggested,
-  children,
-}: {
-  label: string;
-  aiSuggested: boolean;
-  children: React.ReactNode;
-}) {
-  return (
-    <label className="block">
-      <span className="text-sm font-medium text-stone-700">
-        {label}
-        {aiSuggested && (
-          <span className="ml-2 text-xs px-1.5 py-0.5 rounded bg-violet-100 text-violet-600">
-            AI
-          </span>
-        )}
-      </span>
       <div className="mt-1">{children}</div>
     </label>
   );

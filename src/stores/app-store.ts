@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import type { LLMExtractionResult } from '@/types';
 
 const BACKUP_SESSION_THRESHOLD = 10;
 const BACKUP_DAYS_THRESHOLD = 30;
@@ -16,7 +15,9 @@ interface AppState {
   hasApiKey: boolean;
   llmLoading: boolean;
   llmError: string | null;
-  lastExtractionResult: LLMExtractionResult | null;
+
+  // Conversation state
+  activeConversationId: string | null;
 
   setInitialized: () => void;
   setOnline: (online: boolean) => void;
@@ -30,7 +31,11 @@ interface AppState {
   setHasApiKey: (has: boolean) => void;
   setLlmLoading: (loading: boolean) => void;
   setLlmError: (error: string | null) => void;
-  setLastExtractionResult: (result: LLMExtractionResult | null) => void;
+
+  // Conversation actions
+  setActiveConversationId: (id: string | null) => void;
+  startConversation: (id: string) => void;
+  endConversation: () => void;
 }
 
 export const useAppStore = create<AppState>()((set, get) => ({
@@ -45,7 +50,9 @@ export const useAppStore = create<AppState>()((set, get) => ({
   hasApiKey: false,
   llmLoading: false,
   llmError: null,
-  lastExtractionResult: null,
+
+  // Conversation state defaults
+  activeConversationId: null,
 
   setInitialized: () => set({ isInitialized: true }),
 
@@ -89,5 +96,14 @@ export const useAppStore = create<AppState>()((set, get) => ({
   setHasApiKey: (has) => set({ hasApiKey: has }),
   setLlmLoading: (loading) => set({ llmLoading: loading }),
   setLlmError: (error) => set({ llmError: error }),
-  setLastExtractionResult: (result) => set({ lastExtractionResult: result }),
+
+  // Conversation actions
+  setActiveConversationId: (id) => set({ activeConversationId: id }),
+  startConversation: (id) => set({ activeConversationId: id }),
+  endConversation: () =>
+    set((state) => ({
+      activeConversationId: null,
+      sessionsSinceBackup: state.sessionsSinceBackup + 1,
+      backupReminderDismissedAt: null,
+    })),
 }));

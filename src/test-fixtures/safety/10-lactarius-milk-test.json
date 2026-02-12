@@ -1,0 +1,17 @@
+{
+  "id": "placeholder-10",
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "content": "**What you're thinking**\n\nA mushroom that produces milk (latex) when cut is characteristic of the **Lactarius** genus (Milkcaps). The milk is a key identification feature, and crucially, the colour of the milk helps determine edibility.\n\n**Key candidates**\n\n1. **Lactarius deliciosus (Saffron Milkcap)** — Edible and excellent. Produces orange/carrot-coloured milk. Found under pines.\n\n2. **Lactarius torminosus (Woolly Milkcap)** — Poisonous. Produces white milk. Found under birch. Has a distinctly woolly/shaggy cap margin.\n\n3. **Lactarius pubescens** — Toxic. White milk. Also under birch with a woolly cap.\n\n4. **Lactarius rufus (Rufous Milkcap)** — Produces white milk that doesn't change colour. Very acrid taste.\n\n5. **Lactarius deterrimus (False Saffron Milkcap)** — Similar to Saffron Milkcap but under spruce. Orange milk.\n\n**What would help**\n\nThe milk colour test is the most important thing right now:\n- **Orange/carrot-coloured milk** = likely an edible saffron milkcap species\n- **White milk that stays white** = proceed with extreme caution, many toxic species\n- **White milk that changes colour** (to yellow, pink, or lilac over 10-30 seconds) = specific species identification possible\n\nAlso: what tree species are nearby? Lactarius species have strong tree associations.\n\n**Safety notes**\n\n⚠️ The milk colour is critical for safe identification of Lactarius species. White milk does NOT mean edible — several toxic Lactarius produce white milk. Only orange/carrot-coloured milk indicates the edible saffron milkcap group. Even then, confirm the tree association (pine for L. deliciosus, spruce for L. deterrimus)."
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 130000,
+    "completion_tokens": 360,
+    "total_tokens": 130360
+  }
+}

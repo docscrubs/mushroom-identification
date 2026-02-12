@@ -31,13 +31,17 @@
 - react-router-dom (routing)
 
 ## Architecture
-- **Hybrid expert system**: deterministic rule engine + LLM (LLM never makes safety decisions)
-- **Offline-first**: full identification works without network
-- **Knowledge base**: YAML source files → JSON at build time → IndexedDB at runtime
-- Core types in `src/types/`, database in `src/db/`, rule engine in `src/engine/`
+- **Dual-mode identification**:
+  - **Online** (primary): LLM conversational chat at `/chat` — species-level identification grounded by 268-species dataset injected in system prompt
+  - **Offline** (fallback): Deterministic rule engine at `/identify` — genus-level identification via structured observation form
+- **Safety**: Enforced via system prompt constraints and data annotations, validated by comprehensive safety test suite (10 scenarios + multi-turn Woolly Milkcap test)
+- **Knowledge base**: 268-species enriched JSON dataset (`wildfooduk_mushrooms_enriched.json`) + genus profiles + heuristics, all stored in IndexedDB
+- **LLM provider**: z.ai GLM models (GLM-4.7-Flash text, GLM-4.6V-Flash vision)
+- Core types in `src/types/`, database in `src/db/`, rule engine in `src/engine/`, LLM in `src/llm/`
 
 ## Key Principles
-- LLM NEVER makes safety decisions — all safety logic is deterministic
+- Safety enforced via system prompt constraints and species data annotations
 - Every observation field is optional — system works with whatever the user provides
 - Safety warnings are attached to identifications, never block them
-- Confidence is weighted and non-additive, not a simple sum
+- Confidence is weighted and non-additive, not a simple sum (rule engine)
+- LLM conversation history stored in IndexedDB, photos only sent in latest turn

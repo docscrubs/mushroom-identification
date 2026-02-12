@@ -1,5 +1,3 @@
-import type { Observation } from './observation';
-
 // --- API Key & Settings ---
 
 export interface LLMSettings {
@@ -19,7 +17,7 @@ export const DEFAULT_LLM_SETTINGS: Omit<LLMSettings, 'api_key'> = {
   endpoint: 'https://api.z.ai/api/paas/v4/chat/completions',
   model: 'glm-4.7-flash',
   vision_model: 'glm-4.6v-flash',
-  max_tokens: 1024,
+  max_tokens: 2048,
   budget_limit_usd: 5.0,
   budget_used_usd: 0,
   budget_reset_date: new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString(),
@@ -60,33 +58,6 @@ export interface LLMResponse {
   };
 }
 
-// --- Structured Extraction Output ---
-
-export type FieldConfidence = 'high' | 'medium' | 'low';
-
-export interface LLMDirectIdentification {
-  species_guess: string | null;
-  genus_guess: string | null;
-  confidence: FieldConfidence;
-  reasoning: string;
-}
-
-export interface LLMExtractionResult {
-  extracted_observations: Partial<Observation>;
-  field_confidence: Record<string, FieldConfidence>;
-  direct_identification: LLMDirectIdentification;
-  extraction_notes: string[];
-}
-
-// --- Natural Language Explanation ---
-
-export interface LLMExplanation {
-  summary: string;
-  detailed_explanation: string;
-  safety_emphasis: string;
-  suggested_questions: string[];
-}
-
 // --- Cost Tracking ---
 
 export interface LLMUsageRecord {
@@ -98,12 +69,3 @@ export interface LLMUsageRecord {
   cache_hit: boolean;
 }
 
-// --- Session Extension ---
-
-export interface LLMOpinion {
-  genus_guess: string | null;
-  species_guess: string | null;
-  confidence: FieldConfidence;
-  reasoning: string;
-  agreed_with_rule_engine: boolean;
-}

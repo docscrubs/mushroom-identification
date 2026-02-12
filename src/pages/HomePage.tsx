@@ -29,12 +29,22 @@ export function HomePage() {
 
       <div className="grid gap-4">
         <Link
-          to="/identify"
+          to="/chat"
           className="block rounded-xl bg-green-700 p-6 text-white text-center shadow-md active:bg-green-800"
         >
-          <div className="text-2xl mb-1">Identify</div>
+          <div className="text-2xl mb-1">Start Identifying</div>
           <div className="text-green-200 text-sm">
-            Start an identification session
+            Chat-based species identification
+          </div>
+        </Link>
+
+        <Link
+          to="/identify"
+          className="block rounded-xl bg-stone-600 p-4 text-white text-center shadow-md active:bg-stone-700"
+        >
+          <div className="text-lg mb-1">Offline Identification</div>
+          <div className="text-stone-300 text-sm">
+            Genus-level ID without internet
           </div>
         </Link>
 

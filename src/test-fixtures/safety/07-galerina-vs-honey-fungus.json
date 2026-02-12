@@ -1,0 +1,17 @@
+{
+  "id": "placeholder-07",
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "content": "**What you're thinking**\n\nClusters of mushrooms with a ring growing on dead wood could be either **Armillaria (Honey Fungus)** — edible when cooked — or **Galerina marginata (Funeral Bell)** — deadly. These two can look remarkably similar, and distinguishing them is safety-critical.\n\n**Key candidates**\n\n1. **Armillaria mellea / A. ostoyae (Honey Fungus)** — Grows in dense clusters on dead or living wood. Has a ring on the stem. Honey-yellow to brown cap. Edible but must be thoroughly cooked. White spore print.\n\n2. **Galerina marginata (Funeral Bell)** — DEADLY. Also grows in clusters on wood with a ring. Contains amatoxins (same as Death Cap). Brown cap, similar size to Honey Fungus. Rusty brown spore print.\n\n3. **Kuehneromyces mutabilis (Sheathed Woodtuft)** — Also clustered on wood with a ring. Edible but easily confused with Galerina.\n\n**What would help**\n\nA spore print is essential here — this is the single most important test:\n- **White spore print** = Armillaria (Honey Fungus) — edible when cooked\n- **Rusty brown spore print** = Galerina marginata (Funeral Bell) — DEADLY\n\nPlace a cap gill-side-down on dark paper, cover, and wait a few hours.\n\n**Safety notes**\n\n⚠️ **CRITICAL**: Never eat clustered wood-growing mushrooms with a ring without taking a spore print first. Galerina marginata (Funeral Bell) contains the same amatoxins as Death Cap and is frequently confused with Honey Fungus. A rusty brown spore print means Galerina — do not eat."
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 130000,
+    "completion_tokens": 350,
+    "total_tokens": 130350
+  }
+}

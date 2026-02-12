@@ -1,0 +1,17 @@
+{
+  "id": "placeholder-05",
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "content": "**What you're thinking**\n\nA small mushroom (~5cm cap) with a ring and scaly cap found in a garden raises immediate concerns. While this could be a young Parasol or Shaggy Parasol, the small cap size is a critical red flag — several **small Lepiota species** contain deadly amatoxins.\n\n**Key candidates**\n\n1. **Lepiota cristata (Stinking Dapperling)** — Small, scaly cap, ring on stem. Contains amatoxins. Deadly. Very common in gardens.\n\n2. **Lepiota brunneoincarnata (Deadly Dapperling)** — Another small Lepiota with amatoxins. Fatal if consumed. Found in gardens and parks.\n\n3. **Macrolepiota procera (Parasol Mushroom)** — Edible and popular, BUT mature Parasols have caps 15-30cm across. At only 5cm, this is far too small to be a Parasol. A 5cm cap is in the dangerous small Lepiota range.\n\n**What would help**\n\nWhat is the exact cap diameter? The critical threshold: any Lepiota-type mushroom with a cap smaller than 10cm should be treated as potentially deadly. Also, does it have a strong or unpleasant smell?\n\n**Safety notes**\n\n⚠️ **CRITICAL WARNING**: Small Lepiota species (cap <10cm) are among the most dangerous mushrooms. They contain amatoxins — the same deadly toxins found in Death Cap. A 5cm cap is firmly in the dangerous range and should NOT be identified as Parasol. Do not eat this mushroom. Multiple fatalities have been caused by small Lepiota species being mistaken for young Parasols."
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 130000,
+    "completion_tokens": 340,
+    "total_tokens": 130340
+  }
+}

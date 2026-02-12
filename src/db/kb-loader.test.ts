@@ -97,4 +97,16 @@ describe('Knowledge Base Loader', () => {
     await loadKnowledgeBase(db);
     expect(localStorage.getItem('mushroom-kb-version')).toBe(String(KB_VERSION));
   });
+
+  it('loads species dataset alongside genera and heuristics', async () => {
+    await loadKnowledgeBase(db);
+    const speciesCount = await db.species.count();
+    expect(speciesCount).toBe(268);
+    // Genera still loaded
+    const generaCount = await db.genusProfiles.count();
+    expect(generaCount).toBeGreaterThan(0);
+    // Heuristics still loaded
+    const heuristicsCount = await db.heuristics.count();
+    expect(heuristicsCount).toBeGreaterThan(0);
+  });
 });

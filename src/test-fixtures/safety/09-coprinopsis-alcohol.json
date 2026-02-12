@@ -1,0 +1,17 @@
+{
+  "id": "placeholder-09",
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "content": "**What you're thinking**\n\nA grey cap with white scales that's dissolving into black ink is unmistakable — this is an **Ink Cap** species. The auto-digestion (deliquescence) where the cap dissolves into black inky liquid is the defining characteristic of this group.\n\n**Key candidates**\n\n1. **Coprinopsis atramentaria (Common Ink Cap)** — Edible on its own, BUT causes a severe adverse reaction if alcohol is consumed within 3 days before or after eating. Contains coprine, which blocks alcohol metabolism causing flushing, nausea, palpitations and vomiting (similar to Antabuse/disulfiram reaction).\n\n2. **Coprinus comatus (Shaggy Ink Cap / Lawyer's Wig)** — Edible and popular when young (before the ink starts). Taller with shaggy white scales. Does NOT cause the alcohol reaction.\n\n3. **Coprinellus micaceus (Glistening Ink Cap)** — Smaller, with tiny sparkling granules on the cap. Edible but not particularly worthwhile. Alcohol interaction unclear.\n\n**What would help**\n\nCan you describe the overall shape more? Shaggy Ink Cap (Coprinus comatus) has a tall, cylindrical cap covered in shaggy upturned scales. Common Ink Cap (Coprinopsis atramentaria) has a smoother, more oval/bell-shaped grey cap.\n\n**Safety notes**\n\n⚠️ **ALCOHOL WARNING**: If this is Coprinopsis atramentaria (Common Ink Cap), you MUST NOT consume alcohol for at least 3 days (72 hours) before or after eating it. Coprine blocks the enzyme that metabolises alcohol, causing a severe disulfiram-like reaction: intense flushing, racing heart, nausea, and vomiting. This includes all forms of alcohol — wine, beer, spirits, and even some medications containing alcohol."
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 130000,
+    "completion_tokens": 360,
+    "total_tokens": 130360
+  }
+}

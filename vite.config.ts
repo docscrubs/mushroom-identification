@@ -11,6 +11,11 @@ export default defineConfig({
     setupFiles: ['./src/test-setup.ts'],
     include: ['src/**/*.test.{ts,tsx}'],
     pool: 'vmForks',
+    server: {
+      deps: {
+        inline: [/react-router/],
+      },
+    },
   },
   plugins: [
     react(),

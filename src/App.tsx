@@ -9,6 +9,7 @@ import { LearnPage } from '@/pages/LearnPage';
 import { SettingsPage } from '@/pages/SettingsPage';
 import { TrainPage } from '@/pages/TrainPage';
 import { ContributePage } from '@/pages/ContributePage';
+import { ChatPage } from '@/pages/ChatPage';
 import { db } from '@/db/database';
 import { loadKnowledgeBase } from '@/db/kb-loader';
 import { hasApiKey } from '@/llm/api-key';
@@ -71,6 +72,7 @@ export function App() {
         <Routes>
           <Route element={<Layout />}>
             <Route path="/" element={<HomePage />} />
+            <Route path="/chat" element={<ChatPage />} />
             <Route path="/identify" element={<IdentifyPage />} />
             <Route path="/learn" element={<LearnPage />} />
             <Route path="/train" element={<TrainPage />} />

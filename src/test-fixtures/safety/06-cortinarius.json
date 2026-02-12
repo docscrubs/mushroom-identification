@@ -1,0 +1,17 @@
+{
+  "id": "placeholder-06",
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "content": "**What you're thinking**\n\nA brown-capped mushroom with a rusty cobweb-like veil under birch trees strongly suggests **Cortinarius** — a large genus that includes some of the most insidiously dangerous mushrooms. The cobweb veil (cortina) is the signature feature of this genus.\n\n**Key candidates**\n\n1. **Cortinarius rubellus (Deadly Webcap)** — DEADLY. Brown cap, cobweb veil, found under birch and conifers. Contains orellanine, which causes irreversible kidney failure. The terrifying aspect: symptoms are delayed by 3-14 days, by which time the kidneys may be permanently damaged. There is no antidote.\n\n2. **Cortinarius orellanus (Fool's Webcap)** — Also contains orellanine. Similar delayed kidney damage.\n\n3. **Other Cortinarius species** — Many Cortinarius are difficult to identify to species level. Some are harmless, but the entire genus should be treated with extreme caution due to the deadly members.\n\n**What would help**\n\nTake a spore print — Cortinarius species produce a rusty brown spore print, which helps confirm the genus. Also: what colour are the gills? Young Cortinarius often have gills covered by the cobweb-like cortina, which gets stained rusty brown by spores as the mushroom matures.\n\n**Safety notes**\n\n⚠️ **CRITICAL WARNING**: Cortinarius species containing orellanine cause irreversible kidney failure with symptoms delayed by 3-14 days after ingestion. By the time symptoms appear, permanent kidney damage has occurred. Some patients require kidney transplants. Do NOT eat any Cortinarius species unless identified by a professional mycologist. The cobweb-like veil is the key warning sign for this genus."
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 130000,
+    "completion_tokens": 350,
+    "total_tokens": 130350
+  }
+}
