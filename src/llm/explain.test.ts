@@ -44,7 +44,9 @@ const mockResult: IdentificationResult = {
     confidence_sufficient_for_foraging: true,
   },
   suggested_actions: [],
+  follow_up_questions: [],
   ambiguities: [],
+  triggered_heuristics: [],
 };
 
 describe('Explanation Generator', () => {

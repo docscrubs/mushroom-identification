@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import type { Observation, IdentificationResult, LLMExplanation } from '@/types';
+import type { Observation, IdentificationResult, Heuristic, LLMExplanation, FollowUpQuestion } from '@/types';
 import { assembleResult } from '@/engine/result-assembler';
 import { featureRules } from '@/engine/feature-rules';
 import { ALL_GENERA } from '@/engine/genera';
@@ -68,11 +68,50 @@ const GROWTH_PATTERN_OPTIONS: SelectOption[] = [
   { value: 'tiered', label: 'Tiered / overlapping shelves' },
 ];
 
+const MONTH_OPTIONS: SelectOption[] = [
+  { value: '', label: '-- Current month --' },
+  { value: '1', label: 'January' },
+  { value: '2', label: 'February' },
+  { value: '3', label: 'March' },
+  { value: '4', label: 'April' },
+  { value: '5', label: 'May' },
+  { value: '6', label: 'June' },
+  { value: '7', label: 'July' },
+  { value: '8', label: 'August' },
+  { value: '9', label: 'September' },
+  { value: '10', label: 'October' },
+  { value: '11', label: 'November' },
+  { value: '12', label: 'December' },
+];
+
 const YES_NO_OPTIONS: SelectOption[] = [
   { value: '', label: '-- Not observed --' },
   { value: 'true', label: 'Yes' },
   { value: 'false', label: 'No' },
 ];
+
+/** Maps observation fields to inline widget types for follow-up questions */
+const FIELD_WIDGETS: Record<string, { type: 'select' | 'boolean' | 'text' | 'number'; options?: SelectOption[] }> = {
+  gill_type: { type: 'select', options: GILL_TYPE_OPTIONS },
+  flesh_texture: { type: 'select', options: FLESH_TEXTURE_OPTIONS },
+  cap_shape: { type: 'select', options: CAP_SHAPE_OPTIONS },
+  habitat: { type: 'select', options: HABITAT_OPTIONS },
+  substrate: { type: 'select', options: SUBSTRATE_OPTIONS },
+  growth_pattern: { type: 'select', options: GROWTH_PATTERN_OPTIONS },
+  season_month: { type: 'select', options: MONTH_OPTIONS },
+  ring_present: { type: 'boolean' },
+  volva_present: { type: 'boolean' },
+  stem_present: { type: 'boolean' },
+  gill_color: { type: 'text' },
+  gill_attachment: { type: 'text' },
+  spore_print_color: { type: 'text' },
+  cap_color: { type: 'text' },
+  cap_texture: { type: 'text' },
+  stem_color: { type: 'text' },
+  bruising_color: { type: 'text' },
+  smell: { type: 'text' },
+  cap_size_cm: { type: 'number' },
+};
 
 const CONFIDENCE_COLORS: Record<string, string> = {
   definitive: 'bg-green-100 text-green-800 border-green-300',
@@ -92,11 +131,34 @@ export function IdentifyPage() {
   const [guidance, setGuidance] = useState<GuidanceContext | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const [heuristics, setHeuristics] = useState<Heuristic[]>([]);
+  const [reIdentifyCounter, setReIdentifyCounter] = useState(0);
+  const [resultUpdated, setResultUpdated] = useState(false);
+  const observationRef = useRef(observation);
+  observationRef.current = observation;
+  const resultRef = useRef<HTMLDivElement>(null);
   const hasApiKey = useAppStore((s) => s.hasApiKey);
   const llmLoading = useAppStore((s) => s.llmLoading);
   const llmError = useAppStore((s) => s.llmError);
   const setLlmLoading = useAppStore((s) => s.setLlmLoading);
   const setLlmError = useAppStore((s) => s.setLlmError);
+
+  // Load heuristics from DB once
+  useEffect(() => {
+    db.heuristics.toArray().then(setHeuristics);
+  }, []);
+
+  // Re-run identification when a follow-up answer is provided
+  useEffect(() => {
+    if (reIdentifyCounter > 0) {
+      handleIdentify().then(() => {
+        setResultUpdated(true);
+        resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        setTimeout(() => setResultUpdated(false), 2500);
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reIdentifyCounter]);
 
   // Track manual user edits to prevent AI overwriting
   const [userEditedFields, setUserEditedFields] = useState<Set<string>>(new Set());
@@ -110,6 +172,8 @@ export function IdentifyPage() {
         (next as Record<string, unknown>)[field] = true;
       } else if (raw === 'false') {
         (next as Record<string, unknown>)[field] = false;
+      } else if (field === 'season_month') {
+        (next as Record<string, unknown>)[field] = parseInt(raw, 10);
       } else {
         (next as Record<string, unknown>)[field] = raw;
       }
@@ -175,18 +239,20 @@ export function IdentifyPage() {
   }
 
   async function handleIdentify() {
+    // Use ref to always read the latest observation (needed for re-identify via effect)
+    const currentObs = observationRef.current;
     // Merge user text description into observation so the rule engine can match against it
-    let obsForEngine = observation;
+    let obsForEngine = currentObs;
     if (textDescription) {
-      const existing = observation.description_notes ?? '';
+      const existing = currentObs.description_notes ?? '';
       if (!existing.includes(textDescription)) {
         obsForEngine = {
-          ...observation,
+          ...currentObs,
           description_notes: existing ? `${existing} ${textDescription}` : textDescription,
         };
       }
     }
-    const r = assembleResult(obsForEngine, ALL_GENERA, featureRules);
+    const r = assembleResult(obsForEngine, ALL_GENERA, featureRules, heuristics);
     setResult(r);
     setLlmExplanation(null);
 
@@ -406,6 +472,17 @@ export function IdentifyPage() {
           />
         </FieldWithBadge>
 
+        <FieldWithBadge label="Month found" aiSuggested={false}>
+          <Select
+            options={MONTH_OPTIONS}
+            value={observation.season_month != null ? String(observation.season_month) : ''}
+            onChange={(v) => updateObs('season_month', v)}
+          />
+          <p className="text-xs text-stone-400 mt-1">
+            If not set, assumes the current month. Change this for older photos or dried specimens.
+          </p>
+        </FieldWithBadge>
+
         <FieldWithBadge label="Smell" aiSuggested={aiSuggestedFields.has('smell')}>
           <input
             type="text"
@@ -451,12 +528,23 @@ export function IdentifyPage() {
 
       {/* Results */}
       {result && (
-        <ResultView
-          result={result}
-          observation={observation}
-          llmExplanation={llmExplanation}
-          guidance={guidance}
-        />
+        <div ref={resultRef}>
+          {resultUpdated && (
+            <div className="rounded-lg bg-teal-100 border border-teal-300 px-4 py-2 text-sm font-medium text-teal-800 animate-pulse">
+              Results updated with your new observation
+            </div>
+          )}
+          <ResultView
+            result={result}
+            observation={observation}
+            llmExplanation={llmExplanation}
+            guidance={guidance}
+            onAnswerQuestion={(feature, value) => {
+              updateObs(feature, value);
+              setReIdentifyCounter((c) => c + 1);
+            }}
+          />
+        </div>
       )}
     </div>
   );
@@ -467,11 +555,13 @@ function ResultView({
   observation,
   llmExplanation,
   guidance,
+  onAnswerQuestion,
 }: {
   result: IdentificationResult;
   observation: Observation;
   llmExplanation: LLMExplanation | null;
   guidance: GuidanceContext | null;
+  onAnswerQuestion: (feature: keyof Observation, value: string) => void;
 }) {
   const explanation = generateOfflineExplanation(result, observation, guidance?.overallLevel);
   const activeCandidates = result.candidates.filter(
@@ -662,10 +752,45 @@ function ResultView({
         </div>
       )}
 
-      {/* Suggested next steps */}
+      {/* Triggered heuristics — targeted identification procedures */}
+      {result.triggered_heuristics.length > 0 && (
+        <div className="rounded-lg bg-amber-50 border border-amber-200 p-4 space-y-4">
+          <h3 className="font-semibold text-amber-800">Targeted Tests</h3>
+          {result.triggered_heuristics.map((h) => (
+            <div key={h.heuristic_id} className="space-y-2">
+              <div className="flex items-baseline gap-2">
+                <span className="text-sm font-medium text-amber-900">{h.name}</span>
+                <span className="text-xs text-amber-600 italic">for {h.genus}</span>
+              </div>
+              {h.steps.length > 0 && (
+                <ol className="list-decimal list-inside text-sm text-amber-800 space-y-1 ml-1">
+                  {h.steps.map((step, i) => (
+                    <li key={i}>{step}</li>
+                  ))}
+                </ol>
+              )}
+              {h.safety_notes.length > 0 && (
+                <div className="text-xs text-red-700 bg-red-50 rounded p-2 space-y-0.5">
+                  {h.safety_notes.map((note, i) => (
+                    <p key={i}>{note}</p>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Interactive follow-up questions */}
+      <FollowUpSection
+        questions={result.follow_up_questions}
+        onAnswer={onAnswerQuestion}
+      />
+
+      {/* Heuristic-driven suggested actions (procedural, not answerable) */}
       {result.suggested_actions.length > 0 && (
-        <div className="rounded-lg bg-blue-50 border blue-200 p-4 space-y-2">
-          <h3 className="font-semibold text-blue-800">Next Steps</h3>
+        <div className="rounded-lg bg-blue-50 border border-blue-200 p-4 space-y-2">
+          <h3 className="font-semibold text-blue-800">Recommended Actions</h3>
           {result.suggested_actions.slice(0, 4).map((a, i) => (
             <div key={i} className="text-sm text-blue-700 flex gap-2">
               <span
@@ -722,6 +847,137 @@ function PhotoThumbnail({ file }: { file: File }) {
   return src ? (
     <img src={src} alt={file.name} className="w-16 h-16 rounded-lg object-cover border border-stone-200" />
   ) : null;
+}
+
+function FollowUpSection({
+  questions,
+  onAnswer,
+}: {
+  questions: FollowUpQuestion[];
+  onAnswer: (feature: keyof Observation, value: string) => void;
+}) {
+  if (questions.length === 0) return null;
+
+  const newTests = questions.filter((q) => !q.previously_available);
+  const previouslyAvailable = questions.filter((q) => q.previously_available);
+
+  return (
+    <div className="rounded-lg bg-teal-50 border border-teal-200 p-4 space-y-4">
+      <h3 className="font-semibold text-teal-800">Follow-up Questions</h3>
+
+      {/* New tests — things the user can actively check */}
+      {newTests.length > 0 && (
+        <div className="space-y-3">
+          {newTests.map((q) => (
+            <FollowUpCard key={q.feature} question={q} onAnswer={onAnswer} />
+          ))}
+        </div>
+      )}
+
+      {/* Previously available — form fields left empty */}
+      {previouslyAvailable.length > 0 && (
+        <div className="space-y-2">
+          <p className="text-xs text-teal-600 italic">
+            You may not have had this information earlier — if you can check now, it would help:
+          </p>
+          {previouslyAvailable.map((q) => (
+            <FollowUpCard key={q.feature} question={q} onAnswer={onAnswer} compact />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function FollowUpCard({
+  question,
+  onAnswer,
+  compact = false,
+}: {
+  question: FollowUpQuestion;
+  onAnswer: (feature: keyof Observation, value: string) => void;
+  compact?: boolean;
+}) {
+  const [textValue, setTextValue] = useState('');
+  const widget = FIELD_WIDGETS[question.feature];
+
+  const handleSubmitText = () => {
+    if (textValue.trim()) {
+      onAnswer(question.feature as keyof Observation, textValue.trim());
+      setTextValue('');
+    }
+  };
+
+  return (
+    <div className={`${compact ? 'py-1' : 'bg-white rounded-lg border border-teal-100 p-3'} space-y-1.5`}>
+      <div className="flex items-start gap-2">
+        {question.safety_relevant && (
+          <span className="shrink-0 text-xs px-1.5 py-0.5 rounded bg-red-100 text-red-700 mt-0.5">
+            safety
+          </span>
+        )}
+        <p className={`text-sm ${compact ? 'text-teal-700' : 'font-medium text-teal-900'}`}>
+          {question.question}
+        </p>
+      </div>
+      <p className="text-xs text-teal-600">{question.impact_note}</p>
+
+      {/* Inline answer widget */}
+      {widget && (
+        <div className="pt-1">
+          {widget.type === 'boolean' && (
+            <div className="flex gap-2">
+              <button
+                onClick={() => onAnswer(question.feature as keyof Observation, 'true')}
+                className="px-3 py-1.5 text-sm rounded-md bg-teal-100 text-teal-800 hover:bg-teal-200 active:bg-teal-300"
+              >
+                Yes
+              </button>
+              <button
+                onClick={() => onAnswer(question.feature as keyof Observation, 'false')}
+                className="px-3 py-1.5 text-sm rounded-md bg-teal-100 text-teal-800 hover:bg-teal-200 active:bg-teal-300"
+              >
+                No
+              </button>
+            </div>
+          )}
+          {widget.type === 'select' && widget.options && (
+            <select
+              className="w-full rounded-md border border-teal-200 px-2 py-1.5 text-sm bg-white"
+              defaultValue=""
+              onChange={(e) => {
+                if (e.target.value) onAnswer(question.feature as keyof Observation, e.target.value);
+              }}
+            >
+              <option value="" disabled>Choose...</option>
+              {widget.options.filter((o) => o.value !== '').map((o) => (
+                <option key={o.value} value={o.value}>{o.label}</option>
+              ))}
+            </select>
+          )}
+          {(widget.type === 'text' || widget.type === 'number') && (
+            <div className="flex gap-2">
+              <input
+                type={widget.type === 'number' ? 'number' : 'text'}
+                placeholder="Type answer..."
+                className="flex-1 rounded-md border border-teal-200 px-2 py-1.5 text-sm"
+                value={textValue}
+                onChange={(e) => setTextValue(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') handleSubmitText(); }}
+              />
+              <button
+                onClick={handleSubmitText}
+                disabled={!textValue.trim()}
+                className="px-3 py-1.5 text-sm rounded-md bg-teal-600 text-white hover:bg-teal-700 disabled:opacity-40"
+              >
+                Set
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
 }
 
 function Field({

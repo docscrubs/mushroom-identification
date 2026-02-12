@@ -1508,11 +1508,29 @@ export const featureRules: FeatureRule[] = [
   { id: 'notes-russula-distant', field: 'description_notes', match: { type: 'includes', value: 'distant' }, genus: 'Russula', tier: 'moderate', supporting: true, description: 'Distant gills suggest Russula' },
   { id: 'notes-russula-depressed', field: 'description_notes', match: { type: 'includes', value: 'depressed' }, genus: 'Russula', tier: 'moderate', supporting: true, description: 'Depressed cap centre is typical of mature Russula' },
   { id: 'notes-russula-dipped', field: 'description_notes', match: { type: 'includes', value: 'dipped' }, genus: 'Russula', tier: 'moderate', supporting: true, description: 'Cap dipped in centre suggests Russula' },
-  { id: 'notes-russula-brittle-gills', field: 'description_notes', match: { type: 'includes', value: 'brittle gills' }, genus: 'Russula', tier: 'moderate', supporting: true, description: 'Brittle gills that flake suggest Russula' },
+  // Brittle/flaky gills are practically definitive for Russula — the common name is "Brittlegills".
+  // If gills are brittle/flaky it almost certainly IS a Russula. If they're flexible, it almost certainly isn't.
+  { id: 'notes-russula-brittle-gills', field: 'description_notes', match: { type: 'includes', value: 'brittle gills' }, genus: 'Russula', tier: 'strong', supporting: true, description: 'Brittle gills are diagnostic for Russula (Brittlegills)' },
+  { id: 'notes-russula-flaky-gills', field: 'description_notes', match: { type: 'includes', value: 'flaky gills' }, genus: 'Russula', tier: 'strong', supporting: true, description: 'Flaky gills that crumble are diagnostic for Russula (Brittlegills)' },
+  { id: 'notes-russula-gills-flake', field: 'description_notes', match: { type: 'includes', value: 'gills flake' }, genus: 'Russula', tier: 'strong', supporting: true, description: 'Gills that flake apart are diagnostic for Russula' },
+  { id: 'notes-russula-gills-crumble', field: 'description_notes', match: { type: 'includes', value: 'gills crumble' }, genus: 'Russula', tier: 'strong', supporting: true, description: 'Gills that crumble are diagnostic for Russula (Brittlegills)' },
+  { id: 'notes-russula-crumbly-gills', field: 'description_notes', match: { type: 'includes', value: 'crumbly gills' }, genus: 'Russula', tier: 'strong', supporting: true, description: 'Crumbly gills are diagnostic for Russula' },
+  { id: 'notes-russula-gills-snap', field: 'description_notes', match: { type: 'includes', value: 'gills snap' }, genus: 'Russula', tier: 'strong', supporting: true, description: 'Gills that snap off cleanly are diagnostic for Russula' },
+  { id: 'notes-russula-brittle-flesh', field: 'description_notes', match: { type: 'includes', value: 'brittle flesh' }, genus: 'Russula', tier: 'strong', supporting: true, description: 'Brittle flesh that snaps like chalk is diagnostic for Russula/Lactarius' },
+  { id: 'notes-russula-snaps-cleanly', field: 'description_notes', match: { type: 'includes', value: 'snaps cleanly' }, genus: 'Russula', tier: 'strong', supporting: true, description: 'Flesh that snaps cleanly like chalk is diagnostic for Russula' },
+  { id: 'notes-russula-brittlegill', field: 'description_notes', match: { type: 'includes', value: 'brittlegill' }, genus: 'Russula', tier: 'strong', supporting: true, description: 'Brittlegill is the common name for Russula' },
+  { id: 'notes-russula-snaps-chalk', field: 'description_notes', match: { type: 'includes', value: 'snaps like chalk' }, genus: 'Russula', tier: 'strong', supporting: true, description: 'Flesh snapping like chalk is diagnostic for Russula' },
+  // Flexible/pliant gills are strong contra-evidence for Russula
+  { id: 'notes-russula-contra-flexible-gills', field: 'description_notes', match: { type: 'includes', value: 'flexible gills' }, genus: 'Russula', tier: 'strong', supporting: false, description: 'Flexible gills rule against Russula — Russula gills are always brittle' },
+  { id: 'notes-russula-contra-pliant-gills', field: 'description_notes', match: { type: 'includes', value: 'pliant gills' }, genus: 'Russula', tier: 'strong', supporting: false, description: 'Pliant gills rule against Russula — Russula gills are always brittle' },
+  { id: 'notes-russula-contra-bendy-gills', field: 'description_notes', match: { type: 'includes', value: 'bendy gills' }, genus: 'Russula', tier: 'strong', supporting: false, description: 'Bendy/flexible gills rule against Russula' },
   { id: 'notes-russula-taste-test', field: 'description_notes', match: { type: 'includes', value: 'taste test' }, genus: 'Russula', tier: 'moderate', supporting: true, description: 'Taste test is characteristic Russula identification method' },
-  { id: 'notes-russula-snaps-chalk', field: 'description_notes', match: { type: 'includes', value: 'snaps like chalk' }, genus: 'Russula', tier: 'moderate', supporting: true, description: 'Flesh snapping like chalk is definitive Russula trait' },
 
   // --- Lactarius ---
+  // Brittle flesh also applies to Lactarius (shared Russulaceae trait)
+  { id: 'notes-lactarius-brittle-flesh', field: 'description_notes', match: { type: 'includes', value: 'brittle flesh' }, genus: 'Lactarius', tier: 'strong', supporting: true, description: 'Brittle flesh is diagnostic for Russulaceae (Lactarius/Russula)' },
+  { id: 'notes-lactarius-brittle-gills', field: 'description_notes', match: { type: 'includes', value: 'brittle gills' }, genus: 'Lactarius', tier: 'strong', supporting: true, description: 'Brittle gills suggest Russulaceae (Lactarius/Russula)' },
+  { id: 'notes-lactarius-flaky-gills', field: 'description_notes', match: { type: 'includes', value: 'flaky gills' }, genus: 'Lactarius', tier: 'strong', supporting: true, description: 'Flaky gills suggest Russulaceae (Lactarius/Russula)' },
   { id: 'notes-lactarius-milk', field: 'description_notes', match: { type: 'includes', value: 'milk' }, genus: 'Lactarius', tier: 'strong', supporting: true, description: 'Milk/latex when cut is definitive for Lactarius' },
   { id: 'notes-lactarius-latex', field: 'description_notes', match: { type: 'includes', value: 'latex' }, genus: 'Lactarius', tier: 'strong', supporting: true, description: 'Latex exudation confirms Lactarius' },
   { id: 'notes-lactarius-exude', field: 'description_notes', match: { type: 'includes', value: 'exude' }, genus: 'Lactarius', tier: 'strong', supporting: true, description: 'Exuding liquid when cut suggests Lactarius' },
@@ -1620,4 +1638,40 @@ export const featureRules: FeatureRule[] = [
 
   // --- Macrolepiota (striped stem variant) ---
   { id: 'notes-macro-striped', field: 'description_notes', match: { type: 'includes', value: 'striped' }, genus: 'Macrolepiota', tier: 'moderate', supporting: true, description: 'Striped/patterned stem may suggest Parasol snakeskin pattern' },
+  { id: 'notes-macro-fibrous', field: 'description_notes', match: { type: 'includes', value: 'fibrous' }, genus: 'Macrolepiota', tier: 'moderate', supporting: true, description: 'Fibrous stem texture is common in Parasol mushrooms' },
+
+  // === SYNONYM / PHRASE-EXPANSION RULES ===
+  // These cover natural language variants that users commonly write
+
+  // --- "widely spaced" as synonym for "distant" gills ---
+  { id: 'notes-russula-widely-spaced', field: 'description_notes', match: { type: 'includes', value: 'widely spaced' }, genus: 'Russula', tier: 'moderate', supporting: true, description: 'Widely spaced gills suggest Russula' },
+  { id: 'notes-marasmius-widely-spaced', field: 'description_notes', match: { type: 'includes', value: 'widely spaced' }, genus: 'Marasmius', tier: 'moderate', supporting: true, description: 'Widely spaced gills suggest Marasmius' },
+  { id: 'notes-lactarius-widely-spaced', field: 'description_notes', match: { type: 'includes', value: 'widely spaced' }, genus: 'Lactarius', tier: 'moderate', supporting: true, description: 'Widely spaced gills suggest Lactarius' },
+
+  // --- "central depression" as phrase (not just "depressed") ---
+  { id: 'notes-russula-central-depression', field: 'description_notes', match: { type: 'includes', value: 'central depression' }, genus: 'Russula', tier: 'moderate', supporting: true, description: 'Central depression in cap is typical of Russula' },
+  { id: 'notes-lactarius-central-depression', field: 'description_notes', match: { type: 'includes', value: 'central depression' }, genus: 'Lactarius', tier: 'moderate', supporting: true, description: 'Central depression in cap is typical of Lactarius' },
+
+  // --- "rings of colour" also applies to Russula (not just Lactarius) ---
+  { id: 'notes-russula-rings-colour', field: 'description_notes', match: { type: 'includes', value: 'rings of colour' }, genus: 'Russula', tier: 'moderate', supporting: true, description: 'Rings of colour on cap can indicate Russula' },
+
+  // --- Taste descriptors for Russula identification ---
+  { id: 'notes-russula-peppery', field: 'description_notes', match: { type: 'includes', value: 'peppery' }, genus: 'Russula', tier: 'moderate', supporting: true, description: 'Peppery/hot taste is characteristic of many Russula species' },
+  { id: 'notes-russula-acrid', field: 'description_notes', match: { type: 'includes', value: 'acrid' }, genus: 'Russula', tier: 'moderate', supporting: true, description: 'Acrid taste is characteristic of inedible Russula species' },
+  { id: 'notes-russula-mild-taste', field: 'description_notes', match: { type: 'includes', value: 'mild taste' }, genus: 'Russula', tier: 'moderate', supporting: true, description: 'Mild taste suggests edible Russula species' },
+  { id: 'notes-russula-hot-taste', field: 'description_notes', match: { type: 'includes', value: 'hot taste' }, genus: 'Russula', tier: 'moderate', supporting: true, description: 'Hot taste indicates Russula (likely inedible species)' },
+  { id: 'notes-russula-burning', field: 'description_notes', match: { type: 'includes', value: 'burning' }, genus: 'Russula', tier: 'moderate', supporting: true, description: 'Burning sensation on tongue suggests Russula' },
+
+  // --- "spaced apart" as another synonym for distant gills ---
+  { id: 'notes-russula-spaced-apart', field: 'description_notes', match: { type: 'includes', value: 'spaced apart' }, genus: 'Russula', tier: 'moderate', supporting: true, description: 'Gills spaced apart suggest Russula' },
+  { id: 'notes-marasmius-spaced-apart', field: 'description_notes', match: { type: 'includes', value: 'spaced apart' }, genus: 'Marasmius', tier: 'moderate', supporting: true, description: 'Gills spaced apart suggest Marasmius' },
+
+  // --- Clitocybe characteristic: "inrolled" / "rolled" cap margin ---
+  { id: 'notes-clitocybe-rolled', field: 'description_notes', match: { type: 'includes', value: 'rolled' }, genus: 'Clitocybe', tier: 'moderate', supporting: true, description: 'Rolled/inrolled cap margin is characteristic of Clitocybe' },
+  { id: 'notes-clitocybe-inrolled', field: 'description_notes', match: { type: 'includes', value: 'inrolled' }, genus: 'Clitocybe', tier: 'moderate', supporting: true, description: 'Inrolled cap margin is characteristic of Clitocybe' },
+  { id: 'notes-clitocybe-funnel-shaped', field: 'description_notes', match: { type: 'includes', value: 'funnel' }, genus: 'Clitocybe', tier: 'moderate', supporting: true, description: 'Funnel shape is characteristic of many Clitocybe species' },
+  { id: 'notes-clitocybe-decurrent', field: 'description_notes', match: { type: 'includes', value: 'decurrent' }, genus: 'Clitocybe', tier: 'moderate', supporting: true, description: 'Decurrent gills running down the stem are typical of Clitocybe' },
+
+  // --- Fibrous/tough stem for Amanita ---
+  { id: 'notes-amanita-fibrous', field: 'description_notes', match: { type: 'includes', value: 'fibrous' }, genus: 'Amanita', tier: 'weak', supporting: true, description: 'Fibrous flesh is consistent with Amanita (not Russula)' },
 ];

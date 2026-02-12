@@ -20,6 +20,7 @@ export type {
 } from './heuristic';
 export type {
   IdentificationResult,
+  ActivatedHeuristic,
   Candidate,
   Evidence,
   EvidenceTier,
@@ -34,6 +35,7 @@ export type {
   RuleRelevance,
   DisambiguationQuestion,
   AmbiguityFlag,
+  FollowUpQuestion,
 } from './identification';
 export type {
   UserModel,

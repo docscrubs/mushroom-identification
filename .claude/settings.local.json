@@ -44,7 +44,8 @@
       "Bash(\"c:/Users/gscru/dev/mushroom-identification/src/llm/minimal.test.ts\" << 'EOF'\nimport { describe, it, expect } from 'vitest';\n\ndescribe\\('Minimal', \\(\\) => {\n  it\\('works', \\(\\) => {\n    expect\\(1 + 1\\).toBe\\(2\\);\n  }\\);\n}\\);\nEOF)",
       "Bash(del \"c:\\\\Users\\\\gscru\\\\dev\\\\mushroom-identification\\\\src\\\\llm\\\\minimal.test.ts\")",
       "Bash(del \"c:\\\\Users\\\\gscru\\\\dev\\\\mushroom-identification\\\\src\\\\stores\\\\minimal.test.ts\")",
-      "Bash(del \"c:\\\\Users\\\\gscru\\\\dev\\\\mushroom-identification\\\\nul\")"
+      "Bash(del \"c:\\\\Users\\\\gscru\\\\dev\\\\mushroom-identification\\\\nul\")",
+      "Bash(del \"c:\\\\Users\\\\gscru\\\\dev\\\\mushroom-identification\\\\src\\\\engine\\\\debug-scenario.test.ts\")"
     ]
   }
 }

@@ -50,8 +50,42 @@ describe('Description notes rules', () => {
       expect(notesMatchesGenus('cap is dipped in the middle', 'Russula')).toBe(true);
     });
 
-    it('"brittle gills" matches Russula', () => {
-      expect(notesMatchesGenus('brittle gills that flake', 'Russula')).toBe(true);
+    it('"brittle gills" matches Russula at strong tier', () => {
+      const obs: Observation = { description_notes: 'brittle gills that flake' };
+      const matches = matchingRulesForGenus(obs, 'Russula').filter(
+        (r) => r.field === 'description_notes',
+      );
+      expect(matches.length).toBeGreaterThan(0);
+      expect(matches.some((r) => r.tier === 'strong')).toBe(true);
+    });
+
+    it('"flaky gills" matches Russula at strong tier', () => {
+      const obs: Observation = { description_notes: 'flaky gills that crumble' };
+      const matches = matchingRulesForGenus(obs, 'Russula').filter(
+        (r) => r.field === 'description_notes',
+      );
+      expect(matches.length).toBeGreaterThan(0);
+      expect(matches.some((r) => r.tier === 'strong')).toBe(true);
+    });
+
+    it('"gills crumble" matches Russula', () => {
+      expect(notesMatchesGenus('the gills crumble when touched', 'Russula')).toBe(true);
+    });
+
+    it('"gills snap" matches Russula', () => {
+      expect(notesMatchesGenus('gills snap off cleanly', 'Russula')).toBe(true);
+    });
+
+    it('"brittlegill" matches Russula', () => {
+      expect(notesMatchesGenus('looks like a brittlegill', 'Russula')).toBe(true);
+    });
+
+    it('"flexible gills" is contra-evidence for Russula', () => {
+      const obs: Observation = { description_notes: 'flexible gills that bend' };
+      const matches = matchingRulesForGenus(obs, 'Russula').filter(
+        (r) => r.field === 'description_notes',
+      );
+      expect(matches.some((r) => r.supporting === false && r.tier === 'strong')).toBe(true);
     });
 
     it('"taste test" matches Russula', () => {

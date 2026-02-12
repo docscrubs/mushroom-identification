@@ -1,13 +1,16 @@
 import type {
   Observation,
   IdentificationResult,
+  ActivatedHeuristic,
   Candidate,
+  Heuristic,
   SafetyAssessment,
   SafetyWarning,
   LookalikeWarning,
   EdibilityInfo,
   SuggestedAction,
   Evidence,
+  FollowUpQuestion,
 } from '@/types';
 import { type FeatureRule } from './feature-rules';
 import { scoreAllCandidates, scoreToConfidence, type CandidateScore } from './scorer';
@@ -15,6 +18,8 @@ import { selectQuestions } from './disambiguation';
 import { summarizeObservation, summarizeAllObservations } from './evidence-summary';
 import { inferFeatures } from './feature-inference';
 import { detectAmbiguities } from './ambiguity-detection';
+import { preprocessDescriptionNotes } from './description-preprocessing';
+import { findApplicableHeuristics, generateHeuristicActions } from './heuristic-questions';
 
 /** Genera known to contain deadly or seriously toxic species */
 const DANGEROUS_GENERA: Record<string, { toxicity: string; message: string }> = {
@@ -108,12 +113,19 @@ export function assembleResult(
   observation: Observation,
   genera: string[],
   rules: FeatureRule[],
+  heuristics?: Heuristic[],
 ): IdentificationResult {
   // Step 0: Infer implicit features from context
   const { observation: enrichedObs } = inferFeatures(observation);
 
+  // Step 0b: Preprocess description_notes for negations and genus exclusions
+  const preprocessing = preprocessDescriptionNotes(enrichedObs, rules);
+  const allRules = preprocessing.contraRules.length > 0
+    ? [...rules, ...preprocessing.contraRules]
+    : rules;
+
   // Step 1: Score all candidates
-  const scored = scoreAllCandidates(enrichedObs, genera, rules);
+  const scored = scoreAllCandidates(enrichedObs, genera, allRules);
 
   // Step 2: Build candidates list
   const candidates = scored.map((s) => toCandidateResult(s, enrichedObs));
@@ -128,14 +140,44 @@ export function assembleResult(
   const topCandidate = scored.find((s) => !s.eliminated);
   const edibility = topCandidate ? buildEdibility(topCandidate) : undefined;
 
-  // Step 6: Suggested actions from disambiguation
+  // Step 6: Disambiguation → interactive follow-up questions
   const questions = selectQuestions(scored, enrichedObs, rules);
-  const actions = buildSuggestedActions(scored, questions);
-
-  // Step 7: Detect ambiguities
   const activeCandidateGenera = scored
     .filter((s) => !s.eliminated && s.score > 0)
     .map((s) => s.genus);
+  const followUpQuestions = buildFollowUpQuestions(questions, enrichedObs, activeCandidateGenera);
+
+  // Step 6b: Heuristic-driven targeted actions (procedural, not answerable)
+  let triggeredHeuristics: ActivatedHeuristic[] = [];
+  let heuristicActions: SuggestedAction[] = [];
+  if (heuristics && heuristics.length > 0) {
+    const triggered = findApplicableHeuristics(scored, heuristics);
+    heuristicActions = generateHeuristicActions(triggered);
+    triggeredHeuristics = triggered.map((t) => ({
+      heuristic_id: t.heuristic_id,
+      name: t.name,
+      genus: t.genus,
+      category: t.category,
+      steps: t.steps,
+      safety_notes: t.safety_notes,
+    }));
+  }
+
+  // Suggested actions: heuristic actions only (disambiguation is now follow_up_questions)
+  const actions: SuggestedAction[] = [...heuristicActions];
+  if (actions.length === 0 && followUpQuestions.length === 0) {
+    const active = scored.filter((s) => !s.eliminated && s.score > 0);
+    if (active.length === 0) {
+      actions.push({
+        action: 'Provide some basic observations (gill type, flesh texture, habitat)',
+        reason: 'No candidates could be identified with current information',
+        priority: 'recommended',
+        safety_relevant: false,
+      });
+    }
+  }
+
+  // Step 7: Detect ambiguities
   const ambiguities = detectAmbiguities(enrichedObs, activeCandidateGenera);
 
   return {
@@ -144,7 +186,9 @@ export function assembleResult(
     safety,
     edibility,
     suggested_actions: actions,
+    follow_up_questions: followUpQuestions,
     ambiguities,
+    triggered_heuristics: triggeredHeuristics,
   };
 }
 
@@ -300,34 +344,59 @@ function buildEdibility(topCandidate: CandidateScore): EdibilityInfo {
   };
 }
 
-function buildSuggestedActions(
-  scored: CandidateScore[],
+/**
+ * Fields that require the user to perform an active test they may not have done.
+ * These are prioritised over form fields the user skipped.
+ */
+const ACTIVE_TEST_FIELDS = new Set([
+  'spore_print_color',
+  'bruising_color',
+  'taste',
+]);
+
+/**
+ * All fields visible in the identification form.
+ * If a question targets one of these and the user left it empty,
+ * it's marked as previously_available.
+ */
+const FORM_FIELDS = new Set([
+  'gill_type', 'flesh_texture', 'cap_shape', 'ring_present', 'volva_present',
+  'stem_present', 'gill_color', 'spore_print_color', 'cap_color', 'stem_color',
+  'bruising_color', 'habitat', 'substrate', 'growth_pattern', 'season_month',
+  'smell', 'cap_size_cm', 'cap_texture', 'gill_attachment',
+]);
+
+function buildFollowUpQuestions(
   questions: ReturnType<typeof selectQuestions>,
-): SuggestedAction[] {
-  const actions: SuggestedAction[] = [];
+  observation: Observation,
+  activeGenera: string[],
+): FollowUpQuestion[] {
+  const generaLabel = activeGenera.length <= 3
+    ? activeGenera.join(' and ')
+    : `${activeGenera.slice(0, 2).join(', ')} and ${activeGenera.length - 2} others`;
 
-  // Convert top disambiguation questions into suggested actions
-  for (const q of questions.slice(0, 5)) {
-    actions.push({
-      action: q.question,
-      reason: `Would help distinguish between remaining candidates (information gain: ${q.information_gain.toFixed(2)})`,
-      priority: q.safety_relevant ? 'critical' : 'recommended',
-      safety_relevant: q.safety_relevant,
-    });
-  }
+  return questions.slice(0, 8).map((q) => {
+    const isFormField = FORM_FIELDS.has(q.feature);
+    const wasLeftEmpty = isFormField
+      && observation[q.feature as keyof Observation] == null;
+    // Active tests (spore print, bruising) are always "new" even if in the form
+    const isActiveTest = ACTIVE_TEST_FIELDS.has(q.feature);
+    const previouslyAvailable = wasLeftEmpty && !isActiveTest;
 
-  // If no specific questions, add general advice
-  if (actions.length === 0) {
-    const active = scored.filter((s) => !s.eliminated && s.score > 0);
-    if (active.length === 0) {
-      actions.push({
-        action: 'Provide some basic observations (gill type, flesh texture, habitat)',
-        reason: 'No candidates could be identified with current information',
-        priority: 'recommended',
-        safety_relevant: false,
-      });
+    let impactNote: string;
+    if (q.safety_relevant) {
+      impactNote = `Safety-critical — helps rule out dangerous species among ${generaLabel}`;
+    } else {
+      impactNote = `Would help distinguish between ${generaLabel}`;
     }
-  }
 
-  return actions;
+    return {
+      question: q.question,
+      feature: q.feature,
+      information_gain: q.information_gain,
+      safety_relevant: q.safety_relevant,
+      previously_available: previouslyAvailable,
+      impact_note: impactNote,
+    };
+  });
 }

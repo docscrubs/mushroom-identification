@@ -68,8 +68,12 @@ export function scoreCandidate(
       contradicting.push(toEvidence(rule));
     }
     // If the rule doesn't match and is a supporting rule for an observed field,
-    // it's mild contradicting evidence (the field was observed but didn't match)
-    else if (!matches && rule.supporting && observed && rule.match.type !== 'absent') {
+    // it's mild contradicting evidence (the field was observed but didn't match).
+    // Exception: description_notes is a free-text field where many independent
+    // observations coexist. A non-matching description rule just means that
+    // specific trait wasn't mentioned — NOT that it contradicts.
+    else if (!matches && rule.supporting && observed && rule.match.type !== 'absent'
+      && rule.field !== 'description_notes') {
       contradicting.push(toEvidence(rule));
     }
   }

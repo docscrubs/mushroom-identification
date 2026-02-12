@@ -23,7 +23,9 @@ function makeResult(topGenus: string, confidence: string = 'high'): Identificati
       confidence_sufficient_for_foraging: false,
     },
     suggested_actions: [],
+    follow_up_questions: [],
     ambiguities: [],
+    triggered_heuristics: [],
   };
 }
 

@@ -93,13 +93,41 @@ export interface AmbiguityFlag {
   relevant_genera: string[];
 }
 
+/** A heuristic that has been activated by the current identification */
+export interface ActivatedHeuristic {
+  heuristic_id: string;
+  name: string;
+  genus: string;
+  category: string;
+  /** Concrete steps the user should follow */
+  steps: string[];
+  safety_notes: string[];
+}
+
+/** An interactive follow-up question derived from disambiguation */
+export interface FollowUpQuestion {
+  question: string;
+  /** The observation field this question targets */
+  feature: string;
+  information_gain: number;
+  safety_relevant: boolean;
+  /** True if this field was already visible in the form but left empty */
+  previously_available: boolean;
+  /** Why answering this matters — which genera it helps distinguish */
+  impact_note: string;
+}
+
 export interface IdentificationResult {
   candidates: Candidate[];
   reasoning_chain: string[];
   safety: SafetyAssessment;
   edibility?: EdibilityInfo;
   suggested_actions: SuggestedAction[];
+  /** Interactive follow-up questions derived from disambiguation */
+  follow_up_questions: FollowUpQuestion[];
   ambiguities: AmbiguityFlag[];
+  /** Heuristics triggered by the current identification results */
+  triggered_heuristics: ActivatedHeuristic[];
 }
 
 /** Rule activation state during identification */

@@ -148,14 +148,27 @@ function buildEdibility(result: IdentificationResult): string {
 }
 
 function buildNextSteps(result: IdentificationResult): string {
-  if (result.suggested_actions.length === 0) {
-    return '';
+  const parts: string[] = [];
+
+  // Heuristic actions
+  if (result.suggested_actions.length > 0) {
+    const steps = result.suggested_actions
+      .slice(0, 3)
+      .map((a) => `${a.priority === 'critical' ? '[CRITICAL] ' : ''}${a.action}`)
+      .join('. ');
+    parts.push(steps);
   }
 
-  const steps = result.suggested_actions
-    .slice(0, 3)
-    .map((a) => `${a.priority === 'critical' ? '[CRITICAL] ' : ''}${a.action}`)
-    .join('. ');
+  // Follow-up questions (prioritise non-previously-available)
+  const newTests = result.follow_up_questions.filter((q) => !q.previously_available);
+  if (newTests.length > 0) {
+    const steps = newTests
+      .slice(0, 3)
+      .map((q) => `${q.safety_relevant ? '[CRITICAL] ' : ''}${q.question}`)
+      .join('. ');
+    parts.push(steps);
+  }
 
-  return `To increase confidence: ${steps}.`;
+  if (parts.length === 0) return '';
+  return `To increase confidence: ${parts.join('. ')}.`;
 }
