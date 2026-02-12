@@ -1,6 +1,5 @@
 import type { Heuristic, HeuristicCategory, SuggestedAction, ConfidenceLevel } from '@/types';
 import type { CandidateScore } from './scorer';
-import { scoreToConfidence } from './scorer';
 
 /**
  * A heuristic that has been matched to active candidates.

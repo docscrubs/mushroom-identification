@@ -5,7 +5,6 @@ import {
   preprocessDescriptionNotes,
 } from './description-preprocessing';
 import { featureRules, matchesRule } from './feature-rules';
-import { scoreCandidate } from './scorer';
 
 describe('parseNegations', () => {
   it('extracts "not rolled" as a negation', () => {

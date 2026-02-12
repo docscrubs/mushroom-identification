@@ -92,7 +92,6 @@ describe('Result Assembler', () => {
     const result = assembleResult(obs, allGenera, featureRules);
 
     const formFieldQuestions = result.follow_up_questions.filter((q) => q.previously_available);
-    const newTestQuestions = result.follow_up_questions.filter((q) => !q.previously_available);
     // Should have both categories
     expect(formFieldQuestions.length).toBeGreaterThan(0);
     // Active tests (spore print, bruising) should NOT be marked previously_available

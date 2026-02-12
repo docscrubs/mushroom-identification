@@ -2,7 +2,6 @@ import { describe, it, expect } from 'vitest';
 import {
   findApplicableHeuristics,
   generateHeuristicActions,
-  type TriggeredHeuristic,
 } from './heuristic-questions';
 import { seedHeuristics } from '@/data/seed-heuristics';
 import type { CandidateScore } from './scorer';
