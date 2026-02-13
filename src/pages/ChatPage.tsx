@@ -8,12 +8,39 @@ import { useAppStore } from '@/stores/app-store';
 import { db } from '@/db/database';
 import {
   startConversation,
-  sendMessage,
+  sendMessageStreaming,
   endConversation,
   getSession,
   listSessions,
 } from '@/llm/conversation';
 import type { ConversationSession } from '@/types/conversation';
+
+const LOADING_STAGES = [
+  { after: 0, text: 'Analysing...' },
+  { after: 5, text: 'Checking species database...' },
+  { after: 15, text: 'Still working — large dataset to consider...' },
+  { after: 30, text: 'Nearly there...' },
+  { after: 60, text: 'Taking longer than usual...' },
+];
+
+function useLoadingStatus(loading: boolean): string {
+  const [elapsed, setElapsed] = useState(0);
+
+  useEffect(() => {
+    if (!loading) {
+      setElapsed(0);
+      return;
+    }
+    const interval = setInterval(() => setElapsed((e) => e + 1), 1_000);
+    return () => clearInterval(interval);
+  }, [loading]);
+
+  let status = LOADING_STAGES[0]!.text;
+  for (const stage of LOADING_STAGES) {
+    if (elapsed >= stage.after) status = stage.text;
+  }
+  return status;
+}
 
 export function ChatPage() {
   const isOnline = useAppStore((s) => s.isOnline);
@@ -22,9 +49,11 @@ export function ChatPage() {
   const [activeSession, setActiveSession] = useState<ConversationSession | null>(null);
   const [sessions, setSessions] = useState<ConversationSession[]>([]);
   const [loading, setLoading] = useState(false);
+  const [streamingContent, setStreamingContent] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [showSidebar, setShowSidebar] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
+  const loadingStatus = useLoadingStatus(loading && streamingContent === null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -38,10 +67,10 @@ export function ChatPage() {
     refreshSessions();
   }, [refreshSessions]);
 
-  // Auto-scroll on new messages
+  // Auto-scroll on new messages, streaming content, or loading status changes
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [activeSession?.messages.length]);
+  }, [activeSession?.messages.length, streamingContent, loadingStatus]);
 
   async function handleNewConversation() {
     const session = await startConversation(db);
@@ -76,18 +105,43 @@ export function ChatPage() {
   async function doSend(sessionId: string, text: string, photos: string[]) {
     setLoading(true);
     setError(null);
+    setStreamingContent(null);
 
-    const result = await sendMessage(
+    // Optimistically show the user message immediately
+    setActiveSession((prev) => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        messages: [
+          ...prev.messages,
+          {
+            id: `pending-${Date.now()}`,
+            role: 'user' as const,
+            content: text,
+            photos: photos.length > 0 ? photos : undefined,
+            timestamp: new Date().toISOString(),
+          },
+        ],
+      };
+    });
+
+    const result = await sendMessageStreaming(
       db,
       sessionId,
       text,
+      (chunk) => {
+        setStreamingContent((prev) => (prev ?? '') + chunk);
+      },
       photos.length > 0 ? photos : undefined,
     );
+
+    // Streaming is done — replace with final session state
+    setStreamingContent(null);
 
     if (result.ok) {
       setActiveSession(result.session);
     } else {
-      // Update session to show user message even on error
+      // Sync with DB (has the real user message ID)
       const session = await getSession(db, sessionId);
       if (session) setActiveSession(session);
       setError(result.message);
@@ -208,14 +262,29 @@ export function ChatPage() {
             {activeSession.messages.map((msg) => (
               <ChatBubble key={msg.id} message={msg} />
             ))}
-            {loading && (
+
+            {/* Streaming assistant response — shows text as it arrives */}
+            {streamingContent !== null && (
+              <ChatBubble
+                message={{
+                  id: 'streaming',
+                  role: 'assistant',
+                  content: streamingContent,
+                  timestamp: new Date().toISOString(),
+                }}
+              />
+            )}
+
+            {/* Pre-stream loading indicator — only shows before first chunk */}
+            {loading && streamingContent === null && (
               <div className="flex justify-start">
-                <div className="bg-stone-100 border border-stone-200 rounded-lg px-3 py-2">
-                  <span className="flex gap-1">
-                    <span className="w-2 h-2 bg-stone-400 rounded-full animate-bounce" />
-                    <span className="w-2 h-2 bg-stone-400 rounded-full animate-bounce [animation-delay:150ms]" />
-                    <span className="w-2 h-2 bg-stone-400 rounded-full animate-bounce [animation-delay:300ms]" />
+                <div className="bg-stone-100 border border-stone-200 rounded-lg px-3 py-2 flex items-center gap-2">
+                  <span className="flex gap-1 shrink-0">
+                    <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-bounce" />
+                    <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-bounce [animation-delay:150ms]" />
+                    <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-bounce [animation-delay:300ms]" />
                   </span>
+                  <span className="text-xs text-stone-500">{loadingStatus}</span>
                 </div>
               </div>
             )}
@@ -223,8 +292,15 @@ export function ChatPage() {
         )}
 
         {error && (
-          <div className="rounded-lg bg-red-50 border border-red-200 p-3">
-            <p className="text-xs text-red-700">{error}</p>
+          <div className="rounded-lg bg-red-50 border border-red-300 p-4 space-y-1">
+            <p className="text-sm font-medium text-red-800">Something went wrong</p>
+            <p className="text-xs text-red-600">{error}</p>
+            <button
+              onClick={() => setError(null)}
+              className="text-xs text-red-500 underline mt-1"
+            >
+              Dismiss
+            </button>
           </div>
         )}
 

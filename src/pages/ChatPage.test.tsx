@@ -16,7 +16,7 @@ vi.mock('react-router-dom', () => ({
 // Mock the conversation orchestrator
 vi.mock('@/llm/conversation', () => ({
   startConversation: vi.fn(),
-  sendMessage: vi.fn(),
+  sendMessageStreaming: vi.fn(),
   endConversation: vi.fn(),
   getSession: vi.fn(),
   listSessions: vi.fn(),
@@ -30,13 +30,13 @@ vi.mock('@/db/database', () => ({
 import { ChatPage } from './ChatPage';
 import {
   startConversation,
-  sendMessage,
+  sendMessageStreaming,
   endConversation,
   listSessions,
 } from '@/llm/conversation';
 
 const mockStartConversation = startConversation as Mock;
-const mockSendMessage = sendMessage as Mock;
+const mockSendMessageStreaming = sendMessageStreaming as Mock;
 const mockEndConversation = endConversation as Mock;
 const mockListSessions = listSessions as Mock;
 
@@ -63,7 +63,7 @@ describe('ChatPage', () => {
       isInitialized: true,
     });
     mockStartConversation.mockReset();
-    mockSendMessage.mockReset();
+    mockSendMessageStreaming.mockReset();
     mockEndConversation.mockReset();
     mockListSessions.mockReset();
     mockListSessions.mockResolvedValue([]);
@@ -88,29 +88,35 @@ describe('ChatPage', () => {
     expect(screen.getByText(/go to settings/i)).toBeTruthy();
   });
 
-  it('sends a message and displays response', async () => {
+  it('sends a message and displays streamed response', async () => {
     const session = makeSession();
     mockStartConversation.mockResolvedValue(session);
-    mockSendMessage.mockResolvedValue({
-      ok: true,
-      session: makeSession({
-        messages: [
-          {
-            id: 'msg-1',
-            role: 'user' as const,
-            content: 'Brown cap under oak',
-            timestamp: new Date().toISOString(),
-          },
-          {
-            id: 'msg-2',
-            role: 'assistant' as const,
-            content: 'This could be several species.',
-            timestamp: new Date().toISOString(),
-          },
-        ],
-      }),
-      response: 'This could be several species.',
-    });
+    mockSendMessageStreaming.mockImplementation(
+      async (_db: unknown, _sid: unknown, _text: unknown, onChunk: (c: string) => void) => {
+        onChunk('This could be ');
+        onChunk('several species.');
+        return {
+          ok: true,
+          session: makeSession({
+            messages: [
+              {
+                id: 'msg-1',
+                role: 'user' as const,
+                content: 'Brown cap under oak',
+                timestamp: new Date().toISOString(),
+              },
+              {
+                id: 'msg-2',
+                role: 'assistant' as const,
+                content: 'This could be several species.',
+                timestamp: new Date().toISOString(),
+              },
+            ],
+          }),
+          response: 'This could be several species.',
+        };
+      },
+    );
 
     const user = userEvent.setup();
     render(<ChatPage />);
@@ -125,10 +131,10 @@ describe('ChatPage', () => {
     });
   });
 
-  it('displays error message from sendMessage', async () => {
+  it('displays error message from sendMessageStreaming', async () => {
     const session = makeSession();
     mockStartConversation.mockResolvedValue(session);
-    mockSendMessage.mockResolvedValue({
+    mockSendMessageStreaming.mockResolvedValue({
       ok: false,
       error: 'api_error',
       message: 'Network timeout occurred',

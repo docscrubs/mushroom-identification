@@ -4,9 +4,10 @@ import { MushroomDB } from '@/db/database';
 import { saveApiKey } from './api-key';
 import type { LLMResponse } from '@/types/llm';
 
-// Mock callLLM at the network boundary — everything else is real
+// Mock callLLM and callLLMStream at the network boundary — everything else is real
 vi.mock('./api-client', () => ({
   callLLM: vi.fn(),
+  callLLMStream: vi.fn(),
   LLMApiError: class LLMApiError extends Error {
     constructor(
       message: string,
@@ -19,16 +20,18 @@ vi.mock('./api-client', () => ({
   },
 }));
 
-import { callLLM } from './api-client';
+import { callLLM, callLLMStream } from './api-client';
 import {
   startConversation,
   sendMessage,
+  sendMessageStreaming,
   endConversation,
   getSession,
   listSessions,
 } from './conversation';
 
 const mockCallLLM = callLLM as Mock;
+const mockCallLLMStream = callLLMStream as Mock;
 
 function makeLLMResponse(content: string): LLMResponse {
   return {
@@ -44,6 +47,7 @@ describe('conversation orchestrator', () => {
   beforeEach(async () => {
     db = new MushroomDB(`test-conv-orch-${Date.now()}-${Math.random()}`);
     mockCallLLM.mockReset();
+    mockCallLLMStream.mockReset();
     // Most tests need an API key
     await saveApiKey(db, 'test-api-key-123');
   });
@@ -329,6 +333,115 @@ describe('conversation orchestrator', () => {
       const completed = await listSessions(db, 'completed');
       expect(completed).toHaveLength(1);
       expect(completed[0]!.session_id).toBe(s2.session_id);
+    });
+  });
+
+  describe('sendMessageStreaming', () => {
+    it('calls onChunk for each streamed delta and returns final result', async () => {
+      mockCallLLMStream.mockImplementation(
+        async (_req: unknown, _key: unknown, onChunk: (c: string) => void) => {
+          onChunk('Hello');
+          onChunk(' world');
+          return makeLLMResponse('Hello world');
+        },
+      );
+
+      const session = await startConversation(db);
+      const chunks: string[] = [];
+      const result = await sendMessageStreaming(
+        db,
+        session.session_id,
+        'Test message',
+        (chunk) => chunks.push(chunk),
+      );
+
+      expect(chunks).toEqual(['Hello', ' world']);
+      expect(result.ok).toBe(true);
+      if (result.ok) {
+        expect(result.response).toBe('Hello world');
+        expect(result.session.messages).toHaveLength(2);
+        expect(result.session.messages[1]!.content).toBe('Hello world');
+      }
+    });
+
+    it('uses callLLMStream not callLLM', async () => {
+      mockCallLLMStream.mockImplementation(
+        async (_req: unknown, _key: unknown, _onChunk: unknown) => {
+          return makeLLMResponse('Streamed response');
+        },
+      );
+
+      const session = await startConversation(db);
+      await sendMessageStreaming(db, session.session_id, 'Hello', vi.fn());
+
+      expect(mockCallLLMStream).toHaveBeenCalledTimes(1);
+      expect(mockCallLLM).not.toHaveBeenCalled();
+    });
+
+    it('persists both messages to IndexedDB after streaming completes', async () => {
+      mockCallLLMStream.mockImplementation(
+        async (_req: unknown, _key: unknown, onChunk: (c: string) => void) => {
+          onChunk('Saved');
+          return makeLLMResponse('Saved');
+        },
+      );
+
+      const session = await startConversation(db);
+      await sendMessageStreaming(db, session.session_id, 'Save test', vi.fn());
+
+      const retrieved = await getSession(db, session.session_id);
+      expect(retrieved!.messages).toHaveLength(2);
+      expect(retrieved!.messages[0]!.role).toBe('user');
+      expect(retrieved!.messages[1]!.role).toBe('assistant');
+      expect(retrieved!.messages[1]!.content).toBe('Saved');
+    });
+
+    it('handles API errors the same as sendMessage', async () => {
+      mockCallLLMStream.mockRejectedValue(new Error('Stream failed'));
+
+      const session = await startConversation(db);
+      const result = await sendMessageStreaming(
+        db,
+        session.session_id,
+        'Will fail',
+        vi.fn(),
+      );
+
+      expect(result.ok).toBe(false);
+      if (!result.ok) {
+        expect(result.error).toBe('api_error');
+        expect(result.message).toContain('Stream failed');
+      }
+
+      // User message still persisted
+      const retrieved = await getSession(db, session.session_id);
+      expect(retrieved!.messages).toHaveLength(1);
+      expect(retrieved!.messages[0]!.role).toBe('user');
+    });
+
+    it('falls back to non-streaming for cached responses', async () => {
+      // First call populates cache via non-streaming
+      mockCallLLM.mockResolvedValue(makeLLMResponse('Cached answer'));
+      const s1 = await startConversation(db);
+      await sendMessage(db, s1.session_id, 'Cache test message');
+
+      // Streaming call with same input should hit cache without calling stream API
+      mockCallLLMStream.mockClear();
+      mockCallLLM.mockClear();
+      const s2 = await startConversation(db);
+      const result = await sendMessageStreaming(
+        db,
+        s2.session_id,
+        'Cache test message',
+        vi.fn(),
+      );
+
+      expect(result.ok).toBe(true);
+      if (result.ok) {
+        expect(result.response).toBe('Cached answer');
+      }
+      expect(mockCallLLMStream).not.toHaveBeenCalled();
+      expect(mockCallLLM).not.toHaveBeenCalled();
     });
   });
 });
