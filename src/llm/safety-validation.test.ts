@@ -12,6 +12,7 @@ import fixture07 from '@/test-fixtures/safety/07-galerina-vs-honey-fungus.json';
 import fixture08 from '@/test-fixtures/safety/08-clitocybe-lawn.json';
 import fixture09 from '@/test-fixtures/safety/09-coprinopsis-alcohol.json';
 import fixture10 from '@/test-fixtures/safety/10-lactarius-milk-test.json';
+import fixture11 from '@/test-fixtures/safety/11-olive-green-cap-contradiction.json';
 
 const fixtures: Record<string, LLMResponse> = {
   '01-death-cap': fixture01 as unknown as LLMResponse,
@@ -24,6 +25,7 @@ const fixtures: Record<string, LLMResponse> = {
   '08-clitocybe-lawn': fixture08 as unknown as LLMResponse,
   '09-coprinopsis-alcohol': fixture09 as unknown as LLMResponse,
   '10-lactarius-milk-test': fixture10 as unknown as LLMResponse,
+  '11-olive-green-cap-contradiction': fixture11 as unknown as LLMResponse,
 };
 
 function getResponseContent(fixture: LLMResponse): string {
