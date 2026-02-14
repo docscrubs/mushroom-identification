@@ -5,15 +5,26 @@ interface ChatBubbleProps {
   message: ConversationMessage;
 }
 
+/** Parse a markdown table row into trimmed cell values. */
+function parseTableRow(line: string): string[] {
+  return line.split('|').slice(1, -1).map((cell) => cell.trim());
+}
+
+/** Check if a line is a table separator (e.g. |---|---|). */
+function isTableSeparator(line: string): boolean {
+  return /^\|[\s:-]+\|/.test(line) && line.split('|').slice(1, -1).every((cell) => /^[\s:-]+$/.test(cell));
+}
+
 /**
  * Simple regex-based markdown renderer.
- * Handles: headers (##), bold (**), italic (*), unordered lists (-), and line breaks.
+ * Handles: headers (##), bold (**), italic (*), unordered lists (-), tables, and line breaks.
  */
 function renderMarkdown(text: string): React.ReactNode[] {
   const lines = text.split('\n');
   const nodes: React.ReactNode[] = [];
   let listItems: React.ReactNode[] = [];
   let codeBlockLines: string[] | null = null;
+  let tableRows: string[] = [];
 
   function flushList() {
     if (listItems.length > 0) {
@@ -37,11 +48,67 @@ function renderMarkdown(text: string): React.ReactNode[] {
     }
   }
 
+  function flushTable() {
+    if (tableRows.length === 0) return;
+
+    // Find the separator line to split header from body
+    let separatorIndex = -1;
+    for (let j = 0; j < tableRows.length; j++) {
+      if (isTableSeparator(tableRows[j]!)) {
+        separatorIndex = j;
+        break;
+      }
+    }
+
+    const headerRows = separatorIndex > 0 ? tableRows.slice(0, separatorIndex) : [];
+    const bodyRows = tableRows.filter((_, j) => j !== separatorIndex && (separatorIndex < 0 || j > separatorIndex));
+    // If no separator found, treat first row as header if there are multiple rows
+    if (separatorIndex < 0 && tableRows.length > 1) {
+      headerRows.push(tableRows[0]!);
+      bodyRows.length = 0;
+      bodyRows.push(...tableRows.slice(1));
+    }
+
+    nodes.push(
+      <div key={`table-${nodes.length}`} className="overflow-x-auto">
+        <table className="text-xs border-collapse w-full">
+          {headerRows.length > 0 && (
+            <thead>
+              {headerRows.map((row, ri) => (
+                <tr key={ri} className="border-b border-stone-300">
+                  {parseTableRow(row).map((cell, ci) => (
+                    <th key={ci} className="px-2 py-1 text-left font-semibold text-stone-600">
+                      {renderInline(cell)}
+                    </th>
+                  ))}
+                </tr>
+              ))}
+            </thead>
+          )}
+          <tbody>
+            {bodyRows.map((row, ri) => (
+              <tr key={ri} className="border-b border-stone-100">
+                {parseTableRow(row).map((cell, ci) => (
+                  <td key={ci} className="px-2 py-1">
+                    {renderInline(cell)}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>,
+    );
+
+    tableRows = [];
+  }
+
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i]!;
 
     // Code block fences
     if (line.startsWith('```')) {
+      flushTable();
       if (codeBlockLines !== null) {
         flushCodeBlock();
       } else {
@@ -56,6 +123,16 @@ function renderMarkdown(text: string): React.ReactNode[] {
       codeBlockLines.push(line);
       continue;
     }
+
+    // Table rows — collect consecutive pipe-delimited lines
+    if (line.trimStart().startsWith('|') && line.trimEnd().endsWith('|')) {
+      flushList();
+      tableRows.push(line);
+      continue;
+    }
+
+    // Non-table line — flush any accumulated table
+    flushTable();
 
     // Headers
     const headerMatch = line.match(/^(#{1,4})\s+(.+)$/);
@@ -103,6 +180,7 @@ function renderMarkdown(text: string): React.ReactNode[] {
   }
 
   flushCodeBlock();
+  flushTable();
   flushList();
   return nodes;
 }

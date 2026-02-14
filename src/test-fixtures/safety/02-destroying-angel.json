@@ -1,17 +1,17 @@
 {
-  "id": "placeholder-02",
+  "id": "pipeline-02",
   "choices": [
     {
       "message": {
         "role": "assistant",
-        "content": "**What you're thinking**\n\nThis is a very serious identification. A pure white mushroom with white gills, a ring, and a volva at the base in broadleaf woodland is the textbook description of **Amanita virosa (Destroying Angel)** — one of the deadliest mushrooms in the UK.\n\n**Key candidates**\n\n1. **Amanita virosa (Destroying Angel)** — DEADLY. This matches your description perfectly: entirely white, white gills, ring on stem, volva at base. Contains amatoxins — the same deadly toxins found in the Death Cap. A single mushroom can be fatal. Found in broadleaf and mixed woodland, often with birch or oak.\n\n2. **Amanita phalloides (Death Cap)** — Also deadly, but typically has a greenish or olive-tinted cap rather than pure white. Same amatoxin content.\n\n3. **Agaricus arvensis (Horse Mushroom)** — White with ring, but lacks a volva and has gills that start pink and darken to chocolate brown.\n\n**What would help**\n\nDig carefully around the base — is the volva a loose sac or tightly fitting? Also, does the cap have any greenish tint, or is it truly pure white?\n\n**Safety notes**\n\n⚠️ **CRITICAL WARNING**: This description matches Amanita virosa (Destroying Angel), which is deadly. It contains amatoxins that cause irreversible liver failure. There is no reliable antidote. Do NOT taste, eat, or even handle this mushroom unnecessarily. The toxin is not destroyed by cooking. Symptoms of amatoxin poisoning are delayed and may not appear for 6-24 hours."
+        "content": "## Initial Candidates\n\nStage 1 identified the following candidates based on pure white mushroom, white gills, ring, volva, and broadleaf woodland:\n\n- **Destroying Angel (Amanita virosa)** — high confidence — pure white with volva and ring in broadleaf woodland\n- **Death Cap (Amanita phalloides)** — medium confidence — also has volva and ring, but typically greenish cap\n- **Horse Mushroom (Agaricus arvensis)** — low confidence — white with ring, safety inclusion\n\n## Verification\n\n### Destroying Angel (Amanita virosa)\n| Feature | You described | Dataset says | Verdict |\n|---------|--------------|-------------|--------|\n| Cap colour | pure white | pure white, slightly sticky when wet | MATCH |\n| Gills | white | white, free | MATCH |\n| Ring | ring on stem | fragile ring, often disappearing | MATCH |\n| Volva | volva at base | large sac-like volva | MATCH |\n| Habitat | broadleaf woodland | broadleaf and mixed woodland, often with birch | MATCH |\n\n**Overall**: Strong match — all described features align perfectly\n**Edibility**: DEADLY — contains amatoxins identical to Death Cap\n\n### Death Cap (Amanita phalloides)\n| Feature | You described | Dataset says | Verdict |\n|---------|--------------|-------------|--------|\n| Cap colour | pure white | olive green to dirty yellow | CONTRADICTION |\n| Gills | white | white to cream | MATCH |\n| Volva | volva at base | large sac-like volva | MATCH |\n\n**Overall**: ELIMINATED — pure white cap contradicts Death Cap's olive/yellow-green coloration\n**Elimination reason**: Cap colour mismatch; Death Cap is olive/greenish, not pure white\n\n## Assessment\n\nThis is almost certainly **Amanita virosa (Destroying Angel)** — one of the deadliest mushrooms in the UK. Every described feature matches perfectly. Contains amatoxins — the same fatal toxin found in the Death Cap. A single mushroom can be fatal.\n\n## What Would Help\n\nConfirm the volva: dig carefully around the base — is it a loose sac? Also check for a faint sweet smell. Take a spore print — Destroying Angel produces a white spore print.\n\n## Safety Notes\n\n⚠️ **CRITICAL WARNING**: This description matches Amanita virosa (Destroying Angel), which is deadly. It contains amatoxins that cause irreversible liver failure. There is no reliable antidote. Do NOT taste, eat, or handle this mushroom unnecessarily. The toxin is not destroyed by cooking. Symptoms are delayed 6-24 hours."
       },
       "finish_reason": "stop"
     }
   ],
   "usage": {
-    "prompt_tokens": 130000,
-    "completion_tokens": 320,
-    "total_tokens": 130320
+    "prompt_tokens": 5000,
+    "completion_tokens": 550,
+    "total_tokens": 5550
   }
 }

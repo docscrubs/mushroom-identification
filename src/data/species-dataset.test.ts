@@ -110,4 +110,58 @@ describe('species dataset', () => {
       expect(detail.notes === null || typeof detail.notes === 'string').toBe(true);
     }
   });
+
+  describe('enriched species have non-null diagnostic_features and safety_checks', () => {
+    const ENRICHED_SPECIES = [
+      { scientific_name: 'Agaricus campestris', name: 'Field Mushroom' },
+      { scientific_name: 'Agaricus arvensis', name: 'Horse Mushroom' },
+      { scientific_name: 'Clitocybe rivulosa', name: "Fool's Funnel" },
+      { scientific_name: 'Amanita pantherina', name: 'Panthercap' },
+      { scientific_name: 'Amanita excelsa', name: 'Grey Spotted Amanita' },
+      { scientific_name: 'Amanita rubescens', name: 'The Blusher' },
+      {
+        scientific_name: 'Boletus / Rubroboletus satanas',
+        name: "Devil's Bolete",
+      },
+    ];
+
+    for (const { scientific_name, name } of ENRICHED_SPECIES) {
+      it(`${name} (${scientific_name}) has diagnostic_features`, () => {
+        const species = speciesDataset.find(
+          (s) => s.scientific_name === scientific_name,
+        );
+        expect(species).toBeDefined();
+        expect(species!.diagnostic_features).not.toBeNull();
+        expect(Array.isArray(species!.diagnostic_features)).toBe(true);
+        expect(species!.diagnostic_features!.length).toBeGreaterThan(0);
+      });
+
+      it(`${name} (${scientific_name}) has safety_checks`, () => {
+        const species = speciesDataset.find(
+          (s) => s.scientific_name === scientific_name,
+        );
+        expect(species).toBeDefined();
+        expect(species!.safety_checks).not.toBeNull();
+        expect(Array.isArray(species!.safety_checks)).toBe(true);
+        expect(species!.safety_checks!.length).toBeGreaterThan(0);
+      });
+    }
+
+    it('Field Mushroom diagnostic_features mention gill colour exclusion', () => {
+      const fm = speciesDataset.find(
+        (s) => s.scientific_name === 'Agaricus campestris',
+      )!;
+      const joined = fm.diagnostic_features!.join(' ');
+      expect(joined).toMatch(/NEVER\s+white/i);
+    });
+
+    it('Field Mushroom safety_checks warn about Death Cap confusion', () => {
+      const fm = speciesDataset.find(
+        (s) => s.scientific_name === 'Agaricus campestris',
+      )!;
+      const joined = fm.safety_checks!.join(' ');
+      expect(joined).toMatch(/death\s*cap/i);
+      expect(joined).toMatch(/volva/i);
+    });
+  });
 });

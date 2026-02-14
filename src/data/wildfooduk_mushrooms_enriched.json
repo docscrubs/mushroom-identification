@@ -78,8 +78,22 @@
       "beginner_safe": false,
       "notes": null
     },
-    "diagnostic_features": null,
-    "safety_checks": null
+    "diagnostic_features": [
+      "Large (10-16cm cap)",
+      "White cap bruising slightly yellow",
+      "Gills quickly pass from pale pink/grey to brown — NEVER stay permanently white",
+      "Dark purple-brown spore print",
+      "Strong aniseed smell from flesh",
+      "Double-edged ring",
+      "No volva at base",
+      "Cog-wheel appearance under unopened caps"
+    ],
+    "safety_checks": [
+      "Can look similar to Amanitas when young and gills are still pale — ALWAYS dig around base to check for volva",
+      "Horse Mushroom has NO volva — if a volva is present, this is Amanita (potentially deadly)",
+      "Confirm aniseed smell from flesh — Death Cap has no aniseed smell",
+      "Scratch stem base — bright chrome yellow + ink smell = Yellow Stainer (toxic)"
+    ]
   },
   {
     "name": "The Prince",
@@ -242,8 +256,20 @@
       "beginner_safe": false,
       "notes": null
     },
-    "diagnostic_features": null,
-    "safety_checks": null
+    "diagnostic_features": [
+      "Gills start deep pink, darkening to chocolate brown/black — NEVER white",
+      "Cap white to grey-brown — NEVER olive, green, or yellow",
+      "Chocolate brown spore print",
+      "No volva at base",
+      "Delicate ring that often breaks away",
+      "Grassland habitat (meadows, lawns, pasture)"
+    ],
+    "safety_checks": [
+      "CRITICAL: If gills are WHITE, this is NOT a Field Mushroom — consider Amanita phalloides (Death Cap) which is deadly",
+      "If cap has ANY green or olive tones, this is NOT a Field Mushroom — consider Death Cap",
+      "ALWAYS dig around stem base and check for a volva (cup/sack) — presence of volva means Amanita, not Agaricus",
+      "Scratch stem base — bright chrome yellow staining with ink/chemical smell = Yellow Stainer (toxic)"
+    ]
   },
   {
     "name": "Macro Mushroom",
@@ -877,8 +903,19 @@
       "beginner_safe": false,
       "notes": null
     },
-    "diagnostic_features": null,
-    "safety_checks": null
+    "diagnostic_features": [
+      "Grey-silver to brown cap with off-white to grey scales",
+      "Ring (skirt) with STRIATIONS on upper surface — key distinguishing feature",
+      "Bulbous base with NO gutter/rim (not marginate)",
+      "White gills, free of stem",
+      "White spore print"
+    ],
+    "safety_checks": [
+      "Can be confused with deadly Panthercap (Amanita pantherina)",
+      "Key check: examine the ring — Grey Spotted has STRIATIONS on upper surface, Panthercap ring is SMOOTH",
+      "Base: Grey Spotted is simply bulbous, Panthercap has marginate volva with gutter/rim",
+      "Not recommended for beginners due to Panthercap confusion risk"
+    ]
   },
   {
     "name": "Tawny Grisette",
@@ -4688,8 +4725,20 @@
       "beginner_safe": false,
       "notes": null
     },
-    "diagnostic_features": null,
-    "safety_checks": null
+    "diagnostic_features": [
+      "Flesh-coloured to light/dark brown cap with off-white to GREY scales",
+      "Flesh blushes pink to red when bruised or exposed to air — definitive feature",
+      "Ring (skirt) with STRIATIONS on upper surface",
+      "Bulbous base, not marginate when mature",
+      "White spore print"
+    ],
+    "safety_checks": [
+      "Can be confused with deadly Panthercap (Amanita pantherina)",
+      "Key test: cut or damage the flesh — Blusher turns PINK/RED, Panthercap does NOT change colour",
+      "Check ring: Blusher has STRIATIONS, Panthercap ring is SMOOTH",
+      "Check scales: Blusher scales are off-white to GREY, Panthercap scales are pure WHITE",
+      "Must be thoroughly cooked — toxic raw"
+    ]
   },
   {
     "name": "Velvet Shank",
@@ -7452,8 +7501,21 @@
       "beginner_safe": false,
       "notes": null
     },
-    "diagnostic_features": null,
-    "safety_checks": null
+    "diagnostic_features": [
+      "Small white funnel-shaped cap (3-6cm)",
+      "Gills decurrent (running down the stem)",
+      "White/cream gills becoming pinkish buff",
+      "No ring on stem",
+      "Grows in fairy rings on lawns and grassland",
+      "White spore print",
+      "Cap becomes depressed in centre with inrolled edge"
+    ],
+    "safety_checks": [
+      "DEADLY — contains lethal amounts of muscarine",
+      "Grows in same fairy rings as edible Fairy Ring Champignon (Marasmius oreades)",
+      "Key distinction: Fool's Funnel gills run DOWN the stem (decurrent); Marasmius gills are FREE of stem",
+      "Fool's Funnel stem is soft; Marasmius stem is tough and wiry"
+    ]
   },
   {
     "name": "Beechwood Sickener",
@@ -7577,11 +7639,23 @@
       "beginner_safe": false,
       "notes": null
     },
-    "diagnostic_features": null,
-    "safety_checks": null
+    "diagnostic_features": [
+      "Dark brown to red-brown cap with pure WHITE warts/scales",
+      "Smooth ring (skirt) with NO striations on upper surface",
+      "Marginate volva with distinctive gutter/rim at top",
+      "White gills, free of stem",
+      "White spore print",
+      "Prefers acidic soil and beech woodland"
+    ],
+    "safety_checks": [
+      "DEADLY — distinguish from the edible Blusher (Amanita rubescens) by: Panthercap skirt is SMOOTH, Blusher skirt has STRIATIONS",
+      "Panthercap does NOT blush red when damaged, Blusher DOES",
+      "Panthercap has pure white cap scales, Blusher has off-white to grey scales",
+      "Panthercap volva has a gutter/rim (marginate), Blusher's base is simply bulbous"
+    ]
   },
   {
-    "name": "Devil’s Bolete",
+    "name": "Devil's Bolete",
     "scientific_name": "Boletus / Rubroboletus satanas",
     "common_names": "Devil’s Bolete (UK), Satan’s Bolete,, Cap Tyllog y Cythraul (CY), Krwistoborowik Szatański (PL), Sátántinóru (HU)",
     "synonyms": "Boletus satanas",
@@ -7618,8 +7692,19 @@
       "beginner_safe": true,
       "notes": null
     },
-    "diagnostic_features": null,
-    "safety_checks": null
+    "diagnostic_features": [
+      "Pale/off-white cap (unusual for a bolete)",
+      "Blood RED pores (not tubes) underneath — key danger sign",
+      "Swollen stem with red-orange lower half and yellow upper half",
+      "Fine red reticulation (mesh pattern) on stem",
+      "Flesh turns pale blue when cut",
+      "Grows with oak and beech"
+    ],
+    "safety_checks": [
+      "Any bolete with RED pores should be treated with extreme caution",
+      "Blue staining alone is harmless in boletes, but red pores + blue staining = danger",
+      "Do not confuse with edible Lurid Bolete which has a darker cap"
+    ]
   },
   {
     "name": "Destroying Angel",

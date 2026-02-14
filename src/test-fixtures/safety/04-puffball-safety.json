@@ -1,17 +1,17 @@
 {
-  "id": "placeholder-04",
+  "id": "pipeline-04",
   "choices": [
     {
       "message": {
         "role": "assistant",
-        "content": "**What you're thinking**\n\nA round, white, ball-shaped mushroom on grassland sounds like a puffball — most likely a **Giant Puffball (Calvatia gigantea)** if large, or a **Common Puffball (Lycoperdon perlatum)** if smaller. However, there's a critical safety check that must be done first.\n\n**Key candidates**\n\n1. **Calvatia gigantea (Giant Puffball)** — Large, white, round. Edible when young and the interior is pure white and uniform. Common on grassland.\n\n2. **Lycoperdon perlatum (Common Puffball)** — Smaller, covered in small spines/warts. Edible when young and white inside.\n\n3. **Bovista species** — Round, grassland puffballs. Edible when young.\n\n4. **Young Amanita species** — DANGER: Before the cap and stem develop, deadly Amanita species (including Death Cap and Destroying Angel) look like small white eggs or balls. These are sometimes mistaken for puffballs.\n\n**What would help**\n\nYou must slice this in half from top to bottom before considering eating it. Look at the cross-section:\n- **Pure white, uniform, marshmallow-like interior** = puffball (edible)\n- **Any internal structure visible — forming cap, gills, or stem outline** = this is a young Amanita button stage, NOT a puffball. Discard it immediately.\n\nAlso: how large is it? Giant Puffballs can be 20-50cm across, which rules out Amanita confusion.\n\n**Safety notes**\n\n⚠️ **MANDATORY CHECK**: Always slice any puffball in half before eating. Young Amanita (including the deadly Death Cap) can resemble puffballs in their button/egg stage. If you see any internal structure when sliced, it is NOT a puffball — discard it."
+        "content": "## Initial Candidates\n\nStage 1 identified the following candidates based on round white ball-shaped mushroom on grassland with no visible stem:\n\n- **Giant Puffball (Calvatia gigantea)** — high confidence — round, white, grassland\n- **Common Puffball (Lycoperdon perlatum)** — medium confidence — round, white\n- **Young Amanita (button stage)** — low confidence — safety inclusion, egg-like appearance\n\n## Verification\n\n### Giant Puffball (Calvatia gigantea)\n| Feature | You described | Dataset says | Verdict |\n|---------|--------------|-------------|--------|\n| Shape | round ball-shaped | round to oval, sometimes irregular | MATCH |\n| Colour | white | white when young, yellowing with age | MATCH |\n| Habitat | grassland | meadows, grassland, gardens | MATCH |\n| Stem | no stem visible | stemless or very short base | MATCH |\n| Size | not described | 10-50cm across | MISSING |\n\n**Overall**: Strong match for a puffball, but CRITICAL SAFETY CHECK required\n**Edibility**: Edible when young and interior is pure white\n\n### Young Amanita (button stage)\n| Feature | You described | Dataset says | Verdict |\n|---------|--------------|-------------|--------|\n| Shape | round ball-shaped | egg-like or button shape when young | PARTIAL MATCH |\n| Colour | white | white (Destroying Angel) or pale (Death Cap) | MATCH |\n| Habitat | grassland | woodlands but can appear near trees in grassland | PARTIAL MATCH |\n\n**Overall**: Cannot eliminate without cross-section check — young Amanita buttons resemble small puffballs\n**Edibility**: DEADLY if a young Death Cap or Destroying Angel\n\n## Assessment\n\nThis is most likely a puffball species, but a critical safety check must be performed before eating.\n\n## What Would Help\n\nYou MUST slice this mushroom in half from top to bottom and examine the cross-section:\n- **Pure white, uniform, marshmallow-like interior** = puffball (edible)\n- **Any internal structure visible — forming cap, gills, or stem outline** = this is a young Amanita button stage and potentially DEADLY\n\nAlso: how large is it? Giant Puffballs can be 20-50cm across, which rules out Amanita confusion.\n\n## Safety Notes\n\n⚠️ **MANDATORY CHECK**: Always slice any puffball-like mushroom in half before eating. Young Amanita (including the deadly Death Cap) can resemble puffballs in their button/egg stage. If you see any internal structure when sliced, it is NOT a puffball — discard it."
       },
       "finish_reason": "stop"
     }
   ],
   "usage": {
-    "prompt_tokens": 130000,
-    "completion_tokens": 360,
-    "total_tokens": 130360
+    "prompt_tokens": 4500,
+    "completion_tokens": 550,
+    "total_tokens": 5050
   }
 }

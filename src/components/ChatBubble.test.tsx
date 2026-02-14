@@ -116,4 +116,93 @@ describe('ChatBubble', () => {
     // Should display some form of time (timezone-dependent output)
     expect(screen.getByText(/\d{1,2}:\d{2}/)).toBeTruthy();
   });
+
+  describe('markdown table rendering', () => {
+    it('renders a simple table with header and rows', () => {
+      const tableMarkdown = [
+        '| Feature | You described | Dataset says | Verdict |',
+        '|---------|-------------|-------------|---------|',
+        '| Cap colour | olive green | olive green to dirty yellow | MATCH |',
+        '| Gills | white | White to cream | MATCH |',
+      ].join('\n');
+
+      const { container } = render(
+        <ChatBubble
+          message={makeMessage({ role: 'assistant', content: tableMarkdown })}
+        />,
+      );
+
+      const table = container.querySelector('table');
+      expect(table).toBeTruthy();
+
+      // Header cells
+      const headerCells = table!.querySelectorAll('th');
+      expect(headerCells).toHaveLength(4);
+      expect(headerCells[0]!.textContent).toBe('Feature');
+      expect(headerCells[3]!.textContent).toBe('Verdict');
+
+      // Body rows
+      const bodyRows = table!.querySelectorAll('tbody tr');
+      expect(bodyRows).toHaveLength(2);
+    });
+
+    it('renders table cells with inline markdown', () => {
+      const tableMarkdown = [
+        '| Species | Status |',
+        '|---------|--------|',
+        '| **Death Cap** | *DEADLY* |',
+      ].join('\n');
+
+      render(
+        <ChatBubble
+          message={makeMessage({ role: 'assistant', content: tableMarkdown })}
+        />,
+      );
+
+      const strong = screen.getByText('Death Cap');
+      expect(strong.tagName).toBe('STRONG');
+      const em = screen.getByText('DEADLY');
+      expect(em.tagName).toBe('EM');
+    });
+
+    it('renders table with check/cross marks in verdicts', () => {
+      const tableMarkdown = [
+        '| Feature | Verdict |',
+        '|---------|---------|',
+        '| Cap | MATCH |',
+        '| Gills | CONTRADICTION |',
+      ].join('\n');
+
+      render(
+        <ChatBubble
+          message={makeMessage({ role: 'assistant', content: tableMarkdown })}
+        />,
+      );
+
+      expect(screen.getByText('MATCH')).toBeTruthy();
+      expect(screen.getByText('CONTRADICTION')).toBeTruthy();
+    });
+
+    it('renders table between other markdown elements', () => {
+      const content = [
+        '## Verification',
+        '',
+        '| Feature | Verdict |',
+        '|---------|---------|',
+        '| Cap | MATCH |',
+        '',
+        'Some text after the table.',
+      ].join('\n');
+
+      const { container } = render(
+        <ChatBubble
+          message={makeMessage({ role: 'assistant', content })}
+        />,
+      );
+
+      expect(screen.getByText('Verification')).toBeTruthy();
+      expect(container.querySelector('table')).toBeTruthy();
+      expect(screen.getByText('Some text after the table.')).toBeTruthy();
+    });
+  });
 });

@@ -1,17 +1,17 @@
 {
-  "id": "placeholder-wm-2",
+  "id": "pipeline-wm-2",
   "choices": [
     {
       "message": {
         "role": "assistant",
-        "content": "**What you're thinking**\n\nPale pink/salmon gills and birch trees confirm this. The combination of orange-pink cap with woolly margin, white milk, pale pink gills, and birch association is a strong match for **Lactarius torminosus (Woolly Milkcap)**.\n\n**Identification**\n\nThis is most likely **Lactarius torminosus (Woolly Milkcap)**.\n\n**Supporting evidence:**\n- Orange-pink cap with woolly/fluffy margin ✓\n- White milk when cut ✓\n- Pale pink/salmon gills ✓\n- Growing under birch trees ✓\n\n**Confidence:** High — this combination of features is distinctive.\n\n**What could change this:** If the cap margin is only slightly hairy (not distinctly woolly), it could be Lactarius pubescens, which is paler overall. Both are poisonous, so the distinction doesn't change the safety advice.\n\n**Confusion species:** Lactarius deliciosus (Saffron Milkcap) has a similar orange cap but produces orange milk (not white) and grows under pines (not birch).\n\n**Safety notes**\n\n⚠️ **Lactarius torminosus is poisonous.** It causes significant gastrointestinal symptoms including nausea, vomiting, and diarrhoea if consumed. While it is traditionally eaten in some Nordic countries after extensive parboiling in multiple changes of water, this is not recommended without expert guidance. Do not eat this mushroom raw or simply cooked."
+        "content": "## Initial Candidates\n\nStage 1 refined candidates with additional evidence: pale pink/salmon gills and birch tree confirmation.\n\n- **Woolly Milkcap (Lactarius torminosus)** — high confidence — all features now match\n- **Pale Woolly Milkcap (Lactarius pubescens)** — low confidence — typically paler than described\n\n## Verification\n\n### Woolly Milkcap (Lactarius torminosus)\n| Feature | You described | Dataset says | Verdict |\n|---------|--------------|-------------|--------|\n| Cap colour | orange-pink (from turn 1) | salmon-pink to orange | MATCH |\n| Cap margin | faint fluff (from turn 1) | distinctly woolly/shaggy margin | MATCH |\n| Milk | white milk (from turn 1) | copious white milk | MATCH |\n| Gills | pale pink/salmon | cream to pale pink/salmon | MATCH |\n| Habitat | under birch trees | mycorrhizal with birch | MATCH |\n\n**Overall**: Strong match — all five described features align perfectly\n**Edibility**: Poisonous — causes significant gastrointestinal distress\n\n### Pale Woolly Milkcap (Lactarius pubescens)\n| Feature | You described | Dataset says | Verdict |\n|---------|--------------|-------------|--------|\n| Cap colour | orange-pink | whitish-pink to pale pink | PARTIAL MATCH |\n| Gills | pale pink/salmon | whitish to pale cream | PARTIAL MATCH |\n| Habitat | under birch | mycorrhizal with birch | MATCH |\n\n**Overall**: Less likely — cap colour is more saturated than typical L. pubescens\n\n## Assessment\n\nThis is **Lactarius torminosus (Woolly Milkcap)** with high confidence. The combination of orange-pink cap with woolly margin, white milk, pale pink/salmon gills, and birch tree association is distinctive and diagnostic. All described features match the dataset entry with no contradictions.\n\nWhat could change this: if the cap margin is only slightly hairy (not distinctly woolly), it could be L. pubescens, which is paler overall. Both are poisonous, so the distinction doesn't change the safety advice.\n\n## What Would Help\n\nThe identification is already strong. To be fully certain, check whether the cap has concentric colour zones (characteristic of L. torminosus). A spore print would also confirm: L. torminosus produces a pale cream to pale pink spore print.\n\n## Safety Notes\n\n⚠️ **Lactarius torminosus (Woolly Milkcap) is poisonous.** It causes significant gastrointestinal symptoms including nausea, vomiting, and diarrhoea if consumed. While it is traditionally eaten in some Nordic countries after extensive parboiling in multiple changes of water, this is not recommended without expert guidance. Do not eat this mushroom raw or simply cooked."
       },
       "finish_reason": "stop"
     }
   ],
   "usage": {
-    "prompt_tokens": 131000,
-    "completion_tokens": 310,
-    "total_tokens": 131310
+    "prompt_tokens": 5500,
+    "completion_tokens": 520,
+    "total_tokens": 6020
   }
 }

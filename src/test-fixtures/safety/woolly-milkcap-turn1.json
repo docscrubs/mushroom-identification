@@ -1,17 +1,17 @@
 {
-  "id": "placeholder-wm-1",
+  "id": "pipeline-wm-1",
   "choices": [
     {
       "message": {
         "role": "assistant",
-        "content": "**What you're thinking**\n\nAn orange-pink cap with faint fluff around the edge and white milk when cut is very characteristic of a **Lactarius** (Milkcap) species. The woolly/fluffy margin combined with the colour strongly suggests one of the birch-associated milkcaps.\n\n**Key candidates**\n\n1. **Lactarius torminosus (Woolly Milkcap)** — Poisonous. Orange-pink cap with distinctive woolly/shaggy margin, white milk. Strongly associated with birch trees. Causes significant gastrointestinal distress if eaten.\n\n2. **Lactarius pubescens (Pale Woolly Milkcap)** — Toxic. Paler, more whitish-pink with woolly margin. Also under birch.\n\n3. **Lactarius deliciosus (Saffron Milkcap)** — Edible. Orange cap under pines, but this would produce orange/carrot-coloured milk, not white. If the milk is white, this is unlikely.\n\n**What would help**\n\nTwo key questions:\n1. What colour are the gills? (Lactarius torminosus has pale pink/salmon gills)\n2. What trees are nearby — specifically, are there birch trees?\n\n**Safety notes**\n\nBoth Lactarius torminosus and L. pubescens are poisonous and cause nausea, vomiting, and diarrhoea. The white milk is a warning sign — edible milkcaps (like L. deliciosus) produce orange milk. Do not eat this mushroom."
+        "content": "## Initial Candidates\n\nStage 1 identified the following candidates based on orange-pink cap with faint fluff around edge and white milk when cut:\n\n- **Woolly Milkcap (Lactarius torminosus)** — high confidence — orange-pink, woolly margin, white milk\n- **Pale Woolly Milkcap (Lactarius pubescens)** — medium confidence — similar but paler, woolly margin\n- **Saffron Milkcap (Lactarius deliciosus)** — low confidence — orange cap but produces orange milk, not white\n\n## Verification\n\n### Woolly Milkcap (Lactarius torminosus)\n| Feature | You described | Dataset says | Verdict |\n|---------|--------------|-------------|--------|\n| Cap colour | orange-pink | salmon-pink to orange with concentric zones | MATCH |\n| Cap margin | faint fluff around edge | distinctly woolly/shaggy margin | MATCH |\n| Milk | white milk when cut | copious white milk | MATCH |\n| Habitat | not described | under birch | MISSING |\n| Gills | not described | cream to pale pink | MISSING |\n\n**Overall**: Strong match on described features, but need habitat and gill colour to confirm\n**Edibility**: Poisonous — causes nausea, vomiting, diarrhoea\n\n### Pale Woolly Milkcap (Lactarius pubescens)\n| Feature | You described | Dataset says | Verdict |\n|---------|--------------|-------------|--------|\n| Cap colour | orange-pink | whitish-pink to pale pink | PARTIAL MATCH |\n| Cap margin | faint fluff | woolly/hairy margin | MATCH |\n| Milk | white milk | white milk | MATCH |\n\n**Overall**: Possible — similar species but typically paler than described\n**Edibility**: Toxic — similar gastric effects\n\n### Saffron Milkcap (Lactarius deliciosus)\n| Feature | You described | Dataset says | Verdict |\n|---------|--------------|-------------|--------|\n| Milk | white milk | orange/carrot-coloured milk | CONTRADICTION |\n\n**Overall**: ELIMINATED — white milk contradicts L. deliciosus which produces orange milk\n\n## Assessment\n\nThis is most likely a **Lactarius** species in the torminosus/pubescens group. The orange-pink cap with woolly margin and white milk is characteristic. Both L. torminosus and L. pubescens are poisonous and cause significant gastrointestinal distress.\n\n## What Would Help\n\nTwo key questions would narrow this down:\n1. What colour are the gills? (L. torminosus has pale pink/salmon gills)\n2. What trees are nearby — specifically, are there birch trees?\n\n## Safety Notes\n\n⚠️ Both Lactarius torminosus and L. pubescens are poisonous and cause nausea, vomiting, and diarrhoea. The white milk is a warning sign — edible milkcaps (like L. deliciosus) produce orange milk. Do not eat this mushroom."
       },
       "finish_reason": "stop"
     }
   ],
   "usage": {
-    "prompt_tokens": 130000,
-    "completion_tokens": 290,
-    "total_tokens": 130290
+    "prompt_tokens": 5000,
+    "completion_tokens": 580,
+    "total_tokens": 5580
   }
 }

@@ -92,7 +92,17 @@ describe('ChatPage', () => {
     const session = makeSession();
     mockStartConversation.mockResolvedValue(session);
     mockSendMessageStreaming.mockImplementation(
-      async (_db: unknown, _sid: unknown, _text: unknown, onChunk: (c: string) => void) => {
+      async (
+        _db: unknown,
+        _sid: unknown,
+        _text: unknown,
+        onChunk: (c: string) => void,
+        _photos: unknown,
+        onStageChange?: (stage: string) => void,
+      ) => {
+        onStageChange?.('candidates');
+        onStageChange?.('lookup');
+        onStageChange?.('verification');
         onChunk('This could be ');
         onChunk('several species.');
         return {
@@ -128,6 +138,36 @@ describe('ChatPage', () => {
     await waitFor(() => {
       expect(screen.getByText('Brown cap under oak')).toBeTruthy();
       expect(screen.getByText('This could be several species.')).toBeTruthy();
+    });
+  });
+
+  it('passes onStageChange callback to sendMessageStreaming', async () => {
+    const session = makeSession();
+    mockStartConversation.mockResolvedValue(session);
+    mockSendMessageStreaming.mockResolvedValue({
+      ok: true,
+      session: makeSession({
+        messages: [
+          { id: 'msg-1', role: 'user' as const, content: 'test', timestamp: new Date().toISOString() },
+          { id: 'msg-2', role: 'assistant' as const, content: 'response', timestamp: new Date().toISOString() },
+        ],
+      }),
+      response: 'response',
+    });
+
+    const user = userEvent.setup();
+    render(<ChatPage />);
+
+    const textarea = screen.getByPlaceholderText(/describe/i);
+    await user.type(textarea, 'test');
+    await user.click(screen.getByRole('button', { name: /send/i }));
+
+    await waitFor(() => {
+      // sendMessageStreaming should have been called with 6 arguments (including onStageChange)
+      expect(mockSendMessageStreaming).toHaveBeenCalledTimes(1);
+      const args = mockSendMessageStreaming.mock.calls[0]!;
+      expect(args).toHaveLength(6);
+      expect(typeof args[5]).toBe('function'); // onStageChange callback
     });
   });
 

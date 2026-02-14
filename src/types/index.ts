@@ -64,6 +64,7 @@ export type {
   ConversationMessage,
   ConversationSession,
   ConversationStatus,
+  PipelineMetadata,
 } from './conversation';
 export type {
   CardType,
@@ -73,3 +74,10 @@ export type {
   TrainingModule,
   TrainingContent,
 } from './learning';
+export type {
+  Stage1Candidate,
+  Stage1Output,
+  PipelineStage,
+  PipelineCallbacks,
+  PipelineResult,
+} from './pipeline';

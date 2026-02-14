@@ -1,15 +1,14 @@
 import type { MushroomDB } from '@/db/database';
-import type { LLMResponse } from '@/types/llm';
+import type { LLMMessage } from '@/types/llm';
 import type { ConversationSession, ConversationMessage } from '@/types/conversation';
 import type { DatasetSpecies } from '@/types/species';
+import type { PipelineStage } from '@/types/pipeline';
 import { createSession, getSession, updateSession, listSessions as dbListSessions } from '@/db/conversation-store';
-import { buildSystemPrompt } from './system-prompt';
-import { buildLLMMessages } from './message-builder';
-import { callLLM, callLLMStream } from './api-client';
 import { getApiKey, getSettings } from './api-key';
 import { buildCacheKey, getCachedResponse, setCachedResponse } from './cache';
 import { isWithinBudget, recordUsage, estimateCost } from './cost-tracker';
 import { speciesDataset } from '@/data/species-dataset';
+import { runIdentificationPipeline } from './pipeline';
 
 export type SendMessageResult =
   | { ok: true; session: ConversationSession; response: string }
@@ -29,6 +28,49 @@ function generateMessageId(): string {
 }
 
 /**
+ * Build LLM messages from conversation history (without system prompt).
+ * Used as input to the pipeline, which builds its own system prompts per stage.
+ */
+function buildConversationMessages(messages: ConversationMessage[]): LLMMessage[] {
+  const result: LLMMessage[] = [];
+
+  // Find last user message index for photo inclusion
+  let lastUserMsgIndex = -1;
+  for (let i = messages.length - 1; i >= 0; i--) {
+    if (messages[i]!.role === 'user') {
+      lastUserMsgIndex = i;
+      break;
+    }
+  }
+
+  for (let i = 0; i < messages.length; i++) {
+    const msg = messages[i]!;
+    if (msg.role === 'assistant') {
+      result.push({ role: 'assistant', content: msg.content });
+    } else {
+      // User message — include photos only for the latest user turn
+      const includePhotos = i === lastUserMsgIndex && msg.photos && msg.photos.length > 0;
+      if (includePhotos) {
+        result.push({
+          role: 'user',
+          content: [
+            { type: 'text', text: msg.content },
+            ...msg.photos!.map((url) => ({
+              type: 'image_url' as const,
+              image_url: { url },
+            })),
+          ],
+        });
+      } else {
+        result.push({ role: 'user', content: msg.content });
+      }
+    }
+  }
+
+  return result;
+}
+
+/**
  * Start a new conversation session.
  */
 export async function startConversation(db: MushroomDB): Promise<ConversationSession> {
@@ -36,8 +78,8 @@ export async function startConversation(db: MushroomDB): Promise<ConversationSes
 }
 
 /**
- * Send a message in an existing conversation.
- * Handles system prompt assembly, LLM API call, caching, and budget.
+ * Send a message in an existing conversation using the two-stage pipeline.
+ * Handles caching, budget checks, and pipeline orchestration.
  */
 export async function sendMessage(
   db: MushroomDB,
@@ -61,14 +103,10 @@ export async function sendMessage(
   };
   session.messages.push(userMessage);
 
-  // 3. Build system prompt with species data
-  const species = getSpecies();
-  const systemPrompt = buildSystemPrompt(species);
+  // 3. Build conversation messages for cache key + pipeline
+  const llmMessages = buildConversationMessages(session.messages);
 
-  // 4. Build LLM messages
-  const llmMessages = buildLLMMessages(systemPrompt, session.messages);
-
-  // 5. Check cache
+  // 4. Check cache
   const cacheKey = buildCacheKey(llmMessages);
   const cached = await getCachedResponse(db, cacheKey);
   if (cached) {
@@ -83,50 +121,44 @@ export async function sendMessage(
     return { ok: true, session, response: cached };
   }
 
-  // 6. Check budget
+  // 5. Check budget
   const settings = await getSettings(db);
   const withinBudget = await isWithinBudget(db, settings.budget_limit_usd);
   if (!withinBudget) {
-    // Still save the user message
     await updateSession(db, session);
     return { ok: false, error: 'budget_exceeded', message: 'Monthly LLM budget exceeded.' };
   }
 
-  // 7. Check API key
+  // 6. Check API key
   const apiKey = await getApiKey(db);
   if (!apiKey) {
     await updateSession(db, session);
     return { ok: false, error: 'no_api_key', message: 'No API key configured.' };
   }
 
-  // 8. Select model (vision if photos in this message)
-  const hasPhotos = photos && photos.length > 0;
-  const model = hasPhotos ? settings.vision_model : settings.model;
-  const timeoutMs = hasPhotos ? 120_000 : 60_000; // Vision needs longer for image processing
-
-  // 9. Call LLM
-  let llmResponse: LLMResponse;
+  // 7. Run two-stage pipeline
+  const species = getSpecies();
+  let pipelineResult;
   try {
-    llmResponse = await callLLM(
-      {
-        model,
-        messages: llmMessages,
-        max_tokens: settings.max_tokens,
-        temperature: 0.3,
-      },
+    pipelineResult = await runIdentificationPipeline({
+      messages: llmMessages,
       apiKey,
-      settings.endpoint,
-      timeoutMs,
-    );
+      settings: {
+        model: settings.model,
+        vision_model: settings.vision_model,
+        max_tokens: settings.max_tokens,
+        endpoint: settings.endpoint,
+      },
+      dataset: species,
+    });
   } catch (err) {
-    // Save user message even on error
     await updateSession(db, session);
     const message = err instanceof Error ? err.message : 'Unknown API error';
     return { ok: false, error: 'api_error', message };
   }
 
-  // 10. Record usage
-  const usage = llmResponse.usage;
+  // 8. Record combined usage
+  const usage = pipelineResult.usage;
   await recordUsage(db, {
     timestamp: new Date().toISOString(),
     prompt_tokens: usage.prompt_tokens,
@@ -135,30 +167,36 @@ export async function sendMessage(
     cache_hit: false,
   });
 
-  // 11. Extract response content
-  const responseContent = llmResponse.choices[0]?.message?.content ?? '';
+  // 9. Cache the response
+  await setCachedResponse(db, cacheKey, pipelineResult.response);
 
-  // 12. Cache the response
-  await setCachedResponse(db, cacheKey, responseContent);
-
-  // 13. Create assistant message and append
+  // 10. Create assistant message with pipeline metadata
   const assistantMessage: ConversationMessage = {
     id: generateMessageId(),
     role: 'assistant',
-    content: responseContent,
+    content: pipelineResult.response,
     timestamp: new Date().toISOString(),
+    pipeline_metadata: {
+      stage1_candidates: pipelineResult.stage1.candidates.map((c) => ({
+        name: c.name,
+        scientific_name: c.scientific_name,
+        confidence: c.confidence,
+      })),
+      verified_species: pipelineResult.verifiedSpecies,
+      stage1_raw: JSON.stringify(pipelineResult.stage1),
+    },
   };
   session.messages.push(assistantMessage);
 
-  // 14. Save session
+  // 11. Save session
   await updateSession(db, session);
 
-  return { ok: true, session, response: responseContent };
+  return { ok: true, session, response: pipelineResult.response };
 }
 
 /**
- * Send a message with streaming response.
- * Calls onChunk with each content delta as it arrives from the LLM.
+ * Send a message with streaming response using the two-stage pipeline.
+ * Calls onChunk with each content delta from Stage 2 as it arrives.
  * Falls back to cached response if available (no streaming needed).
  */
 export async function sendMessageStreaming(
@@ -167,6 +205,7 @@ export async function sendMessageStreaming(
   text: string,
   onChunk: (content: string) => void,
   photos?: string[],
+  onStageChange?: (stage: PipelineStage) => void,
 ): Promise<SendMessageResult> {
   // 1. Load session
   const session = await getSession(db, sessionId);
@@ -184,14 +223,10 @@ export async function sendMessageStreaming(
   };
   session.messages.push(userMessage);
 
-  // 3. Build system prompt with species data
-  const species = getSpecies();
-  const systemPrompt = buildSystemPrompt(species);
+  // 3. Build conversation messages for cache key + pipeline
+  const llmMessages = buildConversationMessages(session.messages);
 
-  // 4. Build LLM messages
-  const llmMessages = buildLLMMessages(systemPrompt, session.messages);
-
-  // 5. Check cache — if hit, return immediately (no streaming needed)
+  // 4. Check cache — if hit, return immediately (no streaming needed)
   const cacheKey = buildCacheKey(llmMessages);
   const cached = await getCachedResponse(db, cacheKey);
   if (cached) {
@@ -206,7 +241,7 @@ export async function sendMessageStreaming(
     return { ok: true, session, response: cached };
   }
 
-  // 6. Check budget
+  // 5. Check budget
   const settings = await getSettings(db);
   const withinBudget = await isWithinBudget(db, settings.budget_limit_usd);
   if (!withinBudget) {
@@ -214,41 +249,40 @@ export async function sendMessageStreaming(
     return { ok: false, error: 'budget_exceeded', message: 'Monthly LLM budget exceeded.' };
   }
 
-  // 7. Check API key
+  // 6. Check API key
   const apiKey = await getApiKey(db);
   if (!apiKey) {
     await updateSession(db, session);
     return { ok: false, error: 'no_api_key', message: 'No API key configured.' };
   }
 
-  // 8. Select model and timeout
-  const hasPhotos = photos && photos.length > 0;
-  const model = hasPhotos ? settings.vision_model : settings.model;
-  const timeoutMs = hasPhotos ? 120_000 : 60_000;
-
-  // 9. Call LLM with streaming
-  let llmResponse: LLMResponse;
+  // 7. Run two-stage pipeline with streaming
+  const species = getSpecies();
+  let pipelineResult;
   try {
-    llmResponse = await callLLMStream(
-      {
-        model,
-        messages: llmMessages,
-        max_tokens: settings.max_tokens,
-        temperature: 0.3,
-      },
+    pipelineResult = await runIdentificationPipeline({
+      messages: llmMessages,
       apiKey,
-      onChunk,
-      settings.endpoint,
-      timeoutMs,
-    );
+      settings: {
+        model: settings.model,
+        vision_model: settings.vision_model,
+        max_tokens: settings.max_tokens,
+        endpoint: settings.endpoint,
+      },
+      dataset: species,
+      callbacks: {
+        onChunk,
+        onStageChange,
+      },
+    });
   } catch (err) {
     await updateSession(db, session);
     const message = err instanceof Error ? err.message : 'Unknown API error';
     return { ok: false, error: 'api_error', message };
   }
 
-  // 10. Record usage
-  const usage = llmResponse.usage;
+  // 8. Record combined usage
+  const usage = pipelineResult.usage;
   await recordUsage(db, {
     timestamp: new Date().toISOString(),
     prompt_tokens: usage.prompt_tokens,
@@ -257,25 +291,31 @@ export async function sendMessageStreaming(
     cache_hit: false,
   });
 
-  // 11. Extract response content
-  const responseContent = llmResponse.choices[0]?.message?.content ?? '';
+  // 9. Cache the response
+  await setCachedResponse(db, cacheKey, pipelineResult.response);
 
-  // 12. Cache the response
-  await setCachedResponse(db, cacheKey, responseContent);
-
-  // 13. Create assistant message and append
+  // 10. Create assistant message with pipeline metadata
   const assistantMessage: ConversationMessage = {
     id: generateMessageId(),
     role: 'assistant',
-    content: responseContent,
+    content: pipelineResult.response,
     timestamp: new Date().toISOString(),
+    pipeline_metadata: {
+      stage1_candidates: pipelineResult.stage1.candidates.map((c) => ({
+        name: c.name,
+        scientific_name: c.scientific_name,
+        confidence: c.confidence,
+      })),
+      verified_species: pipelineResult.verifiedSpecies,
+      stage1_raw: JSON.stringify(pipelineResult.stage1),
+    },
   };
   session.messages.push(assistantMessage);
 
-  // 14. Save session
+  // 11. Save session
   await updateSession(db, session);
 
-  return { ok: true, session, response: responseContent };
+  return { ok: true, session, response: pipelineResult.response };
 }
 
 /**

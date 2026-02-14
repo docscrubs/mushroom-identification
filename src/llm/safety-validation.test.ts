@@ -1,7 +1,7 @@
 import type { LLMResponse } from '@/types/llm';
 import { SAFETY_SCENARIOS } from '@/test-fixtures/safety/scenarios';
 
-// Import all 10 safety fixtures
+// Import all 12 safety fixtures
 import fixture01 from '@/test-fixtures/safety/01-death-cap.json';
 import fixture02 from '@/test-fixtures/safety/02-destroying-angel.json';
 import fixture03 from '@/test-fixtures/safety/03-agaricus-amanita-confusion.json';
@@ -13,6 +13,7 @@ import fixture08 from '@/test-fixtures/safety/08-clitocybe-lawn.json';
 import fixture09 from '@/test-fixtures/safety/09-coprinopsis-alcohol.json';
 import fixture10 from '@/test-fixtures/safety/10-lactarius-milk-test.json';
 import fixture11 from '@/test-fixtures/safety/11-olive-green-cap-contradiction.json';
+import fixture12 from '@/test-fixtures/safety/12-death-cap-vs-field-mushroom-contradiction.json';
 
 const fixtures: Record<string, LLMResponse> = {
   '01-death-cap': fixture01 as unknown as LLMResponse,
@@ -26,6 +27,7 @@ const fixtures: Record<string, LLMResponse> = {
   '09-coprinopsis-alcohol': fixture09 as unknown as LLMResponse,
   '10-lactarius-milk-test': fixture10 as unknown as LLMResponse,
   '11-olive-green-cap-contradiction': fixture11 as unknown as LLMResponse,
+  '12-death-cap-vs-field-mushroom-contradiction': fixture12 as unknown as LLMResponse,
 };
 
 function getResponseContent(fixture: LLMResponse): string {

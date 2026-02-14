@@ -3,6 +3,7 @@ import { vi, type Mock } from 'vitest';
 import { MushroomDB } from '@/db/database';
 import { saveApiKey } from './api-key';
 import type { LLMResponse } from '@/types/llm';
+import type { Stage1Output } from '@/types/pipeline';
 
 // Mock callLLM and callLLMStream at the network boundary — everything else is real
 vi.mock('./api-client', () => ({
@@ -33,12 +34,63 @@ import {
 const mockCallLLM = callLLM as Mock;
 const mockCallLLMStream = callLLMStream as Mock;
 
-function makeLLMResponse(content: string): LLMResponse {
+function makeLLMResponse(content: string, usage?: Partial<LLMResponse['usage']>): LLMResponse {
   return {
     id: 'resp-1',
     choices: [{ message: { role: 'assistant', content }, finish_reason: 'stop' }],
-    usage: { prompt_tokens: 1000, completion_tokens: 200, total_tokens: 1200 },
+    usage: {
+      prompt_tokens: usage?.prompt_tokens ?? 1000,
+      completion_tokens: usage?.completion_tokens ?? 200,
+      total_tokens: usage?.total_tokens ?? 1200,
+    },
   };
+}
+
+const validStage1Json: Stage1Output = {
+  candidates: [
+    {
+      name: 'Field Mushroom',
+      scientific_name: 'Agaricus campestris',
+      confidence: 'high',
+      key_reasons: 'White cap, pink gills, grassland habitat',
+    },
+    {
+      name: 'Death Cap',
+      scientific_name: 'Amanita phalloides',
+      confidence: 'low',
+      key_reasons: 'Safety inclusion — white-gilled mushroom',
+    },
+  ],
+  reasoning: 'White mushroom in grassland strongly suggests Agaricus campestris',
+  needs_more_info: true,
+  follow_up_question: 'Can you check the stem base for a volva?',
+};
+
+/**
+ * Set up both mocks for the two-stage pipeline:
+ * - callLLM for Stage 1 (candidate generation, returns JSON)
+ * - callLLMStream for Stage 2 (verification, streams chunks)
+ */
+function setupPipelineMocks(
+  stage2Content = '## Verification\nField Mushroom is a strong match.',
+) {
+  mockCallLLM.mockResolvedValue(
+    makeLLMResponse(JSON.stringify(validStage1Json), {
+      prompt_tokens: 500,
+      completion_tokens: 200,
+      total_tokens: 700,
+    }),
+  );
+  mockCallLLMStream.mockImplementation(
+    async (_req: unknown, _key: unknown, onChunk: (c: string) => void) => {
+      onChunk(stage2Content);
+      return makeLLMResponse(stage2Content, {
+        prompt_tokens: 2000,
+        completion_tokens: 400,
+        total_tokens: 2400,
+      });
+    },
+  );
 }
 
 describe('conversation orchestrator', () => {
@@ -73,88 +125,96 @@ describe('conversation orchestrator', () => {
     });
   });
 
-  describe('sendMessage', () => {
-    it('adds user message, calls LLM, adds assistant response', async () => {
-      mockCallLLM.mockResolvedValue(makeLLMResponse('This looks like a Chanterelle.'));
+  describe('sendMessage (pipeline integration)', () => {
+    it('calls Stage 1 (callLLM) then Stage 2 (callLLMStream)', async () => {
+      setupPipelineMocks();
 
       const session = await startConversation(db);
-      const result = await sendMessage(db, session.session_id, 'I found a yellow mushroom');
+      await sendMessage(db, session.session_id, 'I found a white mushroom');
+
+      // Stage 1 via callLLM, Stage 2 via callLLMStream
+      expect(mockCallLLM).toHaveBeenCalledTimes(1);
+      expect(mockCallLLMStream).toHaveBeenCalledTimes(1);
+    });
+
+    it('adds user message and assistant response with pipeline metadata', async () => {
+      setupPipelineMocks();
+
+      const session = await startConversation(db);
+      const result = await sendMessage(db, session.session_id, 'I found a white mushroom');
 
       expect(result.ok).toBe(true);
       if (result.ok) {
         expect(result.session.messages).toHaveLength(2);
         expect(result.session.messages[0]!.role).toBe('user');
-        expect(result.session.messages[0]!.content).toBe('I found a yellow mushroom');
+        expect(result.session.messages[0]!.content).toBe('I found a white mushroom');
         expect(result.session.messages[1]!.role).toBe('assistant');
-        expect(result.session.messages[1]!.content).toBe('This looks like a Chanterelle.');
-        expect(result.response).toBe('This looks like a Chanterelle.');
+        // Pipeline metadata stored on assistant message
+        const metadata = result.session.messages[1]!.pipeline_metadata;
+        expect(metadata).toBeDefined();
+        expect(metadata!.stage1_candidates).toHaveLength(2);
+        expect(metadata!.stage1_candidates![0]!.name).toBe('Field Mushroom');
+        expect(metadata!.verified_species!.length).toBeGreaterThan(0);
       }
     });
 
-    it('uses text model when no photos provided', async () => {
-      mockCallLLM.mockResolvedValue(makeLLMResponse('I can help identify that.'));
+    it('Stage 1 system prompt does NOT contain species dataset', async () => {
+      setupPipelineMocks();
 
       const session = await startConversation(db);
-      await sendMessage(db, session.session_id, 'Brown cap, white gills');
+      await sendMessage(db, session.session_id, 'Brown cap mushroom');
 
-      expect(mockCallLLM).toHaveBeenCalledTimes(1);
-      const request = mockCallLLM.mock.calls[0]![0];
-      expect(request.model).toBe('glm-4.7-flash');
-    });
-
-    it('uses vision model when photos present', async () => {
-      mockCallLLM.mockResolvedValue(makeLLMResponse('I can see the mushroom in your photo.'));
-
-      const session = await startConversation(db);
-      await sendMessage(db, session.session_id, 'What is this?', [
-        'data:image/jpeg;base64,abc',
-      ]);
-
-      expect(mockCallLLM).toHaveBeenCalledTimes(1);
-      const request = mockCallLLM.mock.calls[0]![0];
-      expect(request.model).toBe('glm-4.6v-flash');
-    });
-
-    it('includes species dataset in system prompt sent to LLM', async () => {
-      mockCallLLM.mockResolvedValue(makeLLMResponse('Noted.'));
-
-      const session = await startConversation(db);
-      await sendMessage(db, session.session_id, 'Hello');
-
-      const request = mockCallLLM.mock.calls[0]![0];
-      const systemMessage = request.messages.find(
+      const stage1Request = mockCallLLM.mock.calls[0]![0];
+      const systemMessage = stage1Request.messages.find(
         (m: { role: string }) => m.role === 'system',
       );
       expect(systemMessage).toBeDefined();
-      // System prompt should contain known deadly species
-      expect(systemMessage.content).toContain('Amanita phalloides');
-      expect(systemMessage.content).toContain('Amanita virosa');
+      // Stage 1 should NOT have the full species dataset
+      expect(systemMessage.content).not.toContain('Lactarius torminosus');
+      // But should have candidate generation instructions
+      expect(systemMessage.content).toContain('candidate');
     });
 
-    it('sends full conversation history on each call', async () => {
-      mockCallLLM
-        .mockResolvedValueOnce(makeLLMResponse('Tell me more about the cap.'))
-        .mockResolvedValueOnce(makeLLMResponse('That sounds like Agaricus.'));
+    it('Stage 2 system prompt contains focused species data', async () => {
+      setupPipelineMocks();
 
       const session = await startConversation(db);
+      await sendMessage(db, session.session_id, 'White cap, pink gills');
+
+      const stage2Request = mockCallLLMStream.mock.calls[0]![0];
+      const systemMessage = stage2Request.messages.find(
+        (m: { role: string }) => m.role === 'system',
+      );
+      expect(systemMessage).toBeDefined();
+      // Should contain the candidate species
+      expect(systemMessage.content).toContain('Agaricus campestris');
+      // Should NOT contain unrelated species
+      expect(systemMessage.content).not.toContain('Lactarius torminosus');
+    });
+
+    it('sends full conversation history to Stage 1 on multi-turn', async () => {
+      setupPipelineMocks('Tell me more.');
+      const session = await startConversation(db);
       await sendMessage(db, session.session_id, 'Brown mushroom');
+
+      setupPipelineMocks('Looks like Agaricus.');
       await sendMessage(db, session.session_id, 'Cap is 8cm, convex');
 
-      // Second call should have system + user1 + assistant1 + user2
-      const secondCall = mockCallLLM.mock.calls[1]![0];
-      const nonSystemMessages = secondCall.messages.filter(
+      // Second Stage 1 call should have full history
+      const secondStage1Call = mockCallLLM.mock.calls[1]![0];
+      const nonSystemMessages = secondStage1Call.messages.filter(
         (m: { role: string }) => m.role !== 'system',
       );
       expect(nonSystemMessages).toHaveLength(3);
       expect(nonSystemMessages[0].role).toBe('user');
       expect(nonSystemMessages[0].content).toBe('Brown mushroom');
       expect(nonSystemMessages[1].role).toBe('assistant');
-      expect(nonSystemMessages[1].content).toBe('Tell me more about the cap.');
+      expect(nonSystemMessages[1].content).toBe('Tell me more.');
       expect(nonSystemMessages[2].role).toBe('user');
       expect(nonSystemMessages[2].content).toBe('Cap is 8cm, convex');
     });
 
-    it('handles API errors: user message stored, error returned, session stays active', async () => {
+    it('handles API errors: user message stored, error returned', async () => {
       mockCallLLM.mockRejectedValue(new Error('Network timeout'));
 
       const session = await startConversation(db);
@@ -182,7 +242,6 @@ describe('conversation orchestrator', () => {
     });
 
     it('returns no_api_key error when no key configured', async () => {
-      // Clear the API key set in beforeEach
       await db.llmSettings.clear();
 
       const session = await startConversation(db);
@@ -193,15 +252,12 @@ describe('conversation orchestrator', () => {
         expect(result.error).toBe('no_api_key');
       }
 
-      // User message should still be stored
       const retrieved = await getSession(db, session.session_id);
       expect(retrieved!.messages).toHaveLength(1);
-      // LLM should never be called
       expect(mockCallLLM).not.toHaveBeenCalled();
     });
 
     it('returns budget_exceeded error when over budget', async () => {
-      // Add usage record exceeding the default $5 budget
       await db.llmUsage.add({
         timestamp: new Date().toISOString(),
         prompt_tokens: 1_000_000,
@@ -218,24 +274,19 @@ describe('conversation orchestrator', () => {
         expect(result.error).toBe('budget_exceeded');
       }
 
-      // User message still stored
       const retrieved = await getSession(db, session.session_id);
       expect(retrieved!.messages).toHaveLength(1);
-      // LLM should never be called
       expect(mockCallLLM).not.toHaveBeenCalled();
     });
 
-    it('returns cached response without calling LLM', async () => {
-      mockCallLLM.mockResolvedValue(makeLLMResponse('This is a Chanterelle.'));
-
-      // First call populates the cache
+    it('returns cached response without calling pipeline', async () => {
+      setupPipelineMocks('This is a Chanterelle.');
       const session1 = await startConversation(db);
       await sendMessage(db, session1.session_id, 'Yellow funnel-shaped mushroom');
       expect(mockCallLLM).toHaveBeenCalledTimes(1);
 
-      // Second call with same message in a new session should hit cache
-      // (LLM messages = system prompt + same user text = same cache key)
       mockCallLLM.mockClear();
+      mockCallLLMStream.mockClear();
       const session2 = await startConversation(db);
       const result = await sendMessage(db, session2.session_id, 'Yellow funnel-shaped mushroom');
 
@@ -244,12 +295,12 @@ describe('conversation orchestrator', () => {
         expect(result.response).toBe('This is a Chanterelle.');
         expect(result.session.messages).toHaveLength(2);
       }
-      // callLLM should NOT have been called for the cached response
       expect(mockCallLLM).not.toHaveBeenCalled();
+      expect(mockCallLLMStream).not.toHaveBeenCalled();
     });
 
-    it('records usage on successful non-cached calls', async () => {
-      mockCallLLM.mockResolvedValue(makeLLMResponse('Noted.'));
+    it('records combined usage from both pipeline stages', async () => {
+      setupPipelineMocks();
 
       const session = await startConversation(db);
       const beforeCount = await db.llmUsage.count();
@@ -261,13 +312,15 @@ describe('conversation orchestrator', () => {
 
       const records = await db.llmUsage.toArray();
       const lastRecord = records[records.length - 1]!;
-      expect(lastRecord.prompt_tokens).toBe(1000);
-      expect(lastRecord.completion_tokens).toBe(200);
+      // Combined: Stage 1 (500) + Stage 2 (2000) = 2500
+      expect(lastRecord.prompt_tokens).toBe(2500);
+      // Combined: Stage 1 (200) + Stage 2 (400) = 600
+      expect(lastRecord.completion_tokens).toBe(600);
       expect(lastRecord.cache_hit).toBe(false);
     });
 
     it('persists both messages to IndexedDB after success', async () => {
-      mockCallLLM.mockResolvedValue(makeLLMResponse('Interesting find!'));
+      setupPipelineMocks('Interesting find!');
 
       const session = await startConversation(db);
       await sendMessage(db, session.session_id, 'Found in woodland');
@@ -278,6 +331,28 @@ describe('conversation orchestrator', () => {
       expect(retrieved!.messages[0]!.content).toBe('Found in woodland');
       expect(retrieved!.messages[1]!.role).toBe('assistant');
       expect(retrieved!.messages[1]!.content).toBe('Interesting find!');
+    });
+
+    it('uses vision model for Stage 1 when photos present', async () => {
+      setupPipelineMocks();
+
+      const session = await startConversation(db);
+      await sendMessage(db, session.session_id, 'What is this?', [
+        'data:image/jpeg;base64,abc',
+      ]);
+
+      const stage1Request = mockCallLLM.mock.calls[0]![0];
+      expect(stage1Request.model).toBe('glm-4.6v-flash');
+    });
+
+    it('uses text model for Stage 1 when no photos', async () => {
+      setupPipelineMocks();
+
+      const session = await startConversation(db);
+      await sendMessage(db, session.session_id, 'Brown cap, white gills');
+
+      const stage1Request = mockCallLLM.mock.calls[0]![0];
+      expect(stage1Request.model).toBe('glm-4.7-flash');
     });
   });
 
@@ -336,8 +411,11 @@ describe('conversation orchestrator', () => {
     });
   });
 
-  describe('sendMessageStreaming', () => {
-    it('calls onChunk for each streamed delta and returns final result', async () => {
+  describe('sendMessageStreaming (pipeline integration)', () => {
+    it('streams Stage 2 chunks via onChunk and returns final result', async () => {
+      mockCallLLM.mockResolvedValue(
+        makeLLMResponse(JSON.stringify(validStage1Json)),
+      );
       mockCallLLMStream.mockImplementation(
         async (_req: unknown, _key: unknown, onChunk: (c: string) => void) => {
           onChunk('Hello');
@@ -364,27 +442,48 @@ describe('conversation orchestrator', () => {
       }
     });
 
-    it('uses callLLMStream not callLLM', async () => {
-      mockCallLLMStream.mockImplementation(
-        async (_req: unknown, _key: unknown, _onChunk: unknown) => {
-          return makeLLMResponse('Streamed response');
-        },
-      );
+    it('calls both callLLM (Stage 1) and callLLMStream (Stage 2)', async () => {
+      setupPipelineMocks();
 
       const session = await startConversation(db);
       await sendMessageStreaming(db, session.session_id, 'Hello', vi.fn());
 
+      expect(mockCallLLM).toHaveBeenCalledTimes(1);
       expect(mockCallLLMStream).toHaveBeenCalledTimes(1);
-      expect(mockCallLLM).not.toHaveBeenCalled();
+    });
+
+    it('emits onStageChange callbacks in order', async () => {
+      setupPipelineMocks();
+
+      const session = await startConversation(db);
+      const stages: string[] = [];
+      await sendMessageStreaming(
+        db,
+        session.session_id,
+        'White mushroom',
+        vi.fn(),
+        undefined,
+        (stage) => stages.push(stage),
+      );
+
+      expect(stages).toEqual(['candidates', 'lookup', 'verification']);
+    });
+
+    it('stores pipeline_metadata on assistant message', async () => {
+      setupPipelineMocks();
+
+      const session = await startConversation(db);
+      await sendMessageStreaming(db, session.session_id, 'Found something', vi.fn());
+
+      const retrieved = await getSession(db, session.session_id);
+      const assistantMsg = retrieved!.messages[1]!;
+      expect(assistantMsg.pipeline_metadata).toBeDefined();
+      expect(assistantMsg.pipeline_metadata!.stage1_candidates).toHaveLength(2);
+      expect(assistantMsg.pipeline_metadata!.verified_species!.length).toBeGreaterThan(0);
     });
 
     it('persists both messages to IndexedDB after streaming completes', async () => {
-      mockCallLLMStream.mockImplementation(
-        async (_req: unknown, _key: unknown, onChunk: (c: string) => void) => {
-          onChunk('Saved');
-          return makeLLMResponse('Saved');
-        },
-      );
+      setupPipelineMocks('Saved');
 
       const session = await startConversation(db);
       await sendMessageStreaming(db, session.session_id, 'Save test', vi.fn());
@@ -397,7 +496,7 @@ describe('conversation orchestrator', () => {
     });
 
     it('handles API errors the same as sendMessage', async () => {
-      mockCallLLMStream.mockRejectedValue(new Error('Stream failed'));
+      mockCallLLM.mockRejectedValue(new Error('Stream failed'));
 
       const session = await startConversation(db);
       const result = await sendMessageStreaming(
@@ -413,19 +512,16 @@ describe('conversation orchestrator', () => {
         expect(result.message).toContain('Stream failed');
       }
 
-      // User message still persisted
       const retrieved = await getSession(db, session.session_id);
       expect(retrieved!.messages).toHaveLength(1);
       expect(retrieved!.messages[0]!.role).toBe('user');
     });
 
     it('falls back to non-streaming for cached responses', async () => {
-      // First call populates cache via non-streaming
-      mockCallLLM.mockResolvedValue(makeLLMResponse('Cached answer'));
+      setupPipelineMocks('Cached answer');
       const s1 = await startConversation(db);
       await sendMessage(db, s1.session_id, 'Cache test message');
 
-      // Streaming call with same input should hit cache without calling stream API
       mockCallLLMStream.mockClear();
       mockCallLLM.mockClear();
       const s2 = await startConversation(db);

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { ChatBubble } from '@/components/ChatBubble';
 import { ChatInput } from '@/components/ChatInput';
+import { PipelineProgress } from '@/components/PipelineProgress';
 import { SessionList } from '@/components/SessionList';
 import { SafetyDisclaimer } from '@/components/SafetyDisclaimer';
 import { useAppStore } from '@/stores/app-store';
@@ -14,33 +15,7 @@ import {
   listSessions,
 } from '@/llm/conversation';
 import type { ConversationSession } from '@/types/conversation';
-
-const LOADING_STAGES = [
-  { after: 0, text: 'Analysing...' },
-  { after: 5, text: 'Checking species database...' },
-  { after: 15, text: 'Still working — large dataset to consider...' },
-  { after: 30, text: 'Nearly there...' },
-  { after: 60, text: 'Taking longer than usual...' },
-];
-
-function useLoadingStatus(loading: boolean): string {
-  const [elapsed, setElapsed] = useState(0);
-
-  useEffect(() => {
-    if (!loading) {
-      setElapsed(0);
-      return;
-    }
-    const interval = setInterval(() => setElapsed((e) => e + 1), 1_000);
-    return () => clearInterval(interval);
-  }, [loading]);
-
-  let status = LOADING_STAGES[0]!.text;
-  for (const stage of LOADING_STAGES) {
-    if (elapsed >= stage.after) status = stage.text;
-  }
-  return status;
-}
+import type { PipelineStage } from '@/types/pipeline';
 
 export function ChatPage() {
   const isOnline = useAppStore((s) => s.isOnline);
@@ -50,10 +25,10 @@ export function ChatPage() {
   const [sessions, setSessions] = useState<ConversationSession[]>([]);
   const [loading, setLoading] = useState(false);
   const [streamingContent, setStreamingContent] = useState<string | null>(null);
+  const [pipelineStage, setPipelineStage] = useState<PipelineStage | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [showSidebar, setShowSidebar] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
-  const loadingStatus = useLoadingStatus(loading && streamingContent === null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -67,10 +42,10 @@ export function ChatPage() {
     refreshSessions();
   }, [refreshSessions]);
 
-  // Auto-scroll on new messages, streaming content, or loading status changes
+  // Auto-scroll on new messages, streaming content, or pipeline stage changes
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [activeSession?.messages.length, streamingContent, loadingStatus]);
+  }, [activeSession?.messages.length, streamingContent, pipelineStage]);
 
   async function handleNewConversation() {
     const session = await startConversation(db);
@@ -106,6 +81,7 @@ export function ChatPage() {
     setLoading(true);
     setError(null);
     setStreamingContent(null);
+    setPipelineStage(null);
 
     // Optimistically show the user message immediately
     setActiveSession((prev) => {
@@ -133,10 +109,14 @@ export function ChatPage() {
         setStreamingContent((prev) => (prev ?? '') + chunk);
       },
       photos.length > 0 ? photos : undefined,
+      (stage) => {
+        setPipelineStage(stage);
+      },
     );
 
     // Streaming is done — replace with final session state
     setStreamingContent(null);
+    setPipelineStage(null);
 
     if (result.ok) {
       setActiveSession(result.session);
@@ -275,8 +255,17 @@ export function ChatPage() {
               />
             )}
 
-            {/* Pre-stream loading indicator — only shows before first chunk */}
-            {loading && streamingContent === null && (
+            {/* Pipeline progress indicator — shows during loading before streaming starts */}
+            {loading && streamingContent === null && pipelineStage && (
+              <div className="flex justify-start">
+                <div className="bg-stone-100 border border-stone-200 rounded-lg px-3 py-2">
+                  <PipelineProgress stage={pipelineStage} />
+                </div>
+              </div>
+            )}
+
+            {/* Pre-pipeline loading indicator — shows before first stage callback */}
+            {loading && streamingContent === null && !pipelineStage && (
               <div className="flex justify-start">
                 <div className="bg-stone-100 border border-stone-200 rounded-lg px-3 py-2 flex items-center gap-2">
                   <span className="flex gap-1 shrink-0">
@@ -284,7 +273,7 @@ export function ChatPage() {
                     <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-bounce [animation-delay:150ms]" />
                     <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-bounce [animation-delay:300ms]" />
                   </span>
-                  <span className="text-xs text-stone-500">{loadingStatus}</span>
+                  <span className="text-xs text-stone-500">Analysing...</span>
                 </div>
               </div>
             )}
