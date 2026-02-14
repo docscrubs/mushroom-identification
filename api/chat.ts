@@ -37,6 +37,16 @@ export default async function handler(req: Request): Promise<Response> {
       body: JSON.stringify(body),
     });
 
+    // Log non-OK responses for debugging
+    if (!upstream.ok) {
+      const errorBody = await upstream.text();
+      console.error(`z.ai ${upstream.status}: ${errorBody}`);
+      return new Response(errorBody, {
+        status: upstream.status,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
     // Streaming: pipe SSE response through
     if (body.stream) {
       return new Response(upstream.body, {

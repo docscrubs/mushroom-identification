@@ -2,6 +2,33 @@ import type { LLMRequest, LLMResponse } from '@/types';
 
 const DEFAULT_ENDPOINT = '/api/chat';
 const DEFAULT_TIMEOUT_MS = 30_000;
+const MAX_RETRIES = 3;
+
+/** Retry config — exposed for testing (set backoffMs to 0 in tests). */
+export const retryConfig = { backoffMs: 1_000 };
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/** Fetch with automatic retry on 429 and 5xx responses. */
+async function fetchWithRetry(
+  url: string,
+  init: RequestInit,
+): Promise<Response> {
+  let lastResponse: Response | undefined;
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    if (attempt > 0) {
+      const backoff = retryConfig.backoffMs * 2 ** (attempt - 1);
+      if (backoff > 0) await sleep(backoff);
+    }
+    lastResponse = await fetch(url, init);
+    if (lastResponse.ok || (lastResponse.status !== 429 && lastResponse.status < 500)) {
+      return lastResponse;
+    }
+  }
+  return lastResponse!;
+}
 
 export class LLMApiError extends Error {
   constructor(
@@ -31,7 +58,7 @@ export async function callLLM(
     const headers: Record<string, string> = { 'Content-Type': 'application/json' };
     if (apiKey) headers['Authorization'] = `Bearer ${apiKey}`;
 
-    const response = await fetch(endpoint, {
+    const response = await fetchWithRetry(endpoint, {
       method: 'POST',
       headers,
       body: JSON.stringify(request),
@@ -71,7 +98,7 @@ export async function callLLMStream(
     const headers: Record<string, string> = { 'Content-Type': 'application/json' };
     if (apiKey) headers['Authorization'] = `Bearer ${apiKey}`;
 
-    const response = await fetch(endpoint, {
+    const response = await fetchWithRetry(endpoint, {
       method: 'POST',
       headers,
       body: JSON.stringify({ ...request, stream: true }),

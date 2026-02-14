@@ -1,5 +1,5 @@
 import { vi } from 'vitest';
-import { callLLM, callLLMStream, LLMApiError } from './api-client';
+import { callLLM, callLLMStream, LLMApiError, retryConfig } from './api-client';
 import type { LLMRequest, LLMResponse } from '@/types';
 
 function makeRequest(overrides: Partial<LLMRequest> = {}): LLMRequest {
@@ -33,8 +33,13 @@ function makeResponse(overrides: Partial<LLMResponse> = {}): LLMResponse {
 describe('LLM API Client', () => {
   const originalFetch = globalThis.fetch;
 
+  beforeEach(() => {
+    retryConfig.backoffMs = 0;
+  });
+
   afterEach(() => {
     globalThis.fetch = originalFetch;
+    retryConfig.backoffMs = 1_000;
     vi.restoreAllMocks();
   });
 
@@ -87,36 +92,52 @@ describe('LLM API Client', () => {
     }
   });
 
-  it('throws retryable LLMApiError on 429 (rate limited)', async () => {
-    globalThis.fetch = vi.fn().mockResolvedValue({
+  it('retries on 429 then throws after max retries', async () => {
+    const mockFetch = vi.fn().mockResolvedValue({
       ok: false,
       status: 429,
       statusText: 'Too Many Requests',
     });
+    globalThis.fetch = mockFetch;
 
-    try {
-      await callLLM(makeRequest(), 'sk-test');
-    } catch (e) {
-      const err = e as LLMApiError;
-      expect(err.status).toBe(429);
-      expect(err.retryable).toBe(true);
-    }
+    await expect(callLLM(makeRequest(), 'sk-test')).rejects.toThrow(LLMApiError);
+    // 1 initial + 3 retries = 4 total calls
+    expect(mockFetch).toHaveBeenCalledTimes(4);
   });
 
-  it('throws retryable LLMApiError on 500 (server error)', async () => {
-    globalThis.fetch = vi.fn().mockResolvedValue({
+  it('retries on 429 then succeeds', async () => {
+    const mockFetch = vi.fn()
+      .mockResolvedValueOnce({ ok: false, status: 429, statusText: 'Too Many Requests' })
+      .mockResolvedValueOnce({ ok: true, json: () => Promise.resolve(makeResponse()) });
+    globalThis.fetch = mockFetch;
+
+    const result = await callLLM(makeRequest(), 'sk-test');
+
+    expect(result.id).toBe('resp-123');
+    expect(mockFetch).toHaveBeenCalledTimes(2);
+  });
+
+  it('retries on 500 then throws after max retries', async () => {
+    const mockFetch = vi.fn().mockResolvedValue({
       ok: false,
       status: 500,
       statusText: 'Internal Server Error',
     });
+    globalThis.fetch = mockFetch;
 
-    try {
-      await callLLM(makeRequest(), 'sk-test');
-    } catch (e) {
-      const err = e as LLMApiError;
-      expect(err.status).toBe(500);
-      expect(err.retryable).toBe(true);
-    }
+    await expect(callLLM(makeRequest(), 'sk-test')).rejects.toThrow(LLMApiError);
+    expect(mockFetch).toHaveBeenCalledTimes(4);
+  });
+
+  it('does not retry on 401 (non-retryable)', async () => {
+    globalThis.fetch = vi.fn().mockResolvedValue({
+      ok: false,
+      status: 401,
+      statusText: 'Unauthorized',
+    });
+
+    await expect(callLLM(makeRequest(), 'bad-key')).rejects.toThrow(LLMApiError);
+    expect(globalThis.fetch).toHaveBeenCalledTimes(1);
   });
 
   it('throws on network error', async () => {
@@ -186,8 +207,13 @@ function sseLines(...events: Array<{ content?: string; usage?: object }>): strin
 describe('callLLMStream', () => {
   const originalFetch = globalThis.fetch;
 
+  beforeEach(() => {
+    retryConfig.backoffMs = 0;
+  });
+
   afterEach(() => {
     globalThis.fetch = originalFetch;
+    retryConfig.backoffMs = 1_000;
     vi.restoreAllMocks();
   });
 
