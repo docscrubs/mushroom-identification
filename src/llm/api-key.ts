@@ -39,8 +39,10 @@ export async function getSettings(db: MushroomDB): Promise<LLMSettings> {
   if (!stored) {
     return { ...DEFAULT_LLM_SETTINGS, api_key: '' };
   }
-  // Merge defaults for any newly added fields (e.g. vision_model for existing installs)
-  return { ...DEFAULT_LLM_SETTINGS, ...stored };
+  // Merge defaults for any newly added fields (e.g. vision_model for existing installs).
+  // Always use the current default endpoint — stored endpoint may be stale after
+  // migrating from direct z.ai calls to the serverless proxy.
+  return { ...DEFAULT_LLM_SETTINGS, ...stored, endpoint: DEFAULT_LLM_SETTINGS.endpoint };
 }
 
 /** Update specific LLM settings, preserving unspecified fields. */
