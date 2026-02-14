@@ -17,8 +17,8 @@ import { lookupCandidateSpecies } from '@/data/species-lookup';
 export interface PipelineOptions {
   /** The conversation messages (system prompt is built internally). */
   messages: LLMMessage[];
-  /** API key for LLM calls. */
-  apiKey: string;
+  /** API key for LLM calls (null = use server default). */
+  apiKey: string | null;
   /** LLM settings (models, endpoint, max_tokens). */
   settings: {
     model: string;

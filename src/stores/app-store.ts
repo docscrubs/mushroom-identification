@@ -47,7 +47,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
   backupReminderDismissedAt: null,
 
   // LLM state defaults
-  hasApiKey: false,
+  hasApiKey: true,
   llmLoading: false,
   llmError: null,
 

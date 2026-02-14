@@ -103,7 +103,7 @@ describe('runIdentificationPipeline', () => {
     await runIdentificationPipeline({
       messages: [{ role: 'user', content: 'White mushroom in a field' }],
       apiKey: 'test-key',
-      settings: { model: 'glm-4.7-flash', vision_model: 'glm-4.6v-flash', max_tokens: 2048, endpoint: 'https://api.z.ai/api/paas/v4/chat/completions' },
+      settings: { model: 'glm-4.7-flash', vision_model: 'glm-4.6v-flash', max_tokens: 2048, endpoint: '/api/chat' },
       dataset: speciesDataset,
     });
 
@@ -130,7 +130,7 @@ describe('runIdentificationPipeline', () => {
     await runIdentificationPipeline({
       messages: [{ role: 'user', content: 'Brown cap mushroom' }],
       apiKey: 'test-key',
-      settings: { model: 'glm-4.7-flash', vision_model: 'glm-4.6v-flash', max_tokens: 2048, endpoint: 'https://api.z.ai/api/paas/v4/chat/completions' },
+      settings: { model: 'glm-4.7-flash', vision_model: 'glm-4.6v-flash', max_tokens: 2048, endpoint: '/api/chat' },
       dataset: speciesDataset,
     });
 
@@ -150,7 +150,7 @@ describe('runIdentificationPipeline', () => {
     await runIdentificationPipeline({
       messages: [{ role: 'user', content: 'White cap, pink gills' }],
       apiKey: 'test-key',
-      settings: { model: 'glm-4.7-flash', vision_model: 'glm-4.6v-flash', max_tokens: 2048, endpoint: 'https://api.z.ai/api/paas/v4/chat/completions' },
+      settings: { model: 'glm-4.7-flash', vision_model: 'glm-4.6v-flash', max_tokens: 2048, endpoint: '/api/chat' },
       dataset: speciesDataset,
     });
 
@@ -177,7 +177,7 @@ describe('runIdentificationPipeline', () => {
     await runIdentificationPipeline({
       messages: [{ role: 'user', content: 'Test' }],
       apiKey: 'test-key',
-      settings: { model: 'glm-4.7-flash', vision_model: 'glm-4.6v-flash', max_tokens: 2048, endpoint: 'https://api.z.ai/api/paas/v4/chat/completions' },
+      settings: { model: 'glm-4.7-flash', vision_model: 'glm-4.6v-flash', max_tokens: 2048, endpoint: '/api/chat' },
       dataset: speciesDataset,
       callbacks: {
         onStageChange: (stage) => stages.push(stage),
@@ -201,7 +201,7 @@ describe('runIdentificationPipeline', () => {
     await runIdentificationPipeline({
       messages: [{ role: 'user', content: 'Test' }],
       apiKey: 'test-key',
-      settings: { model: 'glm-4.7-flash', vision_model: 'glm-4.6v-flash', max_tokens: 2048, endpoint: 'https://api.z.ai/api/paas/v4/chat/completions' },
+      settings: { model: 'glm-4.7-flash', vision_model: 'glm-4.6v-flash', max_tokens: 2048, endpoint: '/api/chat' },
       dataset: speciesDataset,
       callbacks: {
         onChunk: (c) => chunks.push(c),
@@ -232,7 +232,7 @@ describe('runIdentificationPipeline', () => {
     const result = await runIdentificationPipeline({
       messages: [{ role: 'user', content: 'Test' }],
       apiKey: 'test-key',
-      settings: { model: 'glm-4.7-flash', vision_model: 'glm-4.6v-flash', max_tokens: 2048, endpoint: 'https://api.z.ai/api/paas/v4/chat/completions' },
+      settings: { model: 'glm-4.7-flash', vision_model: 'glm-4.6v-flash', max_tokens: 2048, endpoint: '/api/chat' },
       dataset: speciesDataset,
     });
 
@@ -260,7 +260,7 @@ describe('runIdentificationPipeline', () => {
         },
       ],
       apiKey: 'test-key',
-      settings: { model: 'glm-4.7-flash', vision_model: 'glm-4.6v-flash', max_tokens: 2048, endpoint: 'https://api.z.ai/api/paas/v4/chat/completions' },
+      settings: { model: 'glm-4.7-flash', vision_model: 'glm-4.6v-flash', max_tokens: 2048, endpoint: '/api/chat' },
       dataset: speciesDataset,
     });
 
@@ -279,7 +279,7 @@ describe('runIdentificationPipeline', () => {
     await runIdentificationPipeline({
       messages: [{ role: 'user', content: 'Brown cap mushroom in woodland' }],
       apiKey: 'test-key',
-      settings: { model: 'glm-4.7-flash', vision_model: 'glm-4.6v-flash', max_tokens: 2048, endpoint: 'https://api.z.ai/api/paas/v4/chat/completions' },
+      settings: { model: 'glm-4.7-flash', vision_model: 'glm-4.6v-flash', max_tokens: 2048, endpoint: '/api/chat' },
       dataset: speciesDataset,
     });
 
@@ -306,7 +306,7 @@ describe('runIdentificationPipeline', () => {
         },
       ],
       apiKey: 'test-key',
-      settings: { model: 'glm-4.7-flash', vision_model: 'glm-4.6v-flash', max_tokens: 2048, endpoint: 'https://api.z.ai/api/paas/v4/chat/completions' },
+      settings: { model: 'glm-4.7-flash', vision_model: 'glm-4.6v-flash', max_tokens: 2048, endpoint: '/api/chat' },
       dataset: speciesDataset,
     });
 
@@ -325,7 +325,7 @@ describe('runIdentificationPipeline', () => {
     const result = await runIdentificationPipeline({
       messages: [{ role: 'user', content: 'Test' }],
       apiKey: 'test-key',
-      settings: { model: 'glm-4.7-flash', vision_model: 'glm-4.6v-flash', max_tokens: 2048, endpoint: 'https://api.z.ai/api/paas/v4/chat/completions' },
+      settings: { model: 'glm-4.7-flash', vision_model: 'glm-4.6v-flash', max_tokens: 2048, endpoint: '/api/chat' },
       dataset: speciesDataset,
     });
 
@@ -348,7 +348,7 @@ describe('runIdentificationPipeline', () => {
     const result = await runIdentificationPipeline({
       messages: [{ role: 'user', content: 'Test' }],
       apiKey: 'test-key',
-      settings: { model: 'glm-4.7-flash', vision_model: 'glm-4.6v-flash', max_tokens: 2048, endpoint: 'https://api.z.ai/api/paas/v4/chat/completions' },
+      settings: { model: 'glm-4.7-flash', vision_model: 'glm-4.6v-flash', max_tokens: 2048, endpoint: '/api/chat' },
       dataset: speciesDataset,
     });
 
@@ -368,7 +368,7 @@ describe('runIdentificationPipeline', () => {
     await runIdentificationPipeline({
       messages: [{ role: 'user', content: 'Test' }],
       apiKey: 'test-key',
-      settings: { model: 'glm-4.7-flash', vision_model: 'glm-4.6v-flash', max_tokens: 2048, endpoint: 'https://api.z.ai/api/paas/v4/chat/completions' },
+      settings: { model: 'glm-4.7-flash', vision_model: 'glm-4.6v-flash', max_tokens: 2048, endpoint: '/api/chat' },
       dataset: speciesDataset,
     });
 
@@ -387,7 +387,7 @@ describe('runIdentificationPipeline', () => {
     await runIdentificationPipeline({
       messages: [{ role: 'user', content: 'Test' }],
       apiKey: 'test-key',
-      settings: { model: 'glm-4.7-flash', vision_model: 'glm-4.6v-flash', max_tokens: 2048, endpoint: 'https://api.z.ai/api/paas/v4/chat/completions' },
+      settings: { model: 'glm-4.7-flash', vision_model: 'glm-4.6v-flash', max_tokens: 2048, endpoint: '/api/chat' },
       dataset: speciesDataset,
     });
 

@@ -45,8 +45,8 @@ describe('API Key Management', () => {
   });
 
   describe('hasApiKey', () => {
-    it('returns false when no key is stored', async () => {
-      expect(await hasApiKey(db)).toBe(false);
+    it('returns true even when no key is stored (server provides default)', async () => {
+      expect(await hasApiKey(db)).toBe(true);
     });
 
     it('returns true when a key is stored', async () => {
@@ -54,10 +54,10 @@ describe('API Key Management', () => {
       expect(await hasApiKey(db)).toBe(true);
     });
 
-    it('returns false after clearing the key', async () => {
+    it('returns true after clearing the key (server provides default)', async () => {
       await saveApiKey(db, 'sk-test-key');
       await clearApiKey(db);
-      expect(await hasApiKey(db)).toBe(false);
+      expect(await hasApiKey(db)).toBe(true);
     });
   });
 

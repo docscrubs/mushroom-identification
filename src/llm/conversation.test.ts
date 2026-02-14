@@ -241,20 +241,17 @@ describe('conversation orchestrator', () => {
       }
     });
 
-    it('returns no_api_key error when no key configured', async () => {
+    it('sends message with null apiKey when no key configured (uses server default)', async () => {
       await db.llmSettings.clear();
+      setupPipelineMocks();
 
       const session = await startConversation(db);
       const result = await sendMessage(db, session.session_id, 'Hello');
 
-      expect(result.ok).toBe(false);
-      if (!result.ok) {
-        expect(result.error).toBe('no_api_key');
-      }
-
-      const retrieved = await getSession(db, session.session_id);
-      expect(retrieved!.messages).toHaveLength(1);
-      expect(mockCallLLM).not.toHaveBeenCalled();
+      expect(result.ok).toBe(true);
+      // apiKey param should be null (server provides default)
+      const apiKeyArg = mockCallLLM.mock.calls[0]![1];
+      expect(apiKeyArg).toBeNull();
     });
 
     it('returns budget_exceeded error when over budget', async () => {

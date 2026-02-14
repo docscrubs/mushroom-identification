@@ -1,6 +1,6 @@
 import type { LLMRequest, LLMResponse } from '@/types';
 
-const DEFAULT_ENDPOINT = 'https://api.z.ai/api/paas/v4/chat/completions';
+const DEFAULT_ENDPOINT = '/api/chat';
 const DEFAULT_TIMEOUT_MS = 30_000;
 
 export class LLMApiError extends Error {
@@ -20,7 +20,7 @@ export class LLMApiError extends Error {
  */
 export async function callLLM(
   request: LLMRequest,
-  apiKey: string,
+  apiKey: string | null,
   endpoint: string = DEFAULT_ENDPOINT,
   timeoutMs: number = DEFAULT_TIMEOUT_MS,
 ): Promise<LLMResponse> {
@@ -28,12 +28,12 @@ export async function callLLM(
   const timeout = setTimeout(() => controller.abort(), timeoutMs);
 
   try {
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    if (apiKey) headers['Authorization'] = `Bearer ${apiKey}`;
+
     const response = await fetch(endpoint, {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
+      headers,
       body: JSON.stringify(request),
       signal: controller.signal,
     });
@@ -59,7 +59,7 @@ export async function callLLM(
  */
 export async function callLLMStream(
   request: LLMRequest,
-  apiKey: string,
+  apiKey: string | null,
   onChunk: (content: string) => void,
   endpoint: string = DEFAULT_ENDPOINT,
   timeoutMs: number = DEFAULT_TIMEOUT_MS,
@@ -68,12 +68,12 @@ export async function callLLMStream(
   const timeout = setTimeout(() => controller.abort(), timeoutMs);
 
   try {
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    if (apiKey) headers['Authorization'] = `Bearer ${apiKey}`;
+
     const response = await fetch(endpoint, {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
+      headers,
       body: JSON.stringify({ ...request, stream: true }),
       signal: controller.signal,
     });

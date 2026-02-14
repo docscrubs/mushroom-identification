@@ -14,7 +14,7 @@ export interface LLMSettings {
 
 export const DEFAULT_LLM_SETTINGS: Omit<LLMSettings, 'api_key'> = {
   id: 'default',
-  endpoint: 'https://api.z.ai/api/paas/v4/chat/completions',
+  endpoint: '/api/chat',
   model: 'glm-4.7-flash',
   vision_model: 'glm-4.6v-flash',
   max_tokens: 2048,

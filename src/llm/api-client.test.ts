@@ -46,11 +46,11 @@ describe('LLM API Client', () => {
     globalThis.fetch = mockFetch;
 
     const request = makeRequest();
-    await callLLM(request, 'sk-test-key', 'https://api.z.ai/api/paas/v4/chat/completions');
+    await callLLM(request, 'sk-test-key');
 
     expect(mockFetch).toHaveBeenCalledOnce();
     const [url, options] = mockFetch.mock.calls[0]!;
-    expect(url).toBe('https://api.z.ai/api/paas/v4/chat/completions');
+    expect(url).toBe('/api/chat');
     expect(options.method).toBe('POST');
     expect(options.headers['Authorization']).toBe('Bearer sk-test-key');
     expect(options.headers['Content-Type']).toBe('application/json');
@@ -125,7 +125,7 @@ describe('LLM API Client', () => {
     await expect(callLLM(makeRequest(), 'sk-test')).rejects.toThrow();
   });
 
-  it('uses default endpoint when none provided', async () => {
+  it('uses default endpoint /api/chat when none provided', async () => {
     const mockFetch = vi.fn().mockResolvedValue({
       ok: true,
       json: () => Promise.resolve(makeResponse()),
@@ -134,7 +134,20 @@ describe('LLM API Client', () => {
 
     await callLLM(makeRequest(), 'sk-test');
     const [url] = mockFetch.mock.calls[0]!;
-    expect(url).toBe('https://api.z.ai/api/paas/v4/chat/completions');
+    expect(url).toBe('/api/chat');
+  });
+
+  it('omits Authorization header when apiKey is null', async () => {
+    const mockFetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve(makeResponse()),
+    });
+    globalThis.fetch = mockFetch;
+
+    await callLLM(makeRequest(), null);
+    const [, options] = mockFetch.mock.calls[0]!;
+    expect(options.headers['Authorization']).toBeUndefined();
+    expect(options.headers['Content-Type']).toBe('application/json');
   });
 });
 

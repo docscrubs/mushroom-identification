@@ -14,11 +14,10 @@ export async function saveApiKey(db: MushroomDB, apiKey: string): Promise<void> 
   }
 }
 
-/** Retrieve the API key: DB first, then VITE_ZAI_API_KEY env var fallback. */
+/** Retrieve the user-provided API key from IndexedDB, or null if none stored. */
 export async function getApiKey(db: MushroomDB): Promise<string | null> {
   const settings = await db.llmSettings.get(SETTINGS_ID);
-  if (settings?.api_key) return settings.api_key;
-  return import.meta.env.VITE_ZAI_API_KEY || null;
+  return settings?.api_key || null;
 }
 
 /** Remove the stored API key. */
@@ -29,10 +28,9 @@ export async function clearApiKey(db: MushroomDB): Promise<void> {
   }
 }
 
-/** Check if an API key is stored. */
-export async function hasApiKey(db: MushroomDB): Promise<boolean> {
-  const key = await getApiKey(db);
-  return key !== null && key.length > 0;
+/** Always true — even without a user key, the server-side proxy provides a default. */
+export async function hasApiKey(_db: MushroomDB): Promise<boolean> {
+  return true;
 }
 
 /** Retrieve full LLM settings, with defaults for missing fields. */

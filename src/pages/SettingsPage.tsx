@@ -98,14 +98,10 @@ export function SettingsPage() {
   }
 
   async function handleTestConnection() {
-    const key = await getApiKey(db);
-    if (!key) {
-      setLlmStatus('Save an API key first.');
-      return;
-    }
     setTesting(true);
     setLlmStatus(null);
     try {
+      const key = await getApiKey(db);
       const settings = await getSettings(db);
       await callLLM(
         {
@@ -183,7 +179,7 @@ export function SettingsPage() {
           )}
           <button
             onClick={handleTestConnection}
-            disabled={testing || !keyStored}
+            disabled={testing}
             className="rounded-lg bg-stone-200 px-4 py-2 text-sm text-stone-700 active:bg-stone-300 disabled:opacity-50"
           >
             {testing ? 'Testing...' : 'Test Connection'}

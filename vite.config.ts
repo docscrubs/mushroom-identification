@@ -1,10 +1,13 @@
-import { defineConfig } from 'vite';
+import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import { VitePWA } from 'vite-plugin-pwa';
 import path from 'path';
 
-export default defineConfig({
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), '');
+
+  return {
   test: {
     globals: true,
     environment: 'jsdom',
@@ -40,16 +43,33 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,ico,png,svg,json,jpg}'],
         runtimeCaching: [
           {
-            urlPattern: /^https:\/\/api\.z\.ai\/.*/i,
+            urlPattern: /\/api\/chat$/,
             handler: 'NetworkOnly',
           },
         ],
       },
     }),
   ],
+  server: {
+    proxy: {
+      '/api/chat': {
+        target: 'https://api.z.ai/api/paas/v4/chat/completions',
+        changeOrigin: true,
+        rewrite: () => '',
+        configure: (proxy) => {
+          proxy.on('proxyReq', (proxyReq) => {
+            if (!proxyReq.getHeader('authorization') && env.ZAI_API_KEY) {
+              proxyReq.setHeader('Authorization', `Bearer ${env.ZAI_API_KEY}`);
+            }
+          });
+        },
+      },
+    },
+  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
     },
   },
+};
 });

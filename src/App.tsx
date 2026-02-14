@@ -12,7 +12,6 @@ import { ContributePage } from '@/pages/ContributePage';
 import { ChatPage } from '@/pages/ChatPage';
 import { db } from '@/db/database';
 import { loadKnowledgeBase } from '@/db/kb-loader';
-import { hasApiKey } from '@/llm/api-key';
 import { seedReviewCards } from '@/learning/seed-cards';
 import { useAppStore } from '@/stores/app-store';
 
@@ -24,10 +23,6 @@ export function App() {
   useEffect(() => {
     async function init() {
       await loadKnowledgeBase(db);
-
-      // Check if an API key is stored so AI features are available immediately
-      const keyExists = await hasApiKey(db);
-      useAppStore.getState().setHasApiKey(keyExists);
 
       // Seed review cards from the knowledge base (idempotent)
       await seedReviewCards(db);

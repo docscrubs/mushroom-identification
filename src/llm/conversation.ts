@@ -129,12 +129,8 @@ export async function sendMessage(
     return { ok: false, error: 'budget_exceeded', message: 'Monthly LLM budget exceeded.' };
   }
 
-  // 6. Check API key
+  // 6. Get API key (null = server default via proxy)
   const apiKey = await getApiKey(db);
-  if (!apiKey) {
-    await updateSession(db, session);
-    return { ok: false, error: 'no_api_key', message: 'No API key configured.' };
-  }
 
   // 7. Run two-stage pipeline
   const species = getSpecies();
@@ -249,12 +245,8 @@ export async function sendMessageStreaming(
     return { ok: false, error: 'budget_exceeded', message: 'Monthly LLM budget exceeded.' };
   }
 
-  // 6. Check API key
+  // 6. Get API key (null = server default via proxy)
   const apiKey = await getApiKey(db);
-  if (!apiKey) {
-    await updateSession(db, session);
-    return { ok: false, error: 'no_api_key', message: 'No API key configured.' };
-  }
 
   // 7. Run two-stage pipeline with streaming
   const species = getSpecies();
