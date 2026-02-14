@@ -26,7 +26,7 @@ export default async function handler(req: Request): Promise<Response> {
   }
 
   try {
-    const body = await req.json();
+    const body = (await req.json()) as { stream?: boolean; [key: string]: unknown };
 
     const upstream = await fetch(ZAI_ENDPOINT, {
       method: 'POST',
