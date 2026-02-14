@@ -14,10 +14,11 @@ export async function saveApiKey(db: MushroomDB, apiKey: string): Promise<void> 
   }
 }
 
-/** Retrieve the stored API key, or null if none is set. */
+/** Retrieve the API key: DB first, then VITE_ZAI_API_KEY env var fallback. */
 export async function getApiKey(db: MushroomDB): Promise<string | null> {
   const settings = await db.llmSettings.get(SETTINGS_ID);
-  return settings?.api_key || null;
+  if (settings?.api_key) return settings.api_key;
+  return import.meta.env.VITE_ZAI_API_KEY || null;
 }
 
 /** Remove the stored API key. */
