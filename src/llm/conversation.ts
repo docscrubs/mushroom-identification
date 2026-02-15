@@ -163,8 +163,10 @@ export async function sendMessage(
     cache_hit: false,
   });
 
-  // 9. Cache the response
-  await setCachedResponse(db, cacheKey, pipelineResult.response);
+  // 9. Cache the response (only if non-empty)
+  if (pipelineResult.response) {
+    await setCachedResponse(db, cacheKey, pipelineResult.response);
+  }
 
   // 10. Create assistant message with pipeline metadata
   const assistantMessage: ConversationMessage = {
@@ -283,8 +285,10 @@ export async function sendMessageStreaming(
     cache_hit: false,
   });
 
-  // 9. Cache the response
-  await setCachedResponse(db, cacheKey, pipelineResult.response);
+  // 9. Cache the response (only if non-empty)
+  if (pipelineResult.response) {
+    await setCachedResponse(db, cacheKey, pipelineResult.response);
+  }
 
   // 10. Create assistant message with pipeline metadata
   const assistantMessage: ConversationMessage = {

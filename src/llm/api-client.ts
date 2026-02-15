@@ -26,6 +26,7 @@ async function fetchWithRetry(
     if (lastResponse.ok || (lastResponse.status !== 429 && lastResponse.status < 500)) {
       return lastResponse;
     }
+    console.warn(`[LLM] Retryable error ${lastResponse.status} on attempt ${attempt}/${MAX_RETRIES}`);
   }
   return lastResponse!;
 }
@@ -119,6 +120,8 @@ export async function callLLMStream(
     let fullContent = '';
     let usage = { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 };
 
+    let chunkCount = 0;
+
     for (;;) {
       const { done, value } = await reader.read();
       if (done) break;
@@ -144,10 +147,15 @@ export async function callLLMStream(
           if (parsed.usage && parsed.usage.total_tokens) {
             usage = parsed.usage;
           }
+          chunkCount++;
         } catch {
-          // Skip unparseable chunks
+          console.warn('[LLM stream] Unparseable SSE chunk:', data.slice(0, 200));
         }
       }
+    }
+
+    if (chunkCount === 0) {
+      console.warn('[LLM stream] Stream completed with zero parsed chunks');
     }
 
     return {

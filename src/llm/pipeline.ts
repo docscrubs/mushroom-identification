@@ -68,7 +68,15 @@ export async function runIdentificationPipeline(
   );
 
   const stage1Raw = stage1Response.choices[0]?.message?.content ?? '';
+  console.log('[Pipeline] Stage 1 raw response length:', stage1Raw.length);
+
+  if (!stage1Raw) {
+    throw new Error('Stage 1 returned an empty response — the LLM may be temporarily unavailable. Please try again.');
+  }
+
   const stage1Output = parseStage1Output(stage1Raw);
+  console.log('[Pipeline] Stage 1 candidates:', stage1Output.candidates.length,
+    stage1Output.candidates.map(c => c.name));
 
   // --- Species Lookup ---
   callbacks?.onStageChange?.('lookup');
@@ -79,6 +87,7 @@ export async function runIdentificationPipeline(
 
   const lookedUpSpecies = lookupCandidateSpecies(allNames, dataset);
   const verifiedSpeciesNames = lookedUpSpecies.map((s) => s.scientific_name);
+  console.log('[Pipeline] Looked up species:', lookedUpSpecies.length, verifiedSpeciesNames);
 
   // --- Stage 2: Verification ---
   callbacks?.onStageChange?.('verification');
@@ -105,6 +114,11 @@ export async function runIdentificationPipeline(
   );
 
   const stage2Content = stage2Response.choices[0]?.message?.content ?? '';
+  console.log('[Pipeline] Stage 2 response length:', stage2Content.length);
+
+  if (!stage2Content) {
+    throw new Error('Stage 2 returned an empty response — the LLM may be temporarily unavailable. Please try again.');
+  }
 
   // --- Combine results ---
   const combinedUsage = {
